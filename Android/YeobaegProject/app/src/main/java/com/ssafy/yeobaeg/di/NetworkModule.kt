@@ -3,6 +3,7 @@ package com.ssafy.yeobaeg.di
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.ssafy.yeobaeg.BuildConfig
 import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.remote.AnalyticsApiService
 import com.ssafy.yeobaeg.data.datasource.remote.ArtworkApiService
 import com.ssafy.yeobaeg.data.datasource.remote.AuthApiService
 import com.ssafy.yeobaeg.data.datasource.remote.CafeApiService
@@ -171,4 +172,8 @@ object NetworkModule {
     fun provideExhibitionApiService(@GeneralRetrofit retrofit: Retrofit): ExhibitionApiService =
         retrofit.create(ExhibitionApiService::class.java)
 
+    @Provides
+    @Singleton
+    fun provideAnalyticsApiService(@GeneralRetrofit retrofit: Retrofit): AnalyticsApiService =
+        retrofit.create(AnalyticsApiService::class.java)
 }

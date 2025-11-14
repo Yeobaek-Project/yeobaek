@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.yeobaeg.analytics.AnalyticsLogger
 import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.domain.model.art.ArtworkDetail
+import com.ssafy.yeobaeg.domain.repository.AnalyticsRepository
 import com.ssafy.yeobaeg.domain.repository.ArtRepository
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
@@ -14,12 +15,15 @@ import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
 import com.ssafy.yeobaeg.presentation.common.util.SnackBarController
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class ArtworkDetailUiState(
@@ -33,6 +37,7 @@ data class ArtworkDetailUiState(
 class ArtworkDetailViewModel @Inject constructor(
     private val artRepository: ArtRepository,
     private val chatRepository: ChatRepository,
+    private val analyticsRepository: AnalyticsRepository,
     private val navigator: Navigator,
     private val snackBarController: SnackBarController,
     private val analyticsLogger: AnalyticsLogger,
@@ -63,6 +68,7 @@ class ArtworkDetailViewModel @Inject constructor(
                 .onSuccess { detail ->
                     _uiState.update { it.copy(loading = false, artwork = detail) }
                     analyticsLogger.logArtworkClick(detail.artworkId)
+                    analyticsRepository.logArtworkDetailClick(detail.artworkId)
                 }
                 .onFailure { error ->
                     _uiState.update {
@@ -86,10 +92,9 @@ class ArtworkDetailViewModel @Inject constructor(
             _uiState.update { it.copy(artwork = d.copy(isBookmarked = !b)) }
             artRepository.toggleBookmark(d.artworkId).onSuccess { response ->
                 _uiState.update { it.copy(artwork = d.copy(isBookmarked = response)) }
-                if(response) {
+                if (response) {
                     analyticsLogger.logArtworkLike(d.artworkId)
-                }
-                else {
+                } else {
                     analyticsLogger.logArtworkUnlike(d.artworkId)
                 }
             }.onFailure {
@@ -101,10 +106,12 @@ class ArtworkDetailViewModel @Inject constructor(
 
     fun onInquiryClick() {
         val artistId = _uiState.value.artwork?.artist?.artistId ?: return
+        val artworkId = _uiState.value.artwork?.artworkId ?: return
 
         viewModelScope.launch {
             chatRepository.createChatRoom(artistId)
                 .onSuccess { room ->
+                    analyticsRepository.logArtworkInquire(artworkId)
                     navigator.navigate(
                         FullScreen.ChattingScreen(room.chatRoomId)
                     )
@@ -120,8 +127,12 @@ class ArtworkDetailViewModel @Inject constructor(
         navigator.navigate(FullScreen.ArtistProfile(artistId))
     }
 
-    fun logViewEnd(id: Long, dwell: Long, maxPct: Int) {
-        Log.d("logViewEnd art", "$id / $dwell / $maxPct")
-        analyticsLogger.logArtworkViewEnd(artworkId = id, dwellMs = dwell, scrollPct = maxPct)
+    fun logViewEnd(id: Long, dwell: Long, scrollPct: Int) {
+        Log.d("logViewEnd art", "$id / $dwell / $scrollPct")
+        analyticsLogger.logArtworkViewEnd(artworkId = id, dwellMs = dwell, scrollPct = scrollPct)
+
+        viewModelScope.launch(NonCancellable + Dispatchers.IO) {
+            analyticsRepository.logArtworkViewEnd(id, dwell, scrollPct)
+        }
     }
 }

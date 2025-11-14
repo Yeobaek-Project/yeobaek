@@ -3,20 +3,25 @@ package com.ssafy.yeobaeg.presentation.cafe
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.yeobaeg.analytics.AnalyticsLogger
 import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.domain.model.cafe.CafeDetail
+import com.ssafy.yeobaeg.domain.repository.AnalyticsRepository
 import com.ssafy.yeobaeg.domain.repository.CafeRepository
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
 import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 data class CafeDetailUiState(
@@ -37,6 +42,7 @@ private const val TAG = "CafeDetailViewModel"
 class CafeDetailViewModel @Inject constructor(
     private val cafeRepository: CafeRepository,
     private val chatRepository: ChatRepository,
+    private val analyticsRepository: AnalyticsRepository,
     private val navigator: Navigator,
     private val analyticsLogger: AnalyticsLogger,
     private val authSessionManager: AuthSessionManager
@@ -52,19 +58,25 @@ class CafeDetailViewModel @Inject constructor(
             }
         }
     }
-    
+
     /**
      * 카페 상세 정보 로드
      */
     fun loadCafeDetail(cafeId: Long) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            
+
             cafeRepository.getCafeDetail(cafeId)
                 .onSuccess { detail ->
-                    Log.d("CafeDetailViewModel", "Loaded cafe detail with ${detail.displaySlots.size} slots")
+                    Log.d(
+                        "CafeDetailViewModel",
+                        "Loaded cafe detail with ${detail.displaySlots.size} slots"
+                    )
                     detail.displaySlots.forEach { slot ->
-                        Log.d("CafeDetailViewModel", "Slot: wid=${slot.wid}, name=${slot.wName}, width=${slot.width}, height=${slot.height}, commission=${slot.commission}, requirements=${slot.requirements}")
+                        Log.d(
+                            "CafeDetailViewModel",
+                            "Slot: wid=${slot.wid}, name=${slot.wName}, width=${slot.width}, height=${slot.height}, commission=${slot.commission}, requirements=${slot.requirements}"
+                        )
                     }
                     _uiState.update {
                         it.copy(
@@ -73,6 +85,7 @@ class CafeDetailViewModel @Inject constructor(
                         )
                     }
                     analyticsLogger.logCafeClick(detail.cafeId)
+                    analyticsRepository.logCafeDetailClick(cafeId)
                 }
                 .onFailure { e ->
                     Log.e("CafeDetailViewModel", "Failed to load cafe detail", e)
@@ -85,14 +98,14 @@ class CafeDetailViewModel @Inject constructor(
                 }
         }
     }
-    
+
     /**
      * 탭 변경
      */
     fun selectTab(tab: CafeDetailTab) {
         _uiState.update { it.copy(selectedTab = tab) }
     }
-    
+
     /**
      * 북마크 토글
      */
@@ -121,10 +134,9 @@ class CafeDetailViewModel @Inject constructor(
                             )
                         )
                     }
-                    if(isBookmarked) {
+                    if (isBookmarked) {
                         analyticsLogger.logCafeLike(cafeId)
-                    }
-                    else {
+                    } else {
                         analyticsLogger.logCafeUnlike(cafeId)
                     }
                 }
@@ -149,6 +161,7 @@ class CafeDetailViewModel @Inject constructor(
         viewModelScope.launch {
             chatRepository.createChatRoom(cafeId)
                 .onSuccess { room ->
+                    analyticsRepository.logCafeInquire(cafeId)
                     navigator.navigate(
                         FullScreen.ChattingScreen(room.chatRoomId)
                     )
@@ -168,7 +181,10 @@ class CafeDetailViewModel @Inject constructor(
      */
     fun navigateToExhibitionCalendar(slot: com.ssafy.yeobaeg.domain.model.DisplaySlot) {
         viewModelScope.launch {
-            Log.d("CafeDetailViewModel", "Navigating to calendar with slot: wid=${slot.wid}, name=${slot.wName}, width=${slot.width}, height=${slot.height}, commission=${slot.commission}, requirements=${slot.requirements}")
+            Log.d(
+                "CafeDetailViewModel",
+                "Navigating to calendar with slot: wid=${slot.wid}, name=${slot.wName}, width=${slot.width}, height=${slot.height}, commission=${slot.commission}, requirements=${slot.requirements}"
+            )
             navigator.navigate(
                 route = FullScreen.ExhibitionCalendar(
                     slotId = slot.wid,
@@ -189,9 +205,13 @@ class CafeDetailViewModel @Inject constructor(
         _uiState.update { it.copy(error = null) }
     }
 
-    fun logViewEnd(id: Long, dwell: Long, maxPct: Int) {
-        Log.d("logViewEnd cafe", "$id / $dwell / $maxPct")
-        analyticsLogger.logCafeViewEnd(cafeId = id, dwellMs = dwell, scrollPct = maxPct)
+    fun logViewEnd(id: Long, dwell: Long, scrollPct: Int) {
+        Log.d("logViewEnd cafe", "$id / $dwell / $scrollPct")
+        analyticsLogger.logCafeViewEnd(cafeId = id, dwellMs = dwell, scrollPct = scrollPct)
+
+        viewModelScope.launch(NonCancellable + Dispatchers.IO) {
+            analyticsRepository.logCafeViewEnd(id, dwell, scrollPct)
+        }
     }
 }
 

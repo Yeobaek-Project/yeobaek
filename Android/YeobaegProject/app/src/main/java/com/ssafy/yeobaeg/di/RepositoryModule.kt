@@ -1,5 +1,6 @@
 package com.ssafy.yeobaeg.di
 
+import com.ssafy.yeobaeg.data.repository.AnalyticsRepositoryImpl
 import com.ssafy.yeobaeg.data.repository.ArtRepositoryImpl
 import com.ssafy.yeobaeg.data.repository.AuthRepositoryImpl
 import com.ssafy.yeobaeg.data.repository.CafeRepositoryImpl
@@ -9,6 +10,7 @@ import com.ssafy.yeobaeg.data.repository.ExhibitionRepositoryImpl
 import com.ssafy.yeobaeg.data.repository.ProfileRepositoryImpl
 import com.ssafy.yeobaeg.data.repository.RecentSearchRepositoryImpl
 import com.ssafy.yeobaeg.data.repository.StorageRepositoryImpl
+import com.ssafy.yeobaeg.domain.repository.AnalyticsRepository
 import com.ssafy.yeobaeg.domain.repository.ArtRepository
 import com.ssafy.yeobaeg.domain.repository.AuthRepository
 import com.ssafy.yeobaeg.domain.repository.CafeRepository
@@ -84,5 +86,11 @@ abstract class RepositoryModule {
     abstract fun bindExhibitionRepository(
         exhibitionRepositoryImpl: ExhibitionRepositoryImpl
     ): ExhibitionRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAnalyticsRepository(
+        analyticsRepositoryImpl: AnalyticsRepositoryImpl
+    ): AnalyticsRepository
 }
 
