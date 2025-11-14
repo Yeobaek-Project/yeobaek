@@ -152,6 +152,22 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long> {
     );
 
     /**
+     * 특정 상태와 시작일을 기준으로 전시 목록 조회
+     * @param state 전시 상태
+     * @param startDate 전시 시작일
+     * @return 전시 목록
+     */
+    List<Exhibition> findAllByStateAndStartDate(ExhibitionState state, LocalDate startDate);
+
+    /**
+     * 특정 상태와 종료일을 기준으로 전시 목록 조회
+     * @param state 전시 상태
+     * @param endDate 전시 종료일
+     * @return 전시 목록
+     */
+    List<Exhibition> findAllByStateAndEndDate(ExhibitionState state, LocalDate endDate);
+
+    /**
      * 특정 카페와 협업한 작가 수 조회 (완료된 전시 기준)
      * @param cafeId 카페 ID
      * @return 협업한 작가 수

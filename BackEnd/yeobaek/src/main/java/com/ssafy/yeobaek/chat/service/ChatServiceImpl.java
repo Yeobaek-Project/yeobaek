@@ -163,7 +163,7 @@ public class ChatServiceImpl implements ChatService {
                 .findFirst()
                 .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
 
-        String partnerImageUrl = s3Service.generatePresignedUrlForDownload(partner.getProfileImageUrl());
+        String partnerImageUrl = s3Service.generatePresignedUrlForThumbnail(partner.getProfileImageUrl());
 
         // 4. 채팅방 요약 정보 생성
         ChatRoomSummary chatRoomSummary = chatMapper.toChatRoomSummary(chatRoom, partner, partnerImageUrl);
@@ -177,7 +177,7 @@ public class ChatServiceImpl implements ChatService {
                 .map(message -> {
                     ChatMessage chatMessage = chatMapper.toChatMessage(message);
                     if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
-                        String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
+                        String presignedUrl = s3Service.generatePresignedUrlForThumbnail(message.getImageUrl());
                         chatMessage.setImageUrl(presignedUrl);
                     }
                     return chatMessage;
@@ -229,7 +229,7 @@ public class ChatServiceImpl implements ChatService {
         // 5. ChatMessage 생성 후 반환
         ChatMessage chatMessage = chatMapper.toChatMessage(message);
         if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
-            String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
+            String presignedUrl = s3Service.generatePresignedUrlForThumbnail(message.getImageUrl());
             chatMessage.setImageUrl(presignedUrl);
         }
         log.info("[ChatService] Returning ChatMessage DTO: {}", chatMessage);
