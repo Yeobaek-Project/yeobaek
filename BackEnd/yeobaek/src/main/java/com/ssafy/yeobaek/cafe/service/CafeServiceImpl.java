@@ -325,7 +325,7 @@ public class CafeServiceImpl implements CafeService {
         }
 
         // 3. 슬롯 소유 카페 확인 및 권한 검사
-        if (!cafe.getCafeOwner().getId().equals(userId)) {
+        if (!cafe.getId().equals(userId)) {
             throw new CustomException(ResponseCode.CAFE_FORBIDDEN_UPDATE_DELETE);
         }
 
@@ -528,7 +528,7 @@ public class CafeServiceImpl implements CafeService {
 
         // 4. 카페 오너 ID 일괄 수집
         List<Long> ownerIds = cafePage.getContent().stream()
-                .map(cafe -> cafe.getCafeOwner().getId())
+                .map(Cafe::getId)
                 .collect(Collectors.toList());
 
         // 5. 리뷰 일괄 조회 (평점 계산용)
@@ -554,7 +554,7 @@ public class CafeServiceImpl implements CafeService {
                     List<String> categories = cafeCategoriesMap.getOrDefault(cafe.getId(), new ArrayList<>());
 
                     // 평점 계산 (카페 오너의 리뷰 평균)
-                    Long ownerId = cafe.getCafeOwner().getId();
+                    Long ownerId = cafe.getId();
                     List<Review> ownerReviews = reviewsByOwnerId.getOrDefault(ownerId, new ArrayList<>());
                     Double totalReviewScore = ownerReviews.stream()
                             .mapToInt(Review::getRating)

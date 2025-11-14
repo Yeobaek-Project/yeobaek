@@ -105,7 +105,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
         if (currentUser.getUserType() == UserRole.CAFE_OWNER) {
             // 카페 사장이 제안
-            if (!cafe.getCafeOwner().getId().equals(userId)) {
+            if (!cafe.getId().equals(userId)) {
                 throw new CustomException(ResponseCode.CAFE_FORBIDDEN_UPDATE_DELETE);
             }
             cafeAgreed = true;  // 제안자가 먼저 동의
@@ -130,7 +130,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         exhibitionRepository.save(exhibition);
 
         // 9. 채팅방 ID 파생 및 시스템 메시지 전송
-        Long cafeOwnerId = cafe.getCafeOwner().getId();
+        Long cafeOwnerId = cafe.getId();
         Long artistId = artwork.getArtist().getUser().getId();
         ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
         Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
@@ -161,7 +161,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         // 3. 권한 확인 및 동의 처리
         if (currentUser.getUserType() == UserRole.CAFE_OWNER) {
             // 카페 사장: 해당 전시의 카페 소유자인지 확인
-            if (!exhibition.getCafe().getCafeOwner().getId().equals(userId)) {
+            if (!exhibition.getCafe().getId().equals(userId)) {
                 throw new CustomException(ResponseCode.EXHIBITION_FORBIDDEN);
             }
 
@@ -194,7 +194,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
         // 4. 양측 모두 동의하여 전시가 확정된 경우 시스템 메시지 전송
         if (exhibition.getState() == ExhibitionState.APPROVED) {
-            Long cafeOwnerId = exhibition.getCafe().getCafeOwner().getId();
+            Long cafeOwnerId = exhibition.getCafe().getId();
             Long artistId = exhibition.getArtwork().getArtist().getUser().getId();
             ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
             Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
@@ -224,7 +224,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
         // 3. 권한 확인
         boolean isCafeOwner = currentUser.getUserType() == UserRole.CAFE_OWNER
-                && exhibition.getCafe().getCafeOwner().getId().equals(userId);
+                && exhibition.getCafe().getId().equals(userId);
         boolean isArtist = currentUser.getUserType() == UserRole.ARTIST
                 && exhibition.getArtwork().getArtist().getUser().getId().equals(userId);
 

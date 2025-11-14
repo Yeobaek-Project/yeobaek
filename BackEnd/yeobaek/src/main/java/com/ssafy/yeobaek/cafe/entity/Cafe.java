@@ -17,11 +17,11 @@ import java.util.List;
 public class Cafe {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "owner_id", nullable = false, unique = true)
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id")
     private User cafeOwner;
 
     @Column(name = "cafe_name", nullable = false)
@@ -52,11 +52,11 @@ public class Cafe {
     private String dailyVisitors;
 
     @Column(name = "view_count", nullable = false)
-    @Builder .Default
+    @Builder.Default
     private Integer viewCount = 0;
 
     @Column(name = "bookmark_count", nullable = false)
-    @Builder .Default
+    @Builder.Default
     private Integer bookmarkCount = 0;
 
     @ElementCollection
