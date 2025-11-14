@@ -346,10 +346,11 @@ public class ChatServiceImpl implements ChatService {
      * @param messageContent 메시지 내용 (프론트엔드에서 사용될 플레이스홀더 또는 실제 내용)
      * @param messageType 메시지 타입 (예: PROPOSAL)
      * @param exhibition 관련 전시
+     * @param sender 발신자
      */
     @Override
     @Transactional
-    public void sendSystemMessage(Long chatRoomId, String messageContent, MessageType messageType, Exhibition exhibition, Long senderId) {
+    public void sendSystemMessage(Long chatRoomId, String messageContent, MessageType messageType, Exhibition exhibition, User sender) {
 
         log.info("[ChatService] Start sending system message in chatRoomId: {}", chatRoomId);
 
@@ -361,6 +362,7 @@ public class ChatServiceImpl implements ChatService {
         // 2. 메시지 엔티티 생성 및 저장
         Message message = Message.builder()
                 .chatRoom(chatRoom)
+                .user(sender)
                 .messageType(messageType)
                 .exhibition(exhibition)
                 .content(messageContent)
@@ -378,7 +380,7 @@ public class ChatServiceImpl implements ChatService {
         // 5. 상대방에게 시스템 이벤트 알림 전송 (개인 알림 채널)
         User recipient = chatRoom.getMembers().stream()
                 .map(ChatRoomMember::getUser)
-                .filter(user -> !user.getId().equals(senderId))
+                .filter(user -> !user.getId().equals(sender.getId()))
                 .findFirst()
                 .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
 

@@ -135,7 +135,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
         Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
 
-        chatService.sendSystemMessage(chatRoomId, null, MessageType.PROPOSAL, exhibition, currentUser.getId());
+        chatService.sendSystemMessage(chatRoomId, null, MessageType.PROPOSAL, exhibition, currentUser);
     }
 
     /**
@@ -199,7 +199,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
             ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
             Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
 
-            chatService.sendSystemMessage(chatRoomId, null, MessageType.AGREED, exhibition, userId);
+            chatService.sendSystemMessage(chatRoomId, null, MessageType.AGREED, exhibition, currentUser);
         }
     }
 

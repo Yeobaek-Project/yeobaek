@@ -5,6 +5,7 @@ import com.ssafy.yeobaek.chat.dto.response.*;
 import com.ssafy.yeobaek.common.enums.ChatSortBy;
 import com.ssafy.yeobaek.common.enums.MessageType;
 import com.ssafy.yeobaek.exhibition.entity.Exhibition;
+import com.ssafy.yeobaek.user.entity.User;
 
 public interface ChatService {
 
@@ -56,6 +57,7 @@ public interface ChatService {
      * @param messageContent 메시지 내용 (프론트엔드에서 사용될 플레이스홀더 또는 실제 내용)
      * @param messageType 메시지 타입 (예: PROPOSAL)
      * @param exhibition 관련 전시
+     * @param sender 발신자
      */
-    void sendSystemMessage(Long chatRoomId, String messageContent, MessageType messageType, Exhibition exhibition, Long senderId);
+    void sendSystemMessage(Long chatRoomId, String messageContent, MessageType messageType, Exhibition exhibition, User sender);
 }
