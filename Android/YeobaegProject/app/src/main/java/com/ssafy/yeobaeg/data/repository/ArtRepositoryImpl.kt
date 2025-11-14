@@ -4,14 +4,18 @@ import com.ssafy.yeobaeg.data.datasource.remote.ArtworkApiService
 import com.ssafy.yeobaeg.data.model.art.request.toDto
 import com.ssafy.yeobaeg.data.model.profile.toDomain
 import com.ssafy.yeobaeg.data.model.response.toDomain
+import com.ssafy.yeobaeg.di.StoreJson // Hilt Qualifier 어노테이션 import
 import com.ssafy.yeobaeg.domain.model.artist.ArtHome
 import com.ssafy.yeobaeg.domain.model.artist.ArtworkRegister
 import com.ssafy.yeobaeg.domain.model.profile.Artwork
 import com.ssafy.yeobaeg.domain.repository.ArtRepository
+import handleApi // handleApi 함수 import
+import kotlinx.serialization.json.Json // Json import
 import javax.inject.Inject
 
 class ArtRepositoryImpl @Inject constructor(
-    private val artworkApiService: ArtworkApiService
+    private val artworkApiService: ArtworkApiService,
+    @StoreJson private val json: Json // 1. Json 의존성 주입 추가
 ) : ArtRepository {
 
     override suspend fun getArtworks(
@@ -22,9 +26,9 @@ class ArtRepositoryImpl @Inject constructor(
         maxHeight: Int?,
         page: Int,
         size: Int
-    ) =
-        runCatching {
-            val response = artworkApiService.getArtworks(
+    ) = runCatching {
+        val responseDto = handleApi(json) {
+            artworkApiService.getArtworks(
                 categories = category?.joinToString(),
                 minWidth = minWidth,
                 maxWidth = maxWidth,
@@ -33,8 +37,9 @@ class ArtRepositoryImpl @Inject constructor(
                 page = page,
                 size = size
             )
-            response.data?.toDomain() ?: throw Exception(response.message)
         }
+        responseDto.toDomain()
+    }
 
     override suspend fun searchArt(
         keyword: String,
@@ -47,64 +52,58 @@ class ArtRepositoryImpl @Inject constructor(
         page: Int,
         size: Int
     ) = runCatching {
-        val response = artworkApiService.getArtworks(
-            keyword = keyword,
-            categories = categories?.joinToString(),
-            minWidth = minWidth,
-            maxWidth = maxWidth,
-            minHeight = minHeight,
-            maxHeight = maxHeight,
-            sortBy = sortBy,
-            page = page,
-            size = size
-        )
-        response.data?.toDomain() ?: throw Exception(response.message)
+        val responseDto = handleApi(json) {
+            artworkApiService.getArtworks(
+                keyword = keyword,
+                categories = categories?.joinToString(),
+                minWidth = minWidth,
+                maxWidth = maxWidth,
+                minHeight = minHeight,
+                maxHeight = maxHeight,
+                sortBy = sortBy,
+                page = page,
+                size = size
+            )
+        }
+        responseDto.toDomain()
     }
 
-    override suspend fun getArtworkDetail(artWorkId: Long) =
-        runCatching {
-            val response = artworkApiService.getArtworkDetail(artWorkId)
-            response.data?.artwork?.toDomain() ?: throw Exception(response.message)
-        }
-
-    override suspend fun toggleBookmark(artWorkId: Long) =
-        runCatching {
-            val response = artworkApiService.toggleBookmark(artWorkId)
-            response.data?.isBookmarked ?: throw Exception(response.message)
-        }
-
-    override suspend fun getPopularArtworks(size: Int) =
-        runCatching {
-            val response = artworkApiService.getPopularArtworks(size)
-            response.data?.artworks?.map { it.toDomain() } ?: emptyList()
-        }
-
-    override suspend fun registerArtwork(request: ArtworkRegister) {
-        runCatching { artworkApiService.registerArtwork(request.toDto()) }
+    override suspend fun getArtworkDetail(artWorkId: Long) = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.getArtworkDetail(artWorkId) }
+        responseDto.artwork.toDomain()
     }
 
-    override suspend fun getArtHome(): Result<ArtHome> {
-        val response = artworkApiService.getMyArtHome()
-        return runCatching {
-            response.data?.toDomain() ?: throw Exception(response.message)
-        }
+    override suspend fun toggleBookmark(artWorkId: Long) = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.toggleBookmark(artWorkId) }
+        responseDto.isBookmarked
     }
 
-    override suspend fun getMyArtworks(page: Int?, size: Int?): Result<Artwork> {
-        val response = artworkApiService.getMyArtworks(page, size)
-        return runCatching {
-            response.data?.toDomain() ?: throw Exception(response.message)
-        }
+    override suspend fun getPopularArtworks(size: Int) = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.getPopularArtworks(size) }
+        responseDto.artworks.map { it.toDomain() }
+    }
+
+    // 원본 코드의 반환 타입이 Unit이었으나, Result<Unit>으로 변경하여 성공/실패 여부를 명확히 전달
+    override suspend fun registerArtwork(request: ArtworkRegister) = runCatching {
+        handleApi(json) { artworkApiService.registerArtwork(request.toDto()) }
+    }
+
+    override suspend fun getArtHome(): Result<ArtHome> = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.getMyArtHome() }
+        responseDto.toDomain()
+    }
+
+    override suspend fun getMyArtworks(page: Int?, size: Int?): Result<Artwork> = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.getMyArtworks(page, size) }
+        responseDto.toDomain()
     }
 
     override suspend fun getRecommendedArtworks(
         slotId: Long,
         page: Int?,
         size: Int?
-    ): Result<Artwork> {
-        val response = artworkApiService.getRecommendedArtworks(slotId, page, size)
-        return runCatching {
-            response.data?.toDomain() ?: throw Exception(response.message)
-        }
+    ): Result<Artwork> = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.getRecommendedArtworks(slotId, page, size) }
+        responseDto.toDomain()
     }
 }

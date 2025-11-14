@@ -35,7 +35,7 @@ interface ArtRepository {
     suspend fun toggleBookmark(artWorkId: Long): Result<Boolean>
 
     suspend fun getPopularArtworks(size: Int = 10): Result<List<PopularArtwork>>
-    suspend fun registerArtwork(request: ArtworkRegister)
+    suspend fun registerArtwork(request: ArtworkRegister): Result<String>
 
     suspend fun getArtHome(): Result<ArtHome>
 

@@ -22,6 +22,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
+import com.ssafy.yeobaeg.ui.theme.YeobaegGray
+import com.ssafy.yeobaeg.ui.theme.YeobaegLightGray
 
 // ---------- 색상 (프로젝트 테마에 맞게 조절) ----------
 private val PrimaryAccent = Color(0xFFDFB14A)  // 별/포인트 색
@@ -134,7 +136,7 @@ fun CafeCard(
                         Surface(
                             modifier = Modifier.height(40.dp),
                             shape = RoundedCornerShape(10.dp),
-                            color = if (enabled) Color(0xFF2E2A28) else Color(0xFF4A4644),
+                            color = if (enabled) YeobaegBrown else YeobaegGray,
                         ) {
                             Box(
                                 modifier = Modifier
@@ -145,7 +147,7 @@ fun CafeCard(
                                 Text(
                                     text = label,
                                     fontSize = 14.sp,
-                                    color = if (enabled) Color.White else Color(0xFF9A9592),
+                                    color = if (enabled) Color.White else YeobaegLightGray,
                                     fontWeight = if (enabled) FontWeight.Medium else FontWeight.Normal,
                                     maxLines = 1
                                 )

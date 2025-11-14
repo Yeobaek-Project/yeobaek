@@ -1,5 +1,6 @@
 package com.ssafy.yeobaeg.presentation.main
 
+import android.R.id.message
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,10 +39,10 @@ class MainActivity : ComponentActivity() {
 
                 // 스낵바 메시지 구독
                 LaunchedEffect(snackbarMessage) {
-                    snackbarMessage?.let { message ->
+                    snackbarMessage?.let { event ->
                         snackbarHostState.showYeobaegSnackbar(
-                            message = message,
-                            type = SnackbarType.SUCCESS
+                            message = event.message,
+                            type = event.type
                         )
                         viewModel.clearSnackbarMessage()
                     }

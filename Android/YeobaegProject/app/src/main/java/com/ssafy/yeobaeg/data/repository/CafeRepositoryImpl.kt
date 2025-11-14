@@ -6,72 +6,68 @@ import com.ssafy.yeobaeg.data.model.cafe.toDomain
 import com.ssafy.yeobaeg.data.model.request.UpdateSlotRequest
 import com.ssafy.yeobaeg.data.model.request.toDto
 import com.ssafy.yeobaeg.data.model.response.toDomain
+import com.ssafy.yeobaeg.di.StoreJson
 import com.ssafy.yeobaeg.domain.model.cafe.CafeDetail
 import com.ssafy.yeobaeg.domain.model.cafe.CafeFilter
 import com.ssafy.yeobaeg.domain.model.cafe.CafeListResult
 import com.ssafy.yeobaeg.domain.model.DisplaySlot
+import com.ssafy.yeobaeg.domain.model.cafe.CafeCategory
 import com.ssafy.yeobaeg.domain.model.cafe.CafeSummary
 import com.ssafy.yeobaeg.domain.model.cafe.RecommendedCafes
 import com.ssafy.yeobaeg.domain.model.cafeowner.CafeOwnerInfo
 import com.ssafy.yeobaeg.domain.model.cafeowner.RegisterCafe
 import com.ssafy.yeobaeg.domain.repository.CafeRepository
+import handleApi
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
-import kotlin.collections.map
 
 class CafeRepositoryImpl @Inject constructor(
-    private val cafeApiService: CafeApiService
+    private val cafeApiService: CafeApiService,
+    @StoreJson private val json: Json
 ) : CafeRepository {
 
-    override suspend fun registerCafe(cafe: RegisterCafe) = runCatching {
-        val response = cafeApiService.registerCafe(cafe.toDto())
-        if (response.code != "S0000") throw Exception(response.message) else Unit
+    override suspend fun registerCafe(cafe: RegisterCafe): Result<Unit> = runCatching {
+        handleApi(json) { cafeApiService.registerCafe(cafe.toDto()) }
     }
 
-    override suspend fun getPopularCafes(size: Int): Result<List<CafeSummary>> {
-        return runCatching {
-            val response = cafeApiService.getPopularCafes(size)
-            response.data?.cafes?.map { it.toDomain() } ?: emptyList()
+    override suspend fun getPopularCafes(size: Int): Result<List<CafeSummary>> = runCatching {
+        val responseDto = handleApi(json) { cafeApiService.getPopularCafes(size) }
+        responseDto.cafes.map { it.toDomain() }
+    }
+
+    override suspend fun registerCafeWall(registerWall: List<DisplaySlot>): Result<List<Unit>> = runCatching {
+        handleApi(json) { cafeApiService.createCafeWall(registerWall.map { it.toDto() }) }
+        emptyList()
+    }
+
+    override suspend fun getMyCafe(): Result<CafeOwnerInfo> = runCatching {
+        val responseDto = handleApi(json) { cafeApiService.getMyCafe() }
+        responseDto.myCafe.toDomain()
+    }.recoverCatching { error ->
+        if (error.message?.contains("CF4041") == true) {
+            CafeOwnerInfo() // 특정 에러 코드일 경우, 성공으로 간주하고 기본 객체 반환
+        } else {
+            throw error // 그 외 에러는 다시 던져서 Result.failure로 처리
         }
     }
-
-    override suspend fun registerCafeWall(registerWall: List<DisplaySlot>): Result<Unit> {
-        val response = cafeApiService.createCafeWall(registerWall.map { it.toDto() })
-
-        return runCatching {
-            if(response.code[0] == 'S') Unit
-            else throw Exception(response.message)
-        }
-    }
-
-    override suspend fun getMyCafe() = runCatching {
-        val response = cafeApiService.getMyCafe()
-        val code = response.code
-        response.data?.myCafe?.toDomain() ?: run {
-            if (code == "CF4041") {
-                CafeOwnerInfo()
-            } else {
-                throw Exception(code.ifBlank { "Unknown error" })
-            }
-        }
-    }
-
 
     override suspend fun updateSlotInfo(
         cafeId: Long,
         slotId: Long,
         commissionRate: Int?,
         requirements: String?
-    ) = runCatching {
-        val response = cafeApiService.updateSlotInfo(
-            cafeId, slotId,
-            UpdateSlotRequest(commissionRate, requirements)
-        )
-        response.data ?: throw Exception(response.message)
+    ): Result<Unit> = runCatching {
+        handleApi(json) {
+            cafeApiService.updateSlotInfo(
+                cafeId, slotId,
+                UpdateSlotRequest(commissionRate, requirements)
+            )
+        }
     }
 
-    override suspend fun getCafeCategories() = runCatching {
-        val response = cafeApiService.getCafeCategories()
-        response.data?.categories?.map { it.toDomain() } ?: throw Exception(response.message)
+    override suspend fun getCafeCategories(): Result<List<CafeCategory>> = runCatching {
+        val responseDto = handleApi(json) { cafeApiService.getCafeCategories() }
+        responseDto.categories.map { it.toDomain() }
     }
 
     override suspend fun getCafes(
@@ -84,9 +80,9 @@ class CafeRepositoryImpl @Inject constructor(
         filter: CafeFilter?,
         page: Int,
         size: Int
-    ): Result<CafeListResult> {
-        return runCatching {
-            val response = cafeApiService.getCafes(
+    ): Result<CafeListResult> = runCatching {
+        val responseDto = handleApi(json) {
+            cafeApiService.getCafes(
                 keyword = keyword,
                 centerLatitude = centerLatitude,
                 centerLongitude = centerLongitude,
@@ -102,39 +98,27 @@ class CafeRepositoryImpl @Inject constructor(
                 page = page,
                 size = size
             )
-
-            response.data?.toDomain()
-                ?: throw Exception("카페 목록을 불러올 수 없습니다")
         }
+        responseDto.toDomain()
     }
 
-    override suspend fun getCafeDetail(cafeId: Long): Result<CafeDetail> {
-        return runCatching {
-            val response = cafeApiService.getCafeDetail(cafeId)
-
-            response.data?.cafeDetail?.toDomain()
-                ?: throw Exception("카페 정보를 불러올 수 없습니다")
-        }
+    override suspend fun getCafeDetail(cafeId: Long): Result<CafeDetail> = runCatching {
+        val responseDto = handleApi(json) { cafeApiService.getCafeDetail(cafeId) }
+        responseDto.cafeDetail.toDomain()
     }
 
     override suspend fun getRecommendedCafes(
         artworkId: Long,
         page: Int?,
         size: Int?
-    ): Result<RecommendedCafes> {
-        val response = cafeApiService.getRecommendedCafes(artworkId,page,size)
-        return runCatching {
-            response.data?.toDomain() ?: throw Exception(response.message)
-        }
+    ): Result<RecommendedCafes> = runCatching {
+        val responseDto = handleApi(json) { cafeApiService.getRecommendedCafes(artworkId, page, size) }
+        responseDto.toDomain()
     }
 
-    override suspend fun toggleCafeBookmark(cafeId: Long): Result<Boolean> {
-        return runCatching {
-            val response = cafeApiService.toggleCafeBookmark(cafeId)
-            Log.d("CafeRepository", "toggleCafeBookmark response: ${response.data}")
-
-            response.data?.isBookmarked
-                ?: throw Exception("북마크 상태를 확인할 수 없습니다")
-        }
+    override suspend fun toggleCafeBookmark(cafeId: Long): Result<Boolean> = runCatching {
+        val responseDto = handleApi(json) { cafeApiService.toggleCafeBookmark(cafeId) }
+        Log.d("CafeRepository", "toggleCafeBookmark response: $responseDto")
+        responseDto.isBookmarked
     }
 }

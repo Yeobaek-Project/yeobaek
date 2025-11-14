@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.yeobaeg.domain.model.profile.Artwork
 import com.ssafy.yeobaeg.domain.model.profile.BookmarkCafe
 import com.ssafy.yeobaeg.domain.repository.ProfileRepository
+import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

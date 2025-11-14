@@ -12,6 +12,7 @@ import com.ssafy.yeobaeg.presentation.common.util.SnackBarController
 import com.ssafy.yeobaeg.navigation.BottomNavScreen
 import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
+import com.ssafy.yeobaeg.presentation.common.util.SnackbarMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,14 +31,14 @@ internal class MainViewModel @Inject constructor(
 
     val userRole: StateFlow<UserRole?> = authSessionManager.currentUserRole
 
-    private val _snackbarMessage = MutableStateFlow<String?>(null)
-    val snackbarMessage: StateFlow<String?> = _snackbarMessage.asStateFlow()
+    private val _snackbarMessage = MutableStateFlow<SnackbarMessage?>(null)
+    val snackbarMessage: StateFlow<SnackbarMessage?> = _snackbarMessage.asStateFlow()
 
     init {
         // SnackbarController 이벤트 구독
         viewModelScope.launch {
             snackbarController.snackbarEvents.collect { event ->
-                _snackbarMessage.update { event.message }
+                _snackbarMessage.update { event }
             }
         }
 

@@ -113,6 +113,7 @@ class ArtExploreViewModel @Inject constructor(
     fun selectCategory(cat: ArtworkCategory) {
         update {
             copy(
+                artworks = emptyList(),
                 selectedCategory = cat,
                 paginationInfo = null // 카테고리 변경 시 페이지네이션 초기화
             )

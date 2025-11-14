@@ -46,6 +46,7 @@ import com.ssafy.yeobaeg.domain.model.profile.ArtworkSummary
 import com.ssafy.yeobaeg.domain.model.cafe.RecommendedCafe
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
+import com.ssafy.yeobaeg.presentation.common.lottie.YeobaegLottieLoading
 import com.ssafy.yeobaeg.presentation.common.util.formatPrice
 import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegGray
@@ -85,6 +86,12 @@ fun ArtistHomeMatchingScreen(
                 onBackClick = viewModel::goBackStep
             )
         }
+
+        MatchingStep.LOADING_RECOMMEND -> YeobaegLottieLoading(listOf(
+            "취향에 맞는 작품을 찾는 중…",
+            "카페에 어울리는 작품을 추천하고 있어요…",
+            "이용 패턴을 분석해 추천 중…"
+        ))
     }
 }
 

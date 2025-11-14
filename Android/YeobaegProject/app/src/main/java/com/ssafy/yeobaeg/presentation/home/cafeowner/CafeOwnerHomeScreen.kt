@@ -95,8 +95,6 @@ private fun CafeOwnerHomeScreen(
             title = "카페 관리",
             onBackClick = {},
             showBackButton = false,
-            actionIcon = R.drawable.ic_setting,
-            onActionClick = {},
         )
         Spacer(Modifier.height(4.dp))
 
@@ -315,7 +313,7 @@ fun FloorPlanSection(
         initialWalls = slots,
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp),
+            .height(400.dp),
         readOnly = true
     )
 

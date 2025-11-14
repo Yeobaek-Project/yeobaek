@@ -10,6 +10,7 @@ import com.ssafy.yeobaeg.domain.repository.CafeRepository
 import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,6 +19,7 @@ import javax.inject.Inject
 
 enum class MatchingStep {
     ARTWORK_SELECTION,  // 작품 선택
+    LOADING_RECOMMEND,  // 추천 로딩 중
     CAFE_SELECTION      // 카페 선택
 }
 
@@ -97,28 +99,46 @@ class ArtistHomeMatchingViewModel @Inject constructor(
     }
 
     fun confirmArtworkSelection() {
-        // 작품 선택 완료 -> 카페 선택 단계로
+        // 작품 선택 완료 -> 로딩 단계로
         _uiState.update {
-            it.copy(currentStep = MatchingStep.CAFE_SELECTION)
+            it.copy(currentStep = MatchingStep.LOADING_RECOMMEND)
         }
-        loadCafes()
+        loadCafesWithMinimumDelay()
     }
 
     // ========== 카페 관련 ==========
-    fun loadCafes() {
+    private fun loadCafesWithMinimumDelay() {
         val artworkId = _uiState.value.selectedArtworkId ?: return
-        _uiState.update { it.copy(isLoadingCafes = true, isLoadingMoreCafes = false) }
+
         viewModelScope.launch {
-            cafeRepository.getRecommendedCafes(artworkId = artworkId).onSuccess { data ->
+            val startTime = System.currentTimeMillis()
+
+            // API 호출
+            val apiResult = cafeRepository.getRecommendedCafes(artworkId = artworkId)
+
+            // 경과 시간 계산
+            val elapsedTime = System.currentTimeMillis() - startTime
+            val remainingTime = (5000 - elapsedTime).coerceAtLeast(0)
+
+            // 최소 3초 보장
+            if (remainingTime > 0) {
+                delay(remainingTime)
+            }
+
+            // 결과 처리
+            apiResult.onSuccess { data ->
                 _uiState.update {
                     it.copy(
-                        isLoadingCafes = false,
+                        currentStep = MatchingStep.CAFE_SELECTION,
                         cafes = data.cafes,
                         cafePagination = data.pagination
                     )
                 }
             }.onFailure {
-                _uiState.update { it.copy(isLoadingCafes = false) }
+                _uiState.update {
+                    it.copy(currentStep = MatchingStep.ARTWORK_SELECTION)
+                }
+                // TODO: 에러 처리
             }
         }
     }
@@ -156,7 +176,7 @@ class ArtistHomeMatchingViewModel @Inject constructor(
     // ========== 공통 ==========
     fun goBackStep() {
         when (_uiState.value.currentStep) {
-            MatchingStep.CAFE_SELECTION -> {
+            MatchingStep.CAFE_SELECTION, MatchingStep.LOADING_RECOMMEND -> {
                 // 카페 선택 상태 초기화하고 작품 선택으로
                 _uiState.update {
                     it.copy(
@@ -168,6 +188,7 @@ class ArtistHomeMatchingViewModel @Inject constructor(
                     )
                 }
             }
+
             MatchingStep.ARTWORK_SELECTION -> {
                 navigateBack()
             }

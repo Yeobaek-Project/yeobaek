@@ -74,7 +74,7 @@ fun FloorPlanSection(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(250.dp)
+                .height(400.dp)
                 .clip(RoundedCornerShape(12.dp))
                 .background(Color.White),
             contentAlignment = Alignment.Center

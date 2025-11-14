@@ -78,14 +78,13 @@ fun WallEditScreen(
                         .fillMaxSize()
                         .padding(20.dp)
                 ) {
-                    Spacer(Modifier.weight(1f))
                     FloorPlanPreview(
                         initialWalls = state.walls,
                         readOnly = false,
                         onWallTapped = { id -> viewModel.onWallTapped(id) },
-                        showHelpText = true
+                        showHelpText = true,
+                        modifier = Modifier.weight(1f)
                     )
-                    Spacer(Modifier.weight(1f))
                     YeobaegButton(
                         text = "다음",
                         onClick = viewModel::proceedToMeasure,

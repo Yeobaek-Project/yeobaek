@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,13 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ssafy.yeobaeg.domain.model.DisplaySlot
 import com.ssafy.yeobaeg.presentation.arcore.plan.FloorPlanPreview
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
+import com.ssafy.yeobaeg.presentation.common.lottie.YeobaegLottieLoading
 import com.ssafy.yeobaeg.presentation.home.artist.matching.ArtworkList
 
 @Composable
@@ -41,7 +40,7 @@ fun CafeOwnerMatchingScreen(
             slots = state.slots,
             currentWallId = state.currentWallId,
             onWallTapped = { id -> viewModel.selectWall(id) },
-            onNext = { viewModel.moveToArtworkSelection() },
+            onNext = { viewModel.confirmArtworkSelection() },
             onBackClick = viewModel::navigateToBack
         )
 
@@ -51,6 +50,12 @@ fun CafeOwnerMatchingScreen(
             onLoadMore = viewModel::loadMoreArtworks,
             onBackClick = viewModel::backToSlotSelection
         )
+
+        MatchingMode.LOADING_RECOMMEND -> YeobaegLottieLoading(listOf(
+            "취향에 맞는 카페를 찾는 중…",
+            "작품과 어울리는 카페를 추천하고 있어요…",
+            "이용 패턴을 분석해 추천 중…"
+        ))
     }
 }
 

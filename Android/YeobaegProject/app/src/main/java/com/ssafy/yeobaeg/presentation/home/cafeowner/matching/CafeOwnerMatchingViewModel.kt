@@ -9,7 +9,9 @@ import com.ssafy.yeobaeg.domain.model.profile.ArtworkSummary
 import com.ssafy.yeobaeg.domain.repository.ArtRepository
 import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
+import com.ssafy.yeobaeg.presentation.home.artist.matching.MatchingStep
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,6 +21,7 @@ import javax.inject.Inject
 enum class MatchingMode {
     SELECT_SLOT,      // 슬롯 선택
     SELECT_ARTWORK,   // 작품 선택
+    LOADING_RECOMMEND
 }
 
 data class MatchingUiState(
@@ -58,16 +61,6 @@ class CafeOwnerMatchingViewModel @Inject constructor(
         }
     }
 
-    fun moveToArtworkSelection() {
-        val currentWallId = _uiState.value.currentWallId
-        if (currentWallId == -1L) return // 선택된 슬롯 없으면 무시
-
-        _uiState.update {
-            it.copy(mode = MatchingMode.SELECT_ARTWORK)
-        }
-        loadRecommendedArtworks()
-    }
-
     fun backToSlotSelection() {
         _uiState.update {
             it.copy(
@@ -82,19 +75,44 @@ class CafeOwnerMatchingViewModel @Inject constructor(
         }
     }
 
+    fun confirmArtworkSelection() {
+        val currentWallId = _uiState.value.currentWallId
+        if (currentWallId == -1L) return // 선택된 슬롯 없으면 무시
+
+        _uiState.update {
+            it.copy(mode = MatchingMode.LOADING_RECOMMEND)
+        }
+        loadRecommendedArtworks()
+    }
+
     // ========== 작품 관련 ==========
-    fun loadRecommendedArtworks() {
+    private fun loadRecommendedArtworks() {
         val wallId = _uiState.value.currentWallId
         if (wallId == -1L) return
 
-        _uiState.update { it.copy(isLoadingArtworks = true, isLoadingMoreArtworks = false) }
         viewModelScope.launch {
-            artRepository.getRecommendedArtworks(wallId).onSuccess { data ->
+            val startTime = System.currentTimeMillis()
+
+            // API 호출
+            val apiResult = artRepository.getRecommendedArtworks(slotId = wallId)
+
+            // 경과 시간 계산
+            val elapsedTime = System.currentTimeMillis() - startTime
+            val remainingTime = (5000 - elapsedTime).coerceAtLeast(0)
+
+            // 최소 3초 보장
+            if (remainingTime > 0) {
+                delay(remainingTime)
+            }
+
+            // 결과 처리
+            apiResult.onSuccess { data ->
                 _uiState.update {
                     it.copy(
                         isLoadingArtworks = false,
                         recommendedArtworks = data.artworks,
-                        artworkPagination = data.pagination
+                        artworkPagination = data.pagination,
+                        mode = MatchingMode.SELECT_ARTWORK
                     )
                 }
             }.onFailure {
