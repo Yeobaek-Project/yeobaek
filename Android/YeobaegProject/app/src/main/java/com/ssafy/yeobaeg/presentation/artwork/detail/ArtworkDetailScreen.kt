@@ -47,6 +47,7 @@ import com.ssafy.yeobaeg.R
 import com.ssafy.yeobaeg.domain.model.art.ArtistSummary
 import com.ssafy.yeobaeg.domain.model.art.ArtworkDetail
 import com.ssafy.yeobaeg.domain.model.art.ExhibitionSpot
+import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.presentation.common.util.formatPrice
@@ -80,6 +81,7 @@ fun ArtworkDetailScreen(
     state.artwork?.let {
         ArtworkDetailScreen(
             artwork = it,
+            userRole = state.userRole,
             onBackClick = viewModel::onBackClick,
             toggleBookmark = viewModel::toggleBookmark,
             onArtistClick = viewModel::navigateToArtist
@@ -91,6 +93,7 @@ fun ArtworkDetailScreen(
 fun ArtworkDetailScreen(
     modifier: Modifier = Modifier,
     artwork: ArtworkDetail,
+    userRole: UserRole? = null,
     onBackClick: () -> Unit = {},
     toggleBookmark: () -> Unit = {},
     onArtistClick: () -> Unit = {}
@@ -108,13 +111,15 @@ fun ArtworkDetailScreen(
             )
         },
         bottomBar = {
-            YeobaegButton(
-                text = "문의",
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp),
-            )
+            if (userRole != UserRole.ARTIST) {
+                YeobaegButton(
+                    text = "문의",
+                    onClick = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 16.dp),
+                )
+            }
         },
         containerColor = Color.White
     ) { innerPadding ->

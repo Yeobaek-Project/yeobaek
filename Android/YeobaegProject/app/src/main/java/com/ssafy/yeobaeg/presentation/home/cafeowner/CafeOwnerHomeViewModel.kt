@@ -75,11 +75,15 @@ class CafeOwnerHomeViewModel @Inject constructor(
         }
     }
 
-    fun navigateToExhibitionCalendar(slotId: Long, slotName: String) = viewModelScope.launch {
+    fun navigateToExhibitionCalendar(slot: com.ssafy.yeobaeg.domain.model.DisplaySlot) = viewModelScope.launch {
         navigator.navigate(
             FullScreen.ExhibitionCalendar(
-                slotId = slotId,
-                slotName = slotName
+                slotId = slot.wid,
+                slotName = slot.wName,
+                width = slot.width,
+                height = slot.height,
+                commission = slot.commission,
+                requirements = slot.requirements
             )
         )
     }

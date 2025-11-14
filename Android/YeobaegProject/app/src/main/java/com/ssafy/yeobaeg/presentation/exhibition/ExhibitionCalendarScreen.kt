@@ -16,8 +16,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionSchedule
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
+import android.util.Log
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.text.font.FontWeight
 import com.ssafy.yeobaeg.presentation.exhibition.components.ExhibitionListDialog
 import com.ssafy.yeobaeg.presentation.exhibition.components.MonthCalendar
+import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegWhite
 import java.time.LocalDate
 import java.time.YearMonth
@@ -27,11 +31,16 @@ import java.time.YearMonth
 fun ExhibitionCalendarScreen(
     slotId: Long,
     slotName: String = "전시 슬롯",
+    width: Float = 0f,
+    height: Float = 0f,
+    commission: Float = 0f,
+    requirements: String = "",
     viewModel: ExhibitionCalendarViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(slotId) {
+        Log.d("ExhibitionCalendarScreen", "Received params: slotId=$slotId, slotName=$slotName, width=$width, height=$height, commission=$commission, requirements=$requirements")
         viewModel.loadSchedule(slotId)
     }
 
@@ -44,35 +53,54 @@ fun ExhibitionCalendarScreen(
         },
         containerColor = YeobaegWhite
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(Color.White)
+                .background(YeobaegWhite)
         ) {
-            when {
-                uiState.isLoading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                uiState.error != null -> {
-                    ErrorContent(
-                        error = uiState.error ?: "오류가 발생했습니다",
-                        onRetry = { viewModel.loadSchedule(slotId) },
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-                else -> {
-                    if (uiState.schedules.isEmpty()) {
-                        EmptyScheduleContent()
-                    } else {
-                        CalendarContent(
-                            schedules = uiState.schedules,
-                            startDate = uiState.startDate,
-                            selectedDate = uiState.selectedDate,
-                            onDateSelected = viewModel::selectDate
+            // 슬롯 정보 카드
+            SlotInfoCard(
+                slotName = slotName,
+                width = width,
+                height = height,
+                commission = commission,
+                requirements = requirements,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            )
+
+            // 메인 컨텐츠
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.White)
+            ) {
+                when {
+                    uiState.isLoading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
                         )
+                    }
+                    uiState.error != null -> {
+                        ErrorContent(
+                            error = uiState.error ?: "오류가 발생했습니다",
+                            onRetry = { viewModel.loadSchedule(slotId) },
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                    else -> {
+                        if (uiState.schedules.isEmpty()) {
+                            EmptyScheduleContent()
+                        } else {
+                            CalendarContent(
+                                schedules = uiState.schedules,
+                                startDate = uiState.startDate,
+                                selectedDate = uiState.selectedDate,
+                                onDateSelected = viewModel::selectDate
+                            )
+                        }
                     }
                 }
             }
@@ -209,6 +237,99 @@ private fun PreviewErrorContent() {
         ErrorContent(
             error = "일정을 불러올 수 없습니다",
             onRetry = {}
+        )
+    }
+}
+
+@Composable
+private fun SlotInfoCard(
+    slotName: String,
+    width: Float,
+    height: Float,
+    commission: Float,
+    requirements: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                text = "슬롯 정보",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = YeobaegDarkBrown
+            )
+
+            Divider(color = Color(0xFFEEEEEE))
+
+            // 슬롯 크기
+            InfoRow(
+                label = "슬롯 크기",
+                value = "${width.toInt()}cm × ${height.toInt()}cm"
+            )
+
+            // 수수료
+            InfoRow(
+                label = "수수료",
+                value = "${commission.toInt()}%"
+            )
+
+            // 요구사항
+            if (requirements.isNotEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "요구사항",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF757575)
+                    )
+                    Text(
+                        text = requirements,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF212121)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoRow(
+    label: String,
+    value: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+            color = Color(0xFF757575)
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.SemiBold,
+            color = YeobaegDarkBrown
         )
     }
 }

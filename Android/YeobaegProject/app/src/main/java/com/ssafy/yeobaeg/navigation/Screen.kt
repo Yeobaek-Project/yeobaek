@@ -62,7 +62,14 @@ sealed interface FullScreen : Screen {
     data class ArtistProfile(val artistId: Long) : FullScreen
 
     @Serializable
-    data class ExhibitionCalendar(val slotId: Long, val slotName: String) : FullScreen
+    data class ExhibitionCalendar(
+        val slotId: Long,
+        val slotName: String,
+        val width: Float,
+        val height: Float,
+        val commission: Float,
+        val requirements: String
+    ) : FullScreen
 
     @Serializable
     data object ArtistHomeMatching : FullScreen

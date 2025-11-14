@@ -254,7 +254,11 @@ fun NavGraph(
                     is FullScreen.ExhibitionCalendar -> NavEntry(key) {
                         ExhibitionCalendarScreen(
                             slotId = key.slotId,
-                            slotName = key.slotName
+                            slotName = key.slotName,
+                            width = key.width,
+                            height = key.height,
+                            commission = key.commission,
+                            requirements = key.requirements
                         )
                     }
 

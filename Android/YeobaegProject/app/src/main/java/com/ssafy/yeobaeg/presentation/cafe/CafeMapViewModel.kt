@@ -149,7 +149,11 @@ class CafeMapViewModel @Inject constructor(
         val cameraPos = state.cameraPosition ?: return
         val myLocation = state.currentLocation ?: return
 
-        val radiusKm = calculateRadiusFromZoom(state.currentZoomLevel)
+        val radiusKm = if (state.searchKeyword.isNotEmpty()) {
+            100.0  // 검색어가 있으면 100km 범위로 검색
+        } else {
+            calculateRadiusFromZoom(state.currentZoomLevel)
+        }
         lastCameraPosition = cameraPos
 
         loadCafes(

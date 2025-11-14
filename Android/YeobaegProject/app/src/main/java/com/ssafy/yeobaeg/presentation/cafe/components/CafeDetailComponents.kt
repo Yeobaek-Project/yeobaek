@@ -23,6 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.presentation.cafe.CafeDetailTab
+import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
+import com.ssafy.yeobaeg.ui.theme.YeobaegWhite
 
 @Composable
 fun CafeImageGallery(
@@ -168,31 +170,5 @@ fun CafeDetailTabs(
             selectedContentColor = Color(0xFF8D6E63),
             unselectedContentColor = Color(0xFFBDBDBD)
         )
-    }
-}
-
-@Composable
-fun CafeDetailBottomBar() {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shadowElevation = 8.dp,
-        color = MaterialTheme.colorScheme.surface
-    ) {
-        Button(
-            onClick = { /* TODO: 채팅 하기 */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF8D6E63)
-            ),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(
-                text = "문의",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
     }
 }

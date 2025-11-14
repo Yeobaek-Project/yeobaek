@@ -64,8 +64,8 @@ fun CafeOwnerHomeScreen(
             onTabSelected = { viewModel.selectTab(it) },
             onScanClick = viewModel::navigateToSpaceScan,
             onWallClick = viewModel::navigateToSlot,
-            onExhibitionItemClick = { slotId, slotName ->
-                viewModel.navigateToExhibitionCalendar(slotId, slotName)
+            onExhibitionItemClick = { slot ->
+                viewModel.navigateToExhibitionCalendar(slot)
             },
             onMatchingClick = viewModel::navigateToMatching,
         )
@@ -79,7 +79,7 @@ private fun CafeOwnerHomeScreen(
     onRegisterClick: () -> Unit = {},
     onTabSelected: (CafeOwnerTab) -> Unit = {},
     onScanClick: () -> Unit = {},
-    onExhibitionItemClick: (Long, String) -> Unit = { _, _ -> },
+    onExhibitionItemClick: (com.ssafy.yeobaeg.domain.model.DisplaySlot) -> Unit = { },
     onMatchingClick: () -> Unit = {},
     onWallClick: (DisplaySlot) -> Unit = {}
 ) {
@@ -224,7 +224,7 @@ fun CafeOwnerHomeContent(
     tab: CafeOwnerTab,
     onTabSelected: (CafeOwnerTab) -> Unit = { },
     onWallClick: (DisplaySlot) -> Unit,
-    onExhibitionItemClick: (Long, String) -> Unit = { _, _ -> }
+    onExhibitionItemClick: (com.ssafy.yeobaeg.domain.model.DisplaySlot) -> Unit = { }
 ) {
     var sheetVisible by remember { mutableStateOf(false) }
     var selected by remember { mutableStateOf<DisplaySlot?>(null) }
@@ -382,7 +382,7 @@ private fun SlotAvailabilityRow(
 @Composable
 fun ExhibitionStatusSection(
     slots: List<DisplaySlot>,
-    onSlotClick: (Long, String) -> Unit = { _, _ -> }
+    onSlotClick: (com.ssafy.yeobaeg.domain.model.DisplaySlot) -> Unit = { }
 ) {
     Column(
         modifier = Modifier
@@ -410,13 +410,13 @@ fun ExhibitionStatusSection(
 @Composable
 fun DisplaySlotList(
     slots: List<DisplaySlot>,
-    onSlotClick: (Long, String) -> Unit = { _, _ -> }
+    onSlotClick: (com.ssafy.yeobaeg.domain.model.DisplaySlot) -> Unit = { }
 ) {
     slots.forEach { displaySlot ->
         ExhibitionListItem(
             displaySlot = displaySlot,
             onClick = {
-                onSlotClick(displaySlot.wid, displaySlot.wName)
+                onSlotClick(displaySlot)
             }
         )
     }

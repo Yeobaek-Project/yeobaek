@@ -120,7 +120,12 @@ fun CafeMapScreen(
             CafeSearchBar(
                 searchKeyword = uiState.searchKeyword,
                 onSearchKeywordChanged = viewModel::onSearchKeywordChanged,
-                onSearch = viewModel::onSearch,
+                onSearch = {
+                    viewModel.onSearch()
+                    coroutineScope.launch {
+                        bottomSheetState.expand()
+                    }
+                },
                 showFilterButton = uiState.userRole == UserRole.ARTIST,
                 onFilterClick = viewModel::toggleFilterDialog,
                 isFilterActive = uiState.filter.isActive(),
@@ -307,7 +312,7 @@ fun GoogleMapView(
     onCafeInfoWindowClick: (Long) -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val defaultPosition = remember { LatLng(37.5665, 126.9780) } // 서울 시청
+    val defaultPosition = remember { LatLng(36.10722517564397, 128.41605298051869) } // 서울 시청
     val initialPosition = cameraPosition ?: currentLocation ?: defaultPosition
 
     val cameraPositionState = rememberCameraPositionState {
