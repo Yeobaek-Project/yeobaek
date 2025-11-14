@@ -6,10 +6,9 @@ interface Navigator {
 
     suspend fun navigate(
         route: NavKey,
-        popUpTo: Boolean = false
     )
 
-    suspend fun navigateBack()
+    suspend fun navigateBack(route: NavKey? = null, popUpTo: Boolean = false)
 
     suspend fun navigateAndClearBackStack(route: NavKey)
 }

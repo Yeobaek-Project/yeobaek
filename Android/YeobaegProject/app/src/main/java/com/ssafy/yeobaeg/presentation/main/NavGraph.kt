@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavEntry
@@ -42,6 +43,12 @@ import com.ssafy.yeobaeg.presentation.chat.ChattingScreen
 import com.ssafy.yeobaeg.presentation.home.artist.ArtistHomeScreen
 import com.ssafy.yeobaeg.presentation.cafe.CafeDetailScreen
 import com.ssafy.yeobaeg.presentation.cafe.CafeMapScreen
+import com.ssafy.yeobaeg.presentation.chat.matching.MatchingArtworkScreen
+import com.ssafy.yeobaeg.presentation.chat.matching.MatchingDateScreen
+import com.ssafy.yeobaeg.presentation.chat.matching.MatchingFeeScreen
+import com.ssafy.yeobaeg.presentation.chat.matching.MatchingNoteScreen
+import com.ssafy.yeobaeg.presentation.chat.matching.MatchingSpaceScreen
+import com.ssafy.yeobaeg.presentation.chat.matching.MatchingViewModel
 import com.ssafy.yeobaeg.presentation.exhibition.ExhibitionCalendarScreen
 import com.ssafy.yeobaeg.presentation.home.GeneralHomeScreen
 import com.ssafy.yeobaeg.presentation.home.artist.ArtworkRegisterScreen
@@ -72,6 +79,7 @@ fun NavGraph(
 ) {
     var lastBackPressedTime by remember { mutableLongStateOf(0L) }
     val context = LocalContext.current
+    val matchingViewModel: MatchingViewModel = hiltViewModel(context as MainActivity)
 
     BackHandler {
         val now = System.currentTimeMillis()
@@ -264,6 +272,26 @@ fun NavGraph(
 
                     is FullScreen.CafeOwnerMatching -> NavEntry(key) {
                         CafeOwnerMatchingScreen(key.slots)
+                    }
+
+                    is FullScreen.MatchingSpaceScreen-> NavEntry(key){
+                        MatchingSpaceScreen(matchingViewModel)
+                    }
+
+                    is FullScreen.MatchingArtworkScreen-> NavEntry(key){
+                        MatchingArtworkScreen(matchingViewModel)
+                    }
+
+                    is FullScreen.MatchingFeeScreen-> NavEntry(key){
+                        MatchingFeeScreen(matchingViewModel)
+                    }
+
+                    is FullScreen.MatchingNoteScreen-> NavEntry(key){
+                        MatchingNoteScreen(matchingViewModel)
+                    }
+
+                    is FullScreen.MatchingDateScreen-> NavEntry(key){
+                        MatchingDateScreen(key.myId,key.myRole,key.partnerId, matchingViewModel)
                     }
 
                     else -> throw IllegalArgumentException("Unknown route: $key")

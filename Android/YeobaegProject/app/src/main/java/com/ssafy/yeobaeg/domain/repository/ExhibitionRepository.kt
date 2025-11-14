@@ -1,6 +1,10 @@
 package com.ssafy.yeobaeg.domain.repository
 
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionSchedule
+import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionInfo
+import com.ssafy.yeobaeg.domain.model.exhibition.PossibleArtworks
+import com.ssafy.yeobaeg.domain.model.exhibition.PossibleSlots
+import com.ssafy.yeobaeg.domain.model.exhibition.ProposeExhibition
 
 interface ExhibitionRepository {
 
@@ -15,4 +19,11 @@ interface ExhibitionRepository {
         slotId: Long,
         from: String
     ): Result<List<ExhibitionSchedule>>
+
+    suspend fun proposeExhibition(info: ProposeExhibition)
+    suspend fun getExhibitionInfo(exhibitionId: Long): Result<ExhibitionInfo>
+    suspend fun agreeExhibitionPropose(exhibitionId: Long)
+    suspend fun getPossibleArtworks(artistId: Long, startDate: String, endDate: String): Result<PossibleArtworks>
+    suspend fun getPossibleSlots(cafeId: Long, startDate: String, endDate: String): Result<PossibleSlots>
+
 }

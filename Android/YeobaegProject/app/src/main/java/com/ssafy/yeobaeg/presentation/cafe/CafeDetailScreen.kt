@@ -92,7 +92,7 @@ fun CafeDetailScreen(
             if (uiState.cafeDetail != null && uiState.userRole != UserRole.CAFE_OWNER) {
                 YeobaegButton(
                     text = "문의",
-                    onClick = { /* TODO: 채팅 하기 */ },
+                    onClick = viewModel::onInquiryClick,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 16.dp)

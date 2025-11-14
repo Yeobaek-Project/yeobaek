@@ -8,6 +8,7 @@ import com.ssafy.yeobaeg.analytics.AnalyticsLogger
 import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.domain.model.art.ArtworkDetail
 import com.ssafy.yeobaeg.domain.repository.ArtRepository
+import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
 import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
@@ -31,6 +32,7 @@ data class ArtworkDetailUiState(
 @HiltViewModel
 class ArtworkDetailViewModel @Inject constructor(
     private val artRepository: ArtRepository,
+    private val chatRepository: ChatRepository,
     private val navigator: Navigator,
     private val snackBarController: SnackBarController,
     private val analyticsLogger: AnalyticsLogger,
@@ -94,6 +96,22 @@ class ArtworkDetailViewModel @Inject constructor(
                 _uiState.update { it.copy(artwork = d.copy(isBookmarked = b)) }
                 snackBarController.showError(it.message ?: "오류")
             }
+        }
+    }
+
+    fun onInquiryClick() {
+        val artistId = _uiState.value.artwork?.artist?.artistId ?: return
+
+        viewModelScope.launch {
+            chatRepository.createChatRoom(artistId)
+                .onSuccess { room ->
+                    navigator.navigate(
+                        FullScreen.ChattingScreen(room.chatRoomId)
+                    )
+                }
+                .onFailure { e ->
+                    snackBarController.showError(e.message ?: "채팅방 생성 실패")
+                }
         }
     }
 

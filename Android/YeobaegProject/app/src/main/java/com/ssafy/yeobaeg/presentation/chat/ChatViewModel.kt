@@ -1,11 +1,12 @@
 package com.ssafy.yeobaeg.presentation.chat
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoomInfo
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoomMessages
+import com.ssafy.yeobaeg.domain.model.chat.MessageType
 import com.ssafy.yeobaeg.domain.model.ws.SendMessage
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import com.ssafy.yeobaeg.domain.repository.ChatWebSocketRepository
@@ -45,6 +46,7 @@ class ChatViewModel @Inject constructor(
     val uiState: StateFlow<ChatUiState> = _uiState
     private var receiveJob: Job? = null
     val myUserId: StateFlow<Long?> = authSessionManager.currentUserId
+    val myUserRole: StateFlow<UserRole?> = authSessionManager.currentUserRole
 
     /** 채팅방 구독 시작 (입장 시) */
     fun subscribeToChatRoom(chatRoomId: Long) {
@@ -92,7 +94,7 @@ class ChatViewModel @Inject constructor(
         return try {
             Json.decodeFromString(ChatMessage.serializer(), json)
         } catch (e: Exception) {
-            ChatMessage(0, 0L, "TEXT", "파싱 오류", "", null, false, "")
+            ChatMessage(0, 0L, MessageType.TEXT, "파싱 오류", "",1 , null,false, "")
         }
     }
 
@@ -107,7 +109,7 @@ class ChatViewModel @Inject constructor(
         val myMsg = ChatMessage(
             messageId = System.currentTimeMillis(),
             senderId = myUserId,
-            messageType = "TEXT",
+            messageType = MessageType.TEXT,
             content = text,
             imageUrl = "",
             exhibition = null,
@@ -169,5 +171,9 @@ class ChatViewModel @Inject constructor(
 
     fun navigateBack() = viewModelScope.launch {
         navigator.navigateBack()
+    }
+
+    fun navigateToMatching(partnerId:Long)=viewModelScope.launch {
+        navigator.navigate(FullScreen.MatchingDateScreen(myUserId.value,myUserRole.value,partnerId))
     }
 }

@@ -12,19 +12,22 @@ class NavigatorImpl @Inject constructor() : Navigator, InternalNavigator {
 
     override suspend fun navigate(
         route: NavKey,
-        popUpTo: Boolean
     ) {
         Log.d("LaunchedNavigator", "Navigating to route: $route")
         channel.send(
             InternalRoute.Navigate(
                 route = route,
-                popUpTo = popUpTo
             ),
         )
     }
 
-    override suspend fun navigateBack() {
-        channel.send(InternalRoute.NavigateBack)
+    override suspend fun navigateBack(
+        route: NavKey?,
+        popUpTo: Boolean
+    ) {
+        channel.send(InternalRoute.NavigateBack(
+            route, popUpTo
+        ))
     }
 
     override suspend fun navigateAndClearBackStack(route: NavKey) {

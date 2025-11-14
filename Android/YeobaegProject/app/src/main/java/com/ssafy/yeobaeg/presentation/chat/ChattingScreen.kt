@@ -1,12 +1,26 @@
 package com.ssafy.yeobaeg.presentation.chat
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -16,8 +30,25 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,14 +60,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
+import com.ssafy.yeobaeg.domain.model.chat.MessageType
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.presentation.common.util.DateFormatter
 import com.ssafy.yeobaeg.presentation.common.util.clearFocusOnTap
-import com.ssafy.yeobaeg.ui.theme.*
+import com.ssafy.yeobaeg.ui.theme.YeobaegBackground
+import com.ssafy.yeobaeg.ui.theme.YeobaegBlack
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
+import com.ssafy.yeobaeg.ui.theme.YeobaegLightGray
+import com.ssafy.yeobaeg.ui.theme.YeobaegTextGray
+import com.ssafy.yeobaeg.ui.theme.YeobaegWhite
+import com.ssafy.yeobaeg.ui.theme.jansilFont
 import kotlinx.coroutines.delay
 
 private const val TAG = "ChattingScreen"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChattingScreen(
@@ -45,6 +85,9 @@ fun ChattingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val myUserId = viewModel.myUserId.collectAsState().value
+    val myUserRole = viewModel.myUserRole.collectAsState().value
+    var showMatchingFlow by remember { mutableStateOf(false) }
+    var inputText by remember { mutableStateOf("") }
 
     DisposableEffect(chatRoomId) {
         viewModel.loadChatMessages(chatRoomId)
@@ -55,12 +98,12 @@ fun ChattingScreen(
         }
     }
 
-    var inputText by remember { mutableStateOf("") }
 
     ChattingScreenContent(
         title = uiState.chatRoomMessages.chatRoom.partnerName,
         profileImg = uiState.chatRoomMessages.chatRoom.partnerImageUrl,
         messages = uiState.chatRoomMessages.messages,
+        partnerName = uiState.chatRoomMessages.chatRoom.partnerName,
         isLoading = uiState.isLoading,
         errorMessage = uiState.errorMessage,
         inputText = inputText,
@@ -72,6 +115,11 @@ fun ChattingScreen(
             }
         },
         onBackClick = viewModel::navigateBack,
+        onMatchingClick = {
+            viewModel.navigateToMatching(
+                uiState.chatRoomMessages.chatRoom.partnerId,
+            )
+        },
         myUserId = myUserId
     )
 }
@@ -84,6 +132,7 @@ fun ChattingScreen(
 fun ChattingScreenContent(
     title: String,
     profileImg: String?,
+    partnerName: String,
     messages: List<ChatMessage> = emptyList(),
     isLoading: Boolean = false,
     errorMessage: String? = null,
@@ -91,6 +140,7 @@ fun ChattingScreenContent(
     onInputChange: (String) -> Unit = {},
     onSendClick: (String) -> Unit = {},
     onBackClick: (() -> Unit)? = null,
+    onMatchingClick: () -> Unit = {},
     myUserId: Long?
 ) {
     val listState = rememberLazyListState()
@@ -124,7 +174,8 @@ fun ChattingScreenContent(
                     .padding(horizontal = 10.dp, vertical = 8.dp),
                 value = inputText,
                 onValueChange = onInputChange,
-                onSendClick = onSendClick
+                onSendClick = onSendClick,
+                onMatchingClick = onMatchingClick
             )
         },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -167,11 +218,38 @@ fun ChattingScreenContent(
                         items = messages.asReversed(),
                         key = { "${it.messageId}_${it.createdAt}" }
                     ) { msg ->
-                        val isMyMessage = myUserId != null && msg.senderId == myUserId
-                        if (isMyMessage) {
-                            MyMessageBubble(msg)
-                        } else {
-                            PartnerMessageBubble(msg, profileImg)
+                        when (msg.messageType) {
+
+                            // 일반 텍스트 메시지
+                            MessageType.TEXT -> {
+                                val isMy = myUserId != null && msg.senderId == myUserId
+                                if (isMy) MyMessageBubble(msg)
+                                else PartnerMessageBubble(msg, profileImg)
+                            }
+
+                            // 이미지 메시지
+                            MessageType.IMAGE -> {
+//                                ImageMessageBubble(msg) // 너가 새로 만들 함수
+                            }
+
+                            // 전시 제안 메시지
+                            MessageType.PROPOSAL -> {
+                                ProposalMessageBubble(
+                                    msg,
+                                    partnerName = partnerName,
+                                    myId = myUserId
+                                )
+                            }
+
+                            // 전시 수락 / 거절 / 취소 / 시작 / 종료 (시스템 메시지)
+                            MessageType.AGREED, MessageType.REJECTED, MessageType.CANCELLED, MessageType.STARTED, MessageType.ENDED -> {
+                                SystemMessageBubble(msg)
+                            }
+
+                            // 서버가 추가 타입 보내도 UI 깨지지 않도록
+                            else -> {
+                                Text("지원하지 않는 메시지 타입: ${msg.messageType}")
+                            }
                         }
                     }
                 }
@@ -213,7 +291,7 @@ fun PartnerMessageBubble(message: ChatMessage, profileImg: String?) {
                     .wrapContentWidth()
             ) {
                 Text(
-                    text = message.content,
+                    text = message.content ?: "",
                     fontFamily = jansilFont,
                     color = YeobaegBlack,
                     fontSize = 15.sp,
@@ -230,6 +308,109 @@ fun PartnerMessageBubble(message: ChatMessage, profileImg: String?) {
         }
     }
 }
+
+@Composable
+fun ProposalMessageBubble(
+    message: ChatMessage,
+    myId: Long?,
+    partnerName: String = "상대방",
+    onAccept: (() -> Unit)? = null,
+    onReject: (() -> Unit)? = null
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(12.dp),
+        color = YeobaegWhite,
+        shadowElevation = 1.dp,
+        border = BorderStroke(1.dp, YeobaegLightGray.copy(alpha = 0.5f))
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+
+            // 상단 제목
+            Text(
+                text = "매칭 요청",
+                fontFamily = jansilFont,
+                fontSize = 16.sp,
+                color = YeobaegBlack
+            )
+
+            Spacer(modifier = Modifier.height(13.dp))
+
+            //내가 요청 보낸 경우
+            if (message.senderId == myId) {
+                Text(
+                    text = "${partnerName}님에게 전시 매칭을 요청했습니다.",
+                    fontFamily = jansilFont,
+                    fontSize = 14.sp,
+                    color = YeobaegBlack
+                )
+            } else { // 내가 요청 보내지 않은 경우
+                // 본문
+                Text(
+                    text = "${partnerName}님이 전시 매칭을 요청했습니다.\n수락하시겠습니까?",
+                    fontFamily = jansilFont,
+                    fontSize = 14.sp,
+                    color = YeobaegBlack
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 버튼 2개
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+
+                    // 거절 버튼
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp)
+                            .border(
+                                width = 1.dp,
+                                color = YeobaegLightGray,
+                                shape = RoundedCornerShape(8.dp)
+                            )
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onReject?.invoke() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "거절",
+                            fontFamily = jansilFont,
+                            fontSize = 14.sp,
+                            color = YeobaegBlack
+                        )
+                    }
+
+                    // 수락 버튼
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(40.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(YeobaegBrown)
+                            .clickable { onAccept?.invoke() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "수락",
+                            fontFamily = jansilFont,
+                            fontSize = 14.sp,
+                            color = YeobaegWhite
+                        )
+                    }
+                }
+            }
+
+        }
+    }
+}
+
 
 @Composable
 fun MyMessageBubble(message: ChatMessage) {
@@ -254,7 +435,7 @@ fun MyMessageBubble(message: ChatMessage) {
                     .wrapContentWidth()
             ) {
                 Text(
-                    text = message.content,
+                    text = message.content ?: "",
                     fontFamily = jansilFont,
                     color = YeobaegWhite,
                     fontSize = 15.sp,
@@ -278,11 +459,12 @@ fun ChatInputBar(
     value: String,
     onValueChange: (String) -> Unit,
     onSendClick: (String) -> Unit,
-    onAddClick: () -> Unit = {},
+    onMatchingClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val trimmedValue = value.trim()
     val isSendEnabled = trimmedValue.isNotEmpty()
+    var showDialog by remember { mutableStateOf(false) }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -292,7 +474,7 @@ fun ChatInputBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically ,
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // + 버튼
@@ -306,8 +488,8 @@ fun ChatInputBar(
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)
-                        .clickable { onAddClick() }
-                ) {
+                        .clickable { showDialog = true })
+                {
                     Text(
                         text = "+",
                         color = YeobaegTextGray,
@@ -387,21 +569,84 @@ fun ChatInputBar(
             }
         }
     }
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {},
+            title = null,
+            text = {
+                Column(
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    DialogOption("사진", Color(0xFFE3F2FD)) { /* TODO: 사진 업로드 로직 */ showDialog =
+                        false
+                    }
+                    DialogOption("매칭 요청", Color(0xFFFFF8E1)) {
+                        showDialog = false
+                        onMatchingClick()
+                    }
+
+                    DialogOption("매칭 요청", Color(0xFFFFF8E1)) { /* TODO: 매칭 로직 */ showDialog =
+                        false
+                    }
+                }
+            },
+            containerColor = YeobaegWhite,
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+}
+
+@Composable
+fun SystemMessageBubble(message: ChatMessage) {
+    Text(
+        text = when (message.messageType) {
+            MessageType.AGREED -> "상대가 제안을 수락했습니다."
+            MessageType.REJECTED -> "상대가 제안을 거절했습니다."
+            MessageType.CANCELLED -> "전시가 취소되었습니다."
+            MessageType.STARTED -> "전시가 시작되었습니다."
+            MessageType.ENDED -> "전시가 종료되었습니다."
+            else -> ""
+        },
+        color = YeobaegTextGray,
+        fontSize = 12.sp,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 6.dp),
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+fun DialogOption(text: String, color: Color, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .clickable { onClick() }
+            .background(color.copy(alpha = 0.4f))
+            .padding(vertical = 10.dp, horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text, fontSize = 16.sp, color = YeobaegBlack, fontFamily = jansilFont)
+    }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun ChattingScreenPreview() {
     val dummyMessages = listOf(
-        ChatMessage(1, 1, "TEXT", "안녕하세요! 작품이 정말 마음에 들어요.", "", null, false, "2시간 전"),
-        ChatMessage(2, 0, "TEXT", "감사합니다 😊", "", null, false, "2시간 전"),
-        ChatMessage(3, 1, "TEXT", "전시 일정이 어떻게 되나요?", "", null, false, "1시간 전"),
-        ChatMessage(4, 0, "TEXT", "다음 주 월요일부터 가능합니다", "", null, false, "1시간 전")
+        ChatMessage(1, 1, MessageType.TEXT, "안녕하세요! 작품이 정말 마음에 들어요.", "", 0, null, false, "2시간 전"),
+        ChatMessage(2, 0, MessageType.TEXT, "감사합니다 😊", "", 0, null, false, "2시간 전"),
+        ChatMessage(3, 1, MessageType.TEXT, "전시 일정이 어떻게 되나요?", "", 0, null, false, "1시간 전"),
+        ChatMessage(4, 0, MessageType.PROPOSAL, "다음 주 월요일부터 가능합니다", "", 0, null, false, "1시간 전")
     )
     ChattingScreenContent(
         title = "김아티스트",
         messages = dummyMessages,
         profileImg = "",
-        myUserId = 0
+        myUserId = 0,
+        partnerName = "fff"
     )
 }

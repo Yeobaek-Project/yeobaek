@@ -5,25 +5,25 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ExhibitionInfoResponse(
-    val cafeId: Long,
-    val artworkId: Long,
-    val slotId: Long,
+    val exhibitionId: Long,
+    val cafeName: String,
+    val slotName: String,
+    val artworkTitle:String,
     val exhibitionStartDate: String,
     val exhibitionEndDate: String,
-    val agreedCommissionRate: Double,
+    val commissionRate: Double,
     val requirements: String,
-    val systemMessageType: String,
 )
 
 fun ExhibitionInfoResponse.toDomain(): ExhibitionInfo {
     return ExhibitionInfo(
-        cafeId = cafeId,
-        artworkId = artworkId,
-        slotId = slotId,
+        exhibitionId = exhibitionId,
+        cafeName = cafeName,
+        slotName = slotName,
+        artworkTitle=artworkTitle,
         exhibitionStartDate = exhibitionStartDate,
         exhibitionEndDate = exhibitionEndDate,
-        agreedCommissionRate = agreedCommissionRate,
+        commissionRate = commissionRate,
         requirements = requirements,
-        systemMessageType = systemMessageType
     )
 }
