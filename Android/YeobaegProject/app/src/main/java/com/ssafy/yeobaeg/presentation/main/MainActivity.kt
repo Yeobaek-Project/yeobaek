@@ -1,6 +1,5 @@
 package com.ssafy.yeobaeg.presentation.main
 
-import android.R.id.message
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,12 +12,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.rememberNavBackStack
+import com.ssafy.yeobaeg.analytics.AnalyticsLogger
 import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.bottomnav.MainTab
-import com.ssafy.yeobaeg.presentation.common.component.SnackbarType
 import com.ssafy.yeobaeg.presentation.common.component.showYeobaegSnackbar
 import com.ssafy.yeobaeg.ui.theme.YeobaegProjectTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

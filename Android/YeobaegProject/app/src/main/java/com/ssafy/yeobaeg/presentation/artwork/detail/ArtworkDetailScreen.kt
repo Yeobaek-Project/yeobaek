@@ -1,5 +1,8 @@
 package com.ssafy.yeobaeg.presentation.artwork.detail
 
+import android.os.SystemClock
+import android.util.Log
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,8 +29,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,7 +72,28 @@ fun ArtworkDetailScreen(
     artworkId: Long,
     viewModel: ArtworkDetailViewModel = hiltViewModel()
 ) {
+    val scrollState = rememberScrollState()
+    val sessionStart = remember(artworkId) { SystemClock.elapsedRealtime() }
+    var maxPct by remember(artworkId) { mutableIntStateOf(0) }
+
     LaunchedEffect(artworkId) { viewModel.load(artworkId) }
+
+    LaunchedEffect(scrollState.value, scrollState.maxValue) {
+        if (scrollState.maxValue > 0) {
+            val currentPct = ((scrollState.value.toFloat() / scrollState.maxValue) * 100).toInt()
+            if (currentPct > maxPct) {
+                maxPct = currentPct
+            }
+        }
+    }
+
+    DisposableEffect(artworkId) {
+        onDispose {
+            val dwell = SystemClock.elapsedRealtime() - sessionStart
+            if (artworkId < 0 || dwell < 1000) return@onDispose
+            viewModel.logViewEnd(artworkId, dwell, maxPct)
+        }
+    }
 
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -84,7 +112,8 @@ fun ArtworkDetailScreen(
             userRole = state.userRole,
             onBackClick = viewModel::onBackClick,
             toggleBookmark = viewModel::toggleBookmark,
-            onArtistClick = viewModel::navigateToArtist
+            onArtistClick = viewModel::navigateToArtist,
+            scrollState = scrollState
         )
     }
 }
@@ -93,13 +122,12 @@ fun ArtworkDetailScreen(
 fun ArtworkDetailScreen(
     modifier: Modifier = Modifier,
     artwork: ArtworkDetail,
+    scrollState: ScrollState = rememberScrollState(),
     userRole: UserRole? = null,
     onBackClick: () -> Unit = {},
     toggleBookmark: () -> Unit = {},
     onArtistClick: () -> Unit = {}
 ) {
-    val scrollState = rememberScrollState()
-
     Scaffold(
         topBar = {
             YeobaegTopAppBar(

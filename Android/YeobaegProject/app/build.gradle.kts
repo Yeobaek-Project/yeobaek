@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.gms)
 }
 
 android {
@@ -122,7 +123,13 @@ dependencies {
     implementation(libs.rxjava2)
     implementation(libs.rxandroid)
 
+    // lottie
     implementation(libs.lottie.compose)
+
+    // firebase analytics
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.jetbrains.kotlinx.coroutines.play.services)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

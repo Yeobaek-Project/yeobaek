@@ -3,6 +3,7 @@ package com.ssafy.yeobaeg.presentation.login
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.yeobaeg.analytics.AnalyticsLogger
 import com.ssafy.yeobaeg.domain.repository.AuthRepository
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
 import com.ssafy.yeobaeg.presentation.common.util.SnackBarController
@@ -29,7 +30,8 @@ class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val authSessionManager: AuthSessionManager,
     private val navigator: Navigator,
-    private val snackbarController: SnackBarController
+    private val snackbarController: SnackBarController,
+    private val analyticsLogger: AnalyticsLogger
 ) : ViewModel() {
     
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -75,6 +77,7 @@ class LoginViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(isLoading = false, error = null)
                     }
+                    analyticsLogger.setUserId(loginResult.userId)
 
                     // 홈 화면으로 이동
                     navigator.navigateAndClearBackStack(BottomNavScreen.Home)

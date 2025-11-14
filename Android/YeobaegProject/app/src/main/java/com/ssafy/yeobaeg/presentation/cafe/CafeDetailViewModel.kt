@@ -3,6 +3,7 @@ package com.ssafy.yeobaeg.presentation.cafe
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.yeobaeg.analytics.AnalyticsLogger
 import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.domain.model.cafe.CafeDetail
 import com.ssafy.yeobaeg.domain.repository.CafeRepository
@@ -34,6 +35,7 @@ enum class CafeDetailTab {
 class CafeDetailViewModel @Inject constructor(
     private val cafeRepository: CafeRepository,
     private val navigator: Navigator,
+    private val analyticsLogger: AnalyticsLogger,
     private val authSessionManager: AuthSessionManager
 ) : ViewModel() {
 
@@ -67,6 +69,7 @@ class CafeDetailViewModel @Inject constructor(
                             isLoading = false
                         )
                     }
+                    analyticsLogger.logCafeClick(detail.cafeId)
                 }
                 .onFailure { e ->
                     Log.e("CafeDetailViewModel", "Failed to load cafe detail", e)
@@ -115,6 +118,12 @@ class CafeDetailViewModel @Inject constructor(
                             )
                         )
                     }
+                    if(isBookmarked) {
+                        analyticsLogger.logCafeLike(cafeId)
+                    }
+                    else {
+                        analyticsLogger.logCafeUnlike(cafeId)
+                    }
                 }
                 .onFailure { e ->
                     Log.e("CafeDetailViewModel", "Failed to toggle bookmark", e)
@@ -159,6 +168,11 @@ class CafeDetailViewModel @Inject constructor(
      */
     fun clearError() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    fun logViewEnd(id: Long, dwell: Long, maxPct: Int) {
+        Log.d("logViewEnd cafe", "$id / $dwell / $maxPct")
+        analyticsLogger.logCafeViewEnd(cafeId = id, dwellMs = dwell, scrollPct = maxPct)
     }
 }
 
