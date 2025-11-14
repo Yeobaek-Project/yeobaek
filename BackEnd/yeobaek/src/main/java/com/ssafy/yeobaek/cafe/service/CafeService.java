@@ -3,6 +3,7 @@ package com.ssafy.yeobaek.cafe.service;
 import com.ssafy.yeobaek.cafe.dto.request.CreateCafeRequest;
 
 import com.ssafy.yeobaek.cafe.dto.request.CreateDisplayWallRequest;
+import com.ssafy.yeobaek.cafe.dto.request.UpdateCafeRequest;
 import com.ssafy.yeobaek.cafe.dto.request.UpdateSlotRequest;
 import com.ssafy.yeobaek.cafe.dto.response.*;
 
@@ -17,6 +18,13 @@ public interface CafeService {
      * @param request 카페 등록 정보
      */
     void createCafe(Long userId, CreateCafeRequest request);
+
+    /**
+     * 내 카페 정보 수정
+     * @param userId 유저 id
+     * @param request 수정할 카페 정보
+     */
+    void updateCafe(Long userId, UpdateCafeRequest request);
 
     /**
      * 카페 공간 등록

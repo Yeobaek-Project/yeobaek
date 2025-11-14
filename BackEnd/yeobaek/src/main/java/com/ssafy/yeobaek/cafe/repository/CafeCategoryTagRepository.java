@@ -13,4 +13,6 @@ public interface CafeCategoryTagRepository extends JpaRepository<CafeCategoryTag
     List<CafeCategoryTag> findAllByCafe(Cafe cafe);
     
     List<CafeCategoryTag> findAllByCafe_IdIn(List<Long> cafeIds);
+
+    void deleteAllByCafe(Cafe cafe);
 }

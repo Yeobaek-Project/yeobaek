@@ -1,6 +1,7 @@
 package com.ssafy.yeobaek.cafe.service;
 
 import com.ssafy.yeobaek.artwork.entity.Artwork;
+import com.ssafy.yeobaek.cafe.dto.request.UpdateCafeRequest;
 import com.ssafy.yeobaek.cafe.dto.request.UpdateSlotRequest;
 import com.ssafy.yeobaek.common.dto.Pagination;
 import com.ssafy.yeobaek.cafe.dto.request.CreateCafeRequest;
@@ -92,6 +93,69 @@ public class CafeServiceImpl implements CafeService {
                     .build();
             cafeCategoryTagRepository.save(cafeCategoryTag);
         });
+    }
+
+    /**
+     * 내 카페 정보 수정
+     * @param userId 유저 id
+     * @param request 수정할 카페 정보
+     */
+    @Override
+    @Transactional
+    public void updateCafe(Long userId, UpdateCafeRequest request) {
+
+        // 1. 카페 조회
+        Cafe cafe = cafeRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.CAFE_NOT_FOUND));
+
+        // 2. 필드별로 값이 존재하면 업데이트
+        if (request.getCafeName() != null && !request.getCafeName().isBlank()) {
+            cafe.setCafeName(request.getCafeName());
+        }
+        if (request.getDescription() != null) {
+            cafe.setDescription(request.getDescription());
+        }
+        if (request.getContact() != null) {
+            cafe.setContact(request.getContact());
+        }
+        if (request.getBusinessHoursStart() != null) {
+            cafe.setBusinessStartTime(request.getBusinessHoursStart());
+        }
+        if (request.getBusinessHoursEnd() != null) {
+            cafe.setBusinessEndTime(request.getBusinessHoursEnd());
+        }
+        if (request.getDailyVisitors() != null) {
+            cafe.setDailyVisitors(request.getDailyVisitors());
+        }
+
+        // 3. 주소 변경 시 좌표 업데이트
+        if (request.getAddress() != null && !request.getAddress().isBlank()) {
+            Coordinates coordinates = geocoderService.getCoordinates(request.getAddress());
+            cafe.setAddress(request.getAddress());
+            cafe.setLatitude(coordinates.getLatitude());
+            cafe.setLongitude(coordinates.getLongitude());
+        }
+
+        // 4. 이미지 목록 변경
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            cafe.setImages(request.getImages());
+        }
+
+        // 5. 카테고리 변경 (기존 연결 모두 삭제 후 새로 추가)
+        if (request.getCategoryIds() != null) {
+            cafeCategoryTagRepository.deleteAllByCafe(cafe);
+            List<CafeCategory> categories = cafeCategoryService.findCategoriesByIds(request.getCategoryIds());
+            categories.forEach(cafeCategory -> {
+                CafeCategoryTag cafeCategoryTag = CafeCategoryTag.builder()
+                        .cafe(cafe)
+                        .category(cafeCategory)
+                        .build();
+                cafeCategoryTagRepository.save(cafeCategoryTag);
+            });
+        }
+
+        // 6. 변경사항 저장
+        cafeRepository.save(cafe);
     }
 
     /**
