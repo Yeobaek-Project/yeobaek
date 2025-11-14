@@ -21,7 +21,9 @@ import com.ssafy.yeobaek.exhibition.repository.ExhibitionRepository;
 import com.ssafy.yeobaek.exhibition.service.ExhibitionService;
 import com.ssafy.yeobaek.review.entity.Review;
 import com.ssafy.yeobaek.review.repository.ReviewRepository;
+import com.ssafy.yeobaek.review.service.ReviewService;
 import com.ssafy.yeobaek.storage.service.S3Service;
+import com.ssafy.yeobaek.user.dto.response.RatingStatsData;
 import com.ssafy.yeobaek.user.entity.User;
 import com.ssafy.yeobaek.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +57,7 @@ public class CafeServiceImpl implements CafeService {
     private final CafeCategoryService cafeCategoryService;
     private final CafeBookmarkService cafeBookmarkService;
     private final ExhibitionService exhibitionService;
+    private final ReviewService reviewService;
     private final CafeMapper cafeMapper;
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
@@ -226,8 +229,11 @@ public class CafeServiceImpl implements CafeService {
         // 4. 카페 이미지 URL 변환
         String primaryImage = s3Service.generatePresignedUrlForThumbnail(cafe.getImages().get(0));
 
-        // 5. DTO 변환하여 반환
-        return cafeMapper.toMyCafeData(cafe, walls, primaryImage, exhibitionInfoMap);
+        // 5. 협업 작가 수 조회
+        Long collaboratingArtists = exhibitionRepository.countDistinctArtistsByCafeId(cafe.getId());
+
+        // 6. DTO 변환하여 반환
+        return cafeMapper.toMyCafeData(cafe, walls, primaryImage, exhibitionInfoMap, collaboratingArtists);
     }
 
 
@@ -351,15 +357,26 @@ public class CafeServiceImpl implements CafeService {
 
         // 5. 카페 이미지 URL 변환
         List<String> images = s3Service.generatePresignedUrlsForDownload(cafe.getImages());
-        String profileImage = s3Service.generatePresignedUrlForThumbnail(cafe.getCafeOwner().getProfileImageUrl());
+        User ownerUser = cafe.getCafeOwner();
+        String profileImage = s3Service.generatePresignedUrlForThumbnail(ownerUser.getProfileImageUrl());
 
         // 6. 북마크 여부 확인
         boolean isBookmarked = cafeBookmarkService.isBookmarked(userId, cafeId);
 
-        // 7. DTO 변환
-        CafeDetailData cafeDetailData = cafeMapper.toCafeDetailData(cafe, walls, categories, images, profileImage, exhibitionInfoMap, isBookmarked);
+        // 7. 평점 정보 계산
+        List<Review> reviews = reviewRepository.findAllByRevieweeId(ownerUser.getId());
+        int totalReviews = reviews.size();
+        double averageRating = reviews.isEmpty() ? 0.0 :
+                reviews.stream()
+                        .mapToInt(Review::getRating)
+                        .average()
+                        .orElse(0.0);
+        RatingStatsData ratingStats = new RatingStatsData(totalReviews, averageRating);
 
-        // 8. 조회수 1 증가
+        // 8. DTO 변환
+        CafeDetailData cafeDetailData = cafeMapper.toCafeDetailData(cafe, walls, categories, images, profileImage, exhibitionInfoMap, isBookmarked, ratingStats);
+
+        // 9. 조회수 1 증가
         cafe.increaseViewCount();
         cafeRepository.save(cafe);
 
