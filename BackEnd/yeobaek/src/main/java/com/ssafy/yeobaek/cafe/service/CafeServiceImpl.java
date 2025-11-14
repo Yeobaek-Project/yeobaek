@@ -582,4 +582,42 @@ public class CafeServiceImpl implements CafeService {
         // 9. Response 반환
         return cafeMapper.toCafeRecommendationResponse(cafeSummaries, pagination);
     }
+
+    /**
+     * 인기 카페 목록 조회
+     * - 북마크 수와 조회수를 9:1로 가중치를 두어 상위 N개 카페를 조회
+     * @param size 조회할 작품 수 (최대 20개)
+     * @return 인기 카페 목록
+     */
+    @Override
+    public PopularCafesData getPopularCafes(Integer size) {
+
+        // 1. 상위 인기 카페 조회
+        Pageable pageable = PageRequest.of(0, size);
+        List<Cafe> popularCafes = cafeRepository.findPopularCafes(pageable);
+
+        if (popularCafes.isEmpty()) {
+            return new PopularCafesData(Collections.emptyList());
+        }
+
+        // 2. 카테고리 정보 일괄 조회 (N+1 방지)
+        List<Long> cafeIds = popularCafes.stream().map(Cafe::getId).collect(Collectors.toList());
+        Map<Long, List<String>> cafeCategoriesMap = cafeCategoryTagRepository.findAllByCafe_IdIn(cafeIds).stream()
+                .collect(Collectors.groupingBy(
+                        tag -> tag.getCafe().getId(),
+                        Collectors.mapping(tag -> tag.getCategory().getCategoryName(), Collectors.toList())
+                ));
+
+        // 3. DTO 변환
+        List<CafeSummary> summaries = popularCafes.stream()
+                .map(cafe -> {
+                    List<String> categories = cafeCategoriesMap.getOrDefault(cafe.getId(), Collections.emptyList());
+                    String primaryImageUrl = s3Service.generatePresignedUrlForThumbnail(cafe.getImages().get(0));
+                    // 인기 카페 목록에서는 거리를 계산하지 않으므로 null 전달
+                    return cafeMapper.toCafeSummary(cafe, null, categories, primaryImageUrl);
+                })
+                .collect(Collectors.toList());
+
+        return new PopularCafesData(summaries);
+    }
 }

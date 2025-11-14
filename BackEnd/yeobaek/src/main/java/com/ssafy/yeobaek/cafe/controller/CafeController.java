@@ -505,14 +505,41 @@ public class CafeController {
                 .body(ResponseDto.success(data));
     }
 
-    @Operation(summary = "인기 카페 목록 조회", description = "조회수, 북마크 수, 평가를 기반으로 인기 카페를 추천합니다. 최대 20개까지 조회합니다.")
+    @Operation(summary = "인기 카페 목록 조회", description = "조회수, 북마크 수를 기반으로 인기 카페를 추천합니다. 최대 20개까지 조회합니다.")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
                     description = "정상 처리",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = ResponseDto.class)
+                            examples = @ExampleObject(
+                                    value = "{\"code\":\"S0000\",\"message\":\"정상 처리\",\"data\":{\"cafes\":[{\"cafeId\":1,\"cafeName\":\"카페 여백 #1\",\"address\":\"서울시 강남구 테헤란로 123\",\"latitude\":37.5665,\"longitude\":126.978,\"primaryImageUrl\":\"https://example.com/cafe1.jpg\",\"availableSlotCount\":2,\"totalSlotCount\":3,\"distance\":null,\"categories\":[\"모던\",\"미니멀\"]},{\"cafeId\":2,\"cafeName\":\"아트 카페 #2\",\"address\":\"서울시 종로구 인사동길 45\",\"latitude\":37.5796,\"longitude\":126.9769,\"primaryImageUrl\":\"https://example.com/cafe2.jpg\",\"availableSlotCount\":3,\"totalSlotCount\":4,\"distance\":null,\"categories\":[\"빈티지\",\"클래식\"]}]}}"
+                            )
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "잘못된 요청",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(
+                                            name = "조회 개수 오류",
+                                            description = "조회할 카페 수가 1~20개를 벗어난 경우",
+                                            value = "{\"code\": \"S4002\", \"message\": \"입력값이 유효하지 않습니다\"}"
+                                    )
+                            }
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "인증 실패",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = {
+                                    @ExampleObject(name = "유효하지 않은 토큰", value = "{\"code\": \"AU4012\", \"message\": \"유효하지 않은 토큰입니다\"}"),
+                                    @ExampleObject(name = "만료된 토큰", value = "{\"code\": \"AU4013\", \"message\": \"만료된 토큰입니다\"}")
+                            }
                     )
             ),
             @ApiResponse(
@@ -521,7 +548,7 @@ public class CafeController {
                     content = @Content(
                             mediaType = "application/json",
                             examples = @ExampleObject(
-                                    value = "{\"code\": \"S5000\", \"data\": null, \"message\": \"서버 내부 오류가 발생했습니다\"}"
+                                    value = "{\"code\": \"S5000\", \"message\": \"서버 내부 오류가 발생했습니다\"}"
                             )
                     )
             )
@@ -529,13 +556,11 @@ public class CafeController {
     @GetMapping("/popular")
     public ResponseEntity<ResponseDto<PopularCafesData>> getPopularCafes(
             @Parameter(description = "조회할 카페 수 (기본값: 10, 최대: 20)")
+            @Min(value = 1, message = "INVALID_INPUT_VALUE")
+            @Max(value = 20, message = "INVALID_INPUT_VALUE")
             @RequestParam(defaultValue = "10") Integer size
     ) {
-        // Mock 데이터
-        int count = Math.min(size, MOCK_CAFE_COUNT);
-        List<CafeSummary> cafes = createMockCafes(count, 100L, null);
-
-        PopularCafesData data = new PopularCafesData(cafes);
+        PopularCafesData data = cafeService.getPopularCafes(size);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
