@@ -13,8 +13,7 @@ import javax.inject.Inject
 sealed interface RouteSideEffect {
     data class Navigate(
         val route: NavKey,
-        val saveState: Boolean,
-        val launchSingleTop: Boolean
+        val popUpTo: Boolean
     ) : RouteSideEffect
 
     data object NavigateBack : RouteSideEffect
@@ -36,8 +35,7 @@ internal class NavigatorViewModel @Inject constructor(
                     is InternalRoute.Navigate ->
                         RouteSideEffect.Navigate(
                             navigator.route,
-                            navigator.saveState,
-                            navigator.launchSingleTop
+                            navigator.popUpTo
                         )
 
                     is InternalRoute.NavigateBack -> RouteSideEffect.NavigateBack

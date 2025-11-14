@@ -35,8 +35,21 @@ private fun InternalLaunchedNavigator(
                     }
 
                     is RouteSideEffect.Navigate -> {
-                        navBackStack.remove(sideEffect.route)
-                        navBackStack.add(sideEffect.route)
+                        val popUpTo = sideEffect.popUpTo
+
+                        if (popUpTo) {
+                            if (!navBackStack.contains(sideEffect.route)) {
+                                navBackStack.add(sideEffect.route)
+                            } else {
+                                while (navBackStack.isNotEmpty() && navBackStack.last() != sideEffect.route) {
+                                    navBackStack.removeLastOrNull()
+                                }
+                            }
+                        }
+                        else {
+                            navBackStack.remove(sideEffect.route)
+                            navBackStack.add(sideEffect.route)
+                        }
                     }
 
                     is RouteSideEffect.NavigateAndClearBackStack -> {

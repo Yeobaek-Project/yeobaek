@@ -5,8 +5,7 @@ import androidx.navigation3.runtime.NavKey
 sealed interface InternalRoute {
     data class Navigate(
         val route: NavKey,
-        val saveState: Boolean,
-        val launchSingleTop: Boolean
+        val popUpTo: Boolean
     ) : InternalRoute
 
     data object NavigateBack : InternalRoute

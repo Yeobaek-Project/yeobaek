@@ -12,15 +12,13 @@ class NavigatorImpl @Inject constructor() : Navigator, InternalNavigator {
 
     override suspend fun navigate(
         route: NavKey,
-        saveState: Boolean,
-        launchSingleTop: Boolean
+        popUpTo: Boolean
     ) {
         Log.d("LaunchedNavigator", "Navigating to route: $route")
         channel.send(
             InternalRoute.Navigate(
                 route = route,
-                saveState = saveState,
-                launchSingleTop = launchSingleTop
+                popUpTo = popUpTo
             ),
         )
     }
