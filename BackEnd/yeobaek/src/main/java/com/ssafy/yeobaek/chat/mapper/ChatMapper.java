@@ -105,18 +105,6 @@ public class ChatMapper {
         return toChatMessage(message, message.getExhibition());
     }
 
-
-    /**
-     * Message 엔티티 목록을 ChatMessage DTO 목록으로 변환
-     * @param messages Message 엔티티 목록
-     * @return ChatMessage DTO 목록
-     */
-    public List<ChatMessage> toChatMessageList(List<Message> messages) {
-        return messages.stream()
-                .map(this::toChatMessage)
-                .collect(Collectors.toList());
-    }
-
     /**
      * 메시지 전송 요청 정보를 Message 엔티티로 변환
      * @param chatRoom 채팅방 정보

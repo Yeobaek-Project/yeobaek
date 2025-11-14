@@ -86,7 +86,6 @@ public class ChatServiceImpl implements ChatService {
                 .findFirst();
 
         ChatRoomData chatRoomData;
-        boolean isNewRoom = false;
 
         // 4. 기존 채팅방이 있으면 해당 채팅방 정보 반환
         if (existingRoomOpt.isPresent()) {
@@ -105,7 +104,6 @@ public class ChatServiceImpl implements ChatService {
             chatRoomData = chatMapper.toChatRoomData(existingChatRoom, partner, partnerImageUrl);
         } else {
             // 5. 새로운 채팅방 생성
-            isNewRoom = true;
             ChatRoom newChatRoom = ChatRoom.builder().build();
             chatRoomRepository.save(newChatRoom);
 
@@ -172,10 +170,21 @@ public class ChatServiceImpl implements ChatService {
 
         // 5. 메시지 목록 조회 (페이지네이션 적용)
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").ascending());
-        Page<Message> messagePage = messageRepository.findByChatRoom(chatRoom, pageable);
-        List<ChatMessage> chatMessages = chatMapper.toChatMessageList(messagePage.getContent());
+        Page<Message> messagePage = messageRepository.findByChatRoomWithExhibition(chatRoom, pageable);
 
-        // 6. 페이징 정보 생성
+        // 6. DTO 변환 (S3 URL 변환 포함)
+        List<ChatMessage> chatMessages = messagePage.getContent().stream()
+                .map(message -> {
+                    ChatMessage chatMessage = chatMapper.toChatMessage(message);
+                    if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
+                        String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
+                        chatMessage.setImageUrl(presignedUrl);
+                    }
+                    return chatMessage;
+                })
+                .collect(Collectors.toList());
+
+        // 7. 페이징 정보 생성
         Pagination pagination = new Pagination(
                 messagePage.getNumber(),
                 messagePage.getSize(),
@@ -219,6 +228,10 @@ public class ChatServiceImpl implements ChatService {
 
         // 5. ChatMessage 생성 후 반환
         ChatMessage chatMessage = chatMapper.toChatMessage(message);
+        if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
+            String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
+            chatMessage.setImageUrl(presignedUrl);
+        }
         log.info("[ChatService] Returning ChatMessage DTO: {}", chatMessage);
 
         // 6. WebSocket을 통해 메시지 전송
