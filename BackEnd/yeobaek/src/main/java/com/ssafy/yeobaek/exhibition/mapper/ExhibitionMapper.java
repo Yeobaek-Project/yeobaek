@@ -8,6 +8,7 @@ import com.ssafy.yeobaek.exhibition.dto.request.CreateExhibitionRequest;
 import com.ssafy.yeobaek.exhibition.dto.response.ArtworkDto;
 import com.ssafy.yeobaek.exhibition.dto.response.CafeDto;
 import com.ssafy.yeobaek.exhibition.dto.response.ExhibitionSummaryResponse;
+import com.ssafy.yeobaek.exhibition.dto.response.SlotDto;
 import com.ssafy.yeobaek.exhibition.entity.Exhibition;
 import org.springframework.stereotype.Component;
 
@@ -54,11 +55,13 @@ public class ExhibitionMapper {
     public ExhibitionSummaryResponse toExhibitionSummaryResponse(Exhibition exhibition) {
         CafeDto cafeDto = toCafeDto(exhibition.getCafe());
         ArtworkDto artworkDto = toArtworkDto(exhibition.getArtwork());
+        SlotDto slotDto = toSlotDto(exhibition.getDisplaySlot());
 
         return ExhibitionSummaryResponse.builder()
                 .exhibitionId(exhibition.getId())
                 .cafe(cafeDto)
                 .artwork(artworkDto)
+                .slot(slotDto)
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
                 .commissionRate(exhibition.getCommissionRate())
@@ -124,6 +127,21 @@ public class ExhibitionMapper {
                 .title(artwork.getTitle())
                 .description(artwork.getDescription())
                 .artCategory(artwork.getArtCategory())
+                .build();
+    }
+
+    /**
+     * DisplaySlot 엔티티를 SlotDto로 변환
+     * @param displaySlot DisplaySlot 엔티티
+     * @return SlotDto
+     */
+    public SlotDto toSlotDto(DisplaySlot displaySlot) {
+        return SlotDto.builder()
+                .slotId(displaySlot.getId())
+                .wallName(displaySlot.getWall().getWallName())
+                .widthCm(displaySlot.getWall().getWidthCm())
+                .heightCm(displaySlot.getWall().getHeightCm())
+                .commissionRate(displaySlot.getCommissionRate())
                 .build();
     }
 }

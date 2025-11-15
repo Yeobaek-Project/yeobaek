@@ -389,13 +389,13 @@ public class ExhibitionController {
     }
 
     @Operation(
-            summary = "전시 상세 정보 조회",
+            summary = "전시 일정 정보 조회",
             description = "전시 ID로 전시의 상세 정보를 조회합니다. 카페, 작품, 슬롯의 간략한 정보를 포함합니다."
     )
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "전시 상세 정보 조회 성공",
+                    description = "전시 일정 정보 조회 성공",
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = ResponseDto.class),

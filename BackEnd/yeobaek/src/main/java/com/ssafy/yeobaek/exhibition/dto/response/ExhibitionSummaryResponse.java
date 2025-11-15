@@ -24,6 +24,9 @@ public class ExhibitionSummaryResponse {
     @Schema(description = "작품 정보")
     private ArtworkDto artwork;
 
+    @Schema(description = "슬롯 정보")
+    private SlotDto slot;
+
     @Schema(description = "전시 시작일", example = "2025-11-15")
     private LocalDate startDate;
 
