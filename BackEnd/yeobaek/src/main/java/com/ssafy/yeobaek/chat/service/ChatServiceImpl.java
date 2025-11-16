@@ -131,7 +131,7 @@ public class ChatServiceImpl implements ChatService {
             EventDto eventDto = EventDto.builder()
                     .eventType(EventType.CHAT_ROOM_CREATED)
                     .build();
-            webSocketMessageService.sendEventToUser(partner.getEmail(), eventDto);
+            webSocketMessageService.sendEventToUser(partner.getId(), eventDto);
         }
 
         return chatRoomData;
@@ -247,7 +247,7 @@ public class ChatServiceImpl implements ChatService {
         EventDto eventDto = EventDto.builder()
                 .eventType(EventType.NEW_MESSAGE_RECEIVED)
                 .build();
-        webSocketMessageService.sendEventToUser(recipient.getEmail(), eventDto);
+        webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
     }
 
     /**
@@ -377,17 +377,24 @@ public class ChatServiceImpl implements ChatService {
         // 4. WebSocket을 통해 메시지 전송
         webSocketMessageService.sendChatMessage(chatRoomId, chatMessage);
 
-        // 5. 상대방에게 시스템 이벤트 알림 전송 (개인 알림 채널)
-        User recipient = chatRoom.getMembers().stream()
-                .map(ChatRoomMember::getUser)
-                .filter(user -> !user.getId().equals(sender.getId()))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
-
+        // 5. 상대방 또는 모든 멤버에게 시스템 이벤트 알림 전송
         EventDto eventDto = EventDto.builder()
                 .eventType(EventType.NEW_MESSAGE_RECEIVED)
                 .build();
 
-        webSocketMessageService.sendEventToUser(recipient.getEmail(), eventDto);
+        if (sender != null) {
+            // 발신자가 있는 경우, 상대방에게만 알림
+            User recipient = chatRoom.getMembers().stream()
+                    .map(ChatRoomMember::getUser)
+                    .filter(user -> !user.getId().equals(sender.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+            webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
+        } else {
+            // 발신자가 없는 시스템 메시지의 경우, 모든 멤버에게 알림
+            chatRoom.getMembers().forEach(member -> {
+                webSocketMessageService.sendEventToUser(member.getUser().getId(), eventDto);
+            });
+        }
     }
 }

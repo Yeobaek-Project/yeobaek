@@ -64,10 +64,36 @@ public class StompHandler implements ChannelInterceptor {
                 throw new IllegalArgumentException("Missing or invalid Authorization header");
             }
         } else if (StompCommand.SEND.equals(command) || StompCommand.SUBSCRIBE.equals(command)) {
-            // CONNECT 이후의 다른 요청에서 세션에 저장된 인증 정보 사용
             Authentication authentication = (Authentication) accessor.getSessionAttributes().get("userAuthentication");
-            if (authentication != null) {
-                accessor.setUser(authentication);
+
+            // If authentication is missing, deny access.
+            if (authentication == null) {
+                log.error("Authentication not found in session for {} command.", command);
+                throw new IllegalArgumentException("User not authenticated.");
+            }
+            accessor.setUser(authentication); // Ensure user is set for the current message
+
+            // Authorize SUBSCRIBE command for notification topics
+            if (StompCommand.SUBSCRIBE.equals(command)) {
+                String destination = accessor.getDestination();
+                if (destination != null && destination.startsWith("/sub/notifications/")) {
+                    try {
+                        String topicUserIdStr = destination.substring("/sub/notifications/".length());
+                        Long topicUserId = Long.parseLong(topicUserIdStr);
+
+                        JwtUserPrincipal principal = (JwtUserPrincipal) authentication.getPrincipal();
+                        Long authenticatedUserId = principal.userId();
+
+                        if (!authenticatedUserId.equals(topicUserId)) {
+                            log.warn("SUBSCRIPTION DENIED: User {} attempted to subscribe to notifications for user {}.", authenticatedUserId, topicUserId);
+                            throw new IllegalArgumentException("Unauthorized subscription.");
+                        }
+                        log.info("SUBSCRIPTION ALLOWED: User {} to topic {}.", authenticatedUserId, destination);
+                    } catch (Exception e) {
+                        log.error("Error during subscription authorization check for destination: {}", destination, e);
+                        throw new IllegalArgumentException("Invalid subscription topic format.");
+                    }
+                }
             }
         }
         return message;

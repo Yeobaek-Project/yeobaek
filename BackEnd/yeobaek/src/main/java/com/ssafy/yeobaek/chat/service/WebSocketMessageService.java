@@ -21,10 +21,10 @@ public class WebSocketMessageService {
         log.info("[WebSocketMessageSenderService] Message sent to destination: {}", destination);
     }
 
-    public void sendEventToUser(String username, EventDto eventDto) {
-        log.info("[WebSocketMessageSenderService] Sending event to user: {} with type: {}", username, eventDto.getEventType());
-        String destination = "/queue/notifications";
-        messagingTemplate.convertAndSendToUser(username, destination, eventDto);
-        log.info("[WebSocketMessageSenderService] Event sent to user: {} on destination: {}", username, destination);
+    public void sendEventToUser(Long userId, EventDto eventDto) {
+        log.info("[WebSocketMessageSenderService] Sending event to user ID: {} with type: {}", userId, eventDto.getEventType());
+        String destination = "/sub/notifications/" + userId;
+        messagingTemplate.convertAndSend(destination, eventDto);
+        log.info("[WebSocketMessageSenderService] Event sent to user ID: {} on destination: {}", userId, destination);
     }
 }
