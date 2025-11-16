@@ -1,5 +1,7 @@
 package com.ssafy.yeobaek.artwork.service;
 
+import com.ssafy.yeobaek.analytics.enums.TargetType;
+import com.ssafy.yeobaek.analytics.service.AnalyticsService;
 import com.ssafy.yeobaek.artwork.dto.response.BookmarkToggleResponse;
 import com.ssafy.yeobaek.artwork.entity.Artwork;
 import com.ssafy.yeobaek.artwork.entity.ArtworkBookmark;
@@ -23,6 +25,7 @@ public class ArtworkBookmarkServiceImpl implements ArtworkBookmarkService {
     private final ArtworkRepository artworkRepository;
     private final UserService userService;
     private final ArtworkBookmarkMapper artworkBookmarkMapper;
+    private final AnalyticsService analyticsService;
 
     /**
      * 사용자가 특정 작품을 북마크했는지 확인
@@ -78,6 +81,9 @@ public class ArtworkBookmarkServiceImpl implements ArtworkBookmarkService {
 
         // 북마크 카운트 증가
         artwork.incrementBookmarkCount();
+
+        // 북마크 이벤트 기록
+        analyticsService.recordBookmarkEvent(userId, artworkId, TargetType.ARTWORK);
     }
 
     /**

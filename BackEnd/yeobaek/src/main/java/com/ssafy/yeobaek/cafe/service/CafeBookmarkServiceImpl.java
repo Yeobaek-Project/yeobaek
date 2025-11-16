@@ -1,5 +1,7 @@
 package com.ssafy.yeobaek.cafe.service;
 
+import com.ssafy.yeobaek.analytics.enums.TargetType;
+import com.ssafy.yeobaek.analytics.service.AnalyticsService;
 import com.ssafy.yeobaek.cafe.dto.response.BookmarkToggleResponse;
 import com.ssafy.yeobaek.cafe.entity.Cafe;
 import com.ssafy.yeobaek.cafe.entity.CafeBookmark;
@@ -23,6 +25,7 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
     private final CafeRepository cafeRepository;
     private final UserService userService;
     private final CafeBookmarkMapper cafeBookmarkMapper;
+    private final AnalyticsService analyticsService;
 
     /**
      * 사용자가 특정 카페를 북마크했는지 확인
@@ -78,6 +81,9 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
         // CafeBookmark 엔티티 변환 및 저장
         CafeBookmark cafeBookmark = cafeBookmarkMapper.toCafeBookmark(user, cafe);
         cafeBookmarkRepository.save(cafeBookmark);
+
+        // 북마크 이벤트 기록
+        analyticsService.recordBookmarkEvent(userId, cafeId, TargetType.CAFE);
     }
 
     /**

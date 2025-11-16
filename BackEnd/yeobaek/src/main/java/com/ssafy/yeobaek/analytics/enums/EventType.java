@@ -22,7 +22,10 @@ public enum EventType {
     SCROLL("페이지 스크롤"),
 
     // 채팅 이벤트
-    CHAT("채팅 문의 시작");
+    CHAT("채팅 문의 시작"),
+
+    // 북마크 이벤트
+    BOOKMARK("북마크 추가/삭제");
 
     @Schema(description = "이벤트 타입 설명")
     private final String description;

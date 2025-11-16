@@ -75,6 +75,30 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     /**
+     * 북마크 이벤트 기록 (서버 내부용)
+     */
+    @Override
+    @Transactional
+    public void recordBookmarkEvent(Long userId, Long targetId, TargetType targetType) {
+        // 사용자 조회
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+
+        // 사용자 유형에 따른 이벤트 수집 제한 검증
+        validateUserTypeAndTargetType(user.getUserType(), targetType);
+
+        // 이벤트 엔티티 생성 및 저장
+        UserBehaviorEvent event = UserBehaviorEvent.builder()
+                .user(user)
+                .eventType(EventType.BOOKMARK)
+                .targetType(targetType)
+                .targetId(targetId)
+                .build();
+
+        userBehaviorEventRepository.save(event);
+    }
+
+    /**
      * 이벤트 타입에 따른 필드 검증
      */
     private void validateEventFields(EventType eventType, RecordEventRequest request) {
@@ -99,6 +123,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
             case VIEW:
             case CHAT:
+            case BOOKMARK:
                 if (request.getDurationSeconds() != null || request.getMaxScrollPercent() != null) {
                     throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
                 }

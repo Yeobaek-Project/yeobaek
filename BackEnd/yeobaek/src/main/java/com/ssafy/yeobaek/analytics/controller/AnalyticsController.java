@@ -1,7 +1,9 @@
 package com.ssafy.yeobaek.analytics.controller;
 
 import com.ssafy.yeobaek.analytics.dto.request.RecordEventRequest;
+import com.ssafy.yeobaek.analytics.dto.response.ImplicitFeedbackScore;
 import com.ssafy.yeobaek.analytics.service.AnalyticsService;
+import com.ssafy.yeobaek.analytics.service.ImplicitFeedbackService;
 import com.ssafy.yeobaek.common.dto.ResponseDto;
 import com.ssafy.yeobaek.common.util.SecurityUtil;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,10 +16,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 사용자 행동 분석 컨트롤러
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnalyticsController {
 
     private final AnalyticsService analyticsService;
+    private final ImplicitFeedbackService implicitFeedbackService;
 
     @Operation(
             summary = "사용자 행동 이벤트 기록",
@@ -116,5 +118,53 @@ public class AnalyticsController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ResponseDto.created());
+    }
+
+    @Operation(
+            summary = "카페 암묵적 피드백 점수 조회",
+            description = "사용자-카페별 암묵적 피드백 점수를 계산하여 반환합니다. " +
+                    "VIEW, DWELL, SCROLL, BOOKMARK, CHAT 이벤트를 기반으로 점수를 계산합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"code\": \"S0000\", \"message\": \"요청이 성공적으로 처리되었습니다\", " +
+                                            "\"data\": [{\"userId\": 1, \"itemId\": 100, \"score\": 27.36}]}"
+                            )
+                    )
+            )
+    })
+    @GetMapping("/implicit-scores/cafes")
+    public ResponseEntity<ResponseDto<List<ImplicitFeedbackScore>>> getCafeImplicitScores() {
+        List<ImplicitFeedbackScore> scores = implicitFeedbackService.calculateCafeImplicitScores();
+        return ResponseEntity.ok(ResponseDto.success(scores));
+    }
+
+    @Operation(
+            summary = "작품 암묵적 피드백 점수 조회",
+            description = "사용자-작품별 암묵적 피드백 점수를 계산하여 반환합니다. " +
+                    "VIEW, DWELL, SCROLL, BOOKMARK, CHAT 이벤트를 기반으로 점수를 계산합니다."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "조회 성공",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"code\": \"S0000\", \"message\": \"요청이 성공적으로 처리되었습니다\", " +
+                                            "\"data\": [{\"userId\": 1, \"itemId\": 200, \"score\": 15.73}]}"
+                            )
+                    )
+            )
+    })
+    @GetMapping("/implicit-scores/artworks")
+    public ResponseEntity<ResponseDto<List<ImplicitFeedbackScore>>> getArtworkImplicitScores() {
+        List<ImplicitFeedbackScore> scores = implicitFeedbackService.calculateArtworkImplicitScores();
+        return ResponseEntity.ok(ResponseDto.success(scores));
     }
 }
