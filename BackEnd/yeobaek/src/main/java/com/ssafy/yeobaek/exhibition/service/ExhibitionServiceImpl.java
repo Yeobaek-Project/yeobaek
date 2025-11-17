@@ -234,6 +234,14 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
         // 4. 거절 처리
         exhibition.reject();
+
+        // 5. 채팅방 ID 파생 및 시스템 메시지 전송
+        Long cafeOwnerId = exhibition.getCafe().getId();
+        Long artistId = exhibition.getArtwork().getArtist().getUser().getId();
+        ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
+        Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
+
+        chatService.sendSystemMessage(chatRoomId, null, MessageType.REJECTED, exhibition, currentUser);
     }
 
     /**
