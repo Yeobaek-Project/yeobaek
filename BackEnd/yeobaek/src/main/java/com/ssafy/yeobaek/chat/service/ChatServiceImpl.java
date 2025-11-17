@@ -177,7 +177,7 @@ public class ChatServiceImpl implements ChatService {
                 .map(message -> {
                     ChatMessage chatMessage = chatMapper.toChatMessage(message);
                     if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
-                        String presignedUrl = s3Service.generatePresignedUrlForThumbnail(message.getImageUrl());
+                        String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
                         chatMessage.setImageUrl(presignedUrl);
                     }
                     return chatMessage;
@@ -229,7 +229,7 @@ public class ChatServiceImpl implements ChatService {
         // 5. ChatMessage 생성 후 반환
         ChatMessage chatMessage = chatMapper.toChatMessage(message);
         if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
-            String presignedUrl = s3Service.generatePresignedUrlForThumbnail(message.getImageUrl());
+            String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
             chatMessage.setImageUrl(presignedUrl);
         }
         log.info("[ChatService] Returning ChatMessage DTO: {}", chatMessage);
