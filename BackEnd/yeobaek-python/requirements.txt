@@ -1,0 +1,12 @@
+# FastAPI 관련
+fastapi>=0.104.1
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+
+# 데이터 처리 (pip로 설치 가능)
+numpy>=1.26.0
+pandas>=2.0.3
+scipy>=1.11.0
+
+# ALS 추천 모델 (Windows에서는 conda로 설치 필요)
+implicit>=0.7.0

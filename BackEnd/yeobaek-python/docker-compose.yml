@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  yeobaek-recommender:
+    build: .
+    container_name: yeobaek-recommender
+    ports:
+      - "8081:8081"
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    # 헬스체크 설정
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # 기존 yeobaek 네트워크에 연결
+    networks:
+      - yeobaek-network
+
+# 기존 네트워크 사용 (외부 네트워크로 지정)
+networks:
+  yeobaek-network:
+    external: true
+    name: yeobaek_yeobaek-network
