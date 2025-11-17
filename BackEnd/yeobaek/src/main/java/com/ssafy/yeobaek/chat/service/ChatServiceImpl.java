@@ -15,7 +15,6 @@ import com.ssafy.yeobaek.common.enums.EventType;
 import com.ssafy.yeobaek.common.enums.MessageType;
 import com.ssafy.yeobaek.common.exception.CustomException;
 import com.ssafy.yeobaek.exhibition.entity.Exhibition;
-import com.ssafy.yeobaek.exhibition.repository.ExhibitionRepository;
 import com.ssafy.yeobaek.storage.service.S3Service;
 import com.ssafy.yeobaek.user.entity.User;
 import com.ssafy.yeobaek.user.service.UserService;
@@ -48,10 +47,10 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final MessageRepository messageRepository;
-    private final ExhibitionRepository exhibitionRepository;
     private final UserService userService;
     private final S3Service s3Service;
     private final WebSocketMessageService webSocketMessageService;
+    private final ChatPresenceService chatPresenceService;
 
     /**
      * 채팅방 생성
@@ -146,6 +145,7 @@ public class ChatServiceImpl implements ChatService {
      * @return 채팅방 정보
      */
     @Override
+    @Transactional
     public ChatRoomDetailData getChatRoomMessages(Long userId, Long chatRoomId, Integer page, Integer size) {
 
         // 1. 채팅방 조회
@@ -156,7 +156,10 @@ public class ChatServiceImpl implements ChatService {
         chatRoomMemberRepository.findByChatRoomAndUser_Id(chatRoom, userId)
                 .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN));
 
-        // 3. 상대방 정보 조회
+        // 3. 해당 채팅방의 안 읽은 메시지를 모두 읽음 처리
+        messageRepository.updateReadStatusInBulk(chatRoomId, userId);
+
+        // 4. 상대방 정보 조회
         User partner = chatRoom.getMembers().stream()
                 .map(ChatRoomMember::getUser)
                 .filter(user -> !user.getId().equals(userId))
@@ -221,12 +224,23 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN));
         log.info("[ChatService] Sender {} is a valid member of chatRoom {}", userId, chatRoom.getId());
 
-        // 4. 메시지 엔티티 생성 및 저장
-        Message message = chatMapper.toMessageEntity(chatRoom, sender, request);
-        messageRepository.save(message);
-        log.info("[ChatService] Message saved to DB with id: {}", message.getId());
+        // 4. 받는 사람 조회
+        User recipient = chatRoom.getMembers().stream()
+                .map(ChatRoomMember::getUser)
+                .filter(user -> !user.getId().equals(userId))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
 
-        // 5. ChatMessage 생성 후 반환
+        // 5. 받는 사람이 현재 채팅방에 접속해 있는지 확인
+        boolean isPresent = chatPresenceService.isUserPresent(request.getChatRoomId(), recipient.getId());
+
+        // 6. 메시지 엔티티 생성 및 저장
+        Message message = chatMapper.toMessageEntity(chatRoom, sender, request);
+        message.setIsRead(isPresent);
+        messageRepository.save(message);
+        log.info("[ChatService] Message saved to DB with id: {}. isRead: {}", message.getId(), isPresent);
+
+        // 7. ChatMessage 생성 후 반환
         ChatMessage chatMessage = chatMapper.toChatMessage(message);
         if (message.getMessageType() == MessageType.IMAGE && message.getImageUrl() != null) {
             String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
@@ -234,16 +248,10 @@ public class ChatServiceImpl implements ChatService {
         }
         log.info("[ChatService] Returning ChatMessage DTO: {}", chatMessage);
 
-        // 6. WebSocket을 통해 메시지 전송
+        // 8. WebSocket을 통해 메시지 전송
         webSocketMessageService.sendChatMessage(request.getChatRoomId(), chatMessage);
 
-        // 7. 상대방에게 새 메시지 도착 이벤트 전송
-        User recipient = chatRoom.getMembers().stream()
-                .map(ChatRoomMember::getUser)
-                .filter(user -> !user.getId().equals(userId))
-                .findFirst()
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND)); // 채팅방에 상대방이 없는 경우
-
+        // 9. 상대방에게 새 메시지 도착 이벤트 전송
         EventDto eventDto = EventDto.builder()
                 .eventType(EventType.NEW_MESSAGE_RECEIVED)
                 .build();
