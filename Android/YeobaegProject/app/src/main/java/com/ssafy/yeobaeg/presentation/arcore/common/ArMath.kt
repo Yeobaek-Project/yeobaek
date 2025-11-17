@@ -3,7 +3,10 @@ package com.ssafy.yeobaeg.presentation.arcore.common
 import android.annotation.SuppressLint
 import com.google.ar.core.HitResult
 import dev.romainguy.kotlin.math.Float3
+import io.github.sceneview.loaders.MaterialLoader
+import io.github.sceneview.math.Color
 import io.github.sceneview.math.Position
+import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.CylinderNode
 import kotlin.math.atan2
 import kotlin.math.sqrt
@@ -61,6 +64,37 @@ fun eulerYawOnGround(dx: Float, dz: Float): Float3 {
     val yawRad = atan2(dx / lenXZ, dz / lenXZ)
     val rad2deg = 180f / Math.PI.toFloat()
     return Float3(90f, yawRad * rad2deg, 0f)
+}
+
+/** 바닥(수평) 두 점을 잇는 큐브 생성 - 입체감 있는 선 */
+fun createCubeBetweenGround(
+    materialLoader: MaterialLoader,
+    a: Position,
+    b: Position
+): CubeNode {
+    val dx = b.x - a.x
+    val dz = b.z - a.z
+    val lenXZ = sqrt(dx * dx + dz * dz).coerceAtLeast(EPS)
+    val floorY = (a.y + b.y) * 0.5f
+    val mid = Position((a.x + b.x) * 0.5f, floorY, (a.z + b.z) * 0.5f)
+
+    val boxWidth = 0.01f   // 1cm 폭 (X축)
+    val boxLength = lenXZ  // 두 점 사이의 거리 (Y축 - Cylinder처럼)
+    val boxDepth = 0.25f   // 5cm 깊이 (Z축) - 입체감 강화
+
+    // Cylinder와 동일하게 Y축을 길이로 사용
+    return CubeNode(
+        engine = materialLoader.engine,
+        size = Float3(boxWidth, boxLength, boxDepth),
+        materialInstance = materialLoader.createColorInstance(
+            color = Color(0.3f, 0.8f, 0.7f, 1f) // 민트색
+        )
+    ).apply {
+        isShadowCaster = false
+        position = mid
+        // Cylinder와 동일한 회전 로직 (Y축이 길이 방향이므로 X축으로 90도 회전 후 yaw 적용)
+        rotation = eulerYawOnGround(dx, dz)
+    }
 }
 
 @SuppressLint("DefaultLocale")

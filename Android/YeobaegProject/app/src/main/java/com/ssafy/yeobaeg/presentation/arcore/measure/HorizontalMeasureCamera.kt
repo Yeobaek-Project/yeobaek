@@ -52,6 +52,7 @@ import com.google.ar.core.Session
 import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
 import com.ssafy.yeobaeg.R
+import com.ssafy.yeobaeg.presentation.arcore.common.createCubeBetweenGround
 import com.ssafy.yeobaeg.presentation.arcore.common.detachAnchorSafe
 import com.ssafy.yeobaeg.presentation.arcore.common.distance
 import com.ssafy.yeobaeg.presentation.arcore.common.fmt
@@ -66,6 +67,7 @@ import io.github.sceneview.ar.ARScene
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.ar.rememberARCameraStream
 import io.github.sceneview.math.Position
+import io.github.sceneview.node.CubeNode
 import io.github.sceneview.node.CylinderNode
 import io.github.sceneview.node.SphereNode
 import io.github.sceneview.rememberEngine
@@ -274,7 +276,7 @@ fun HorizontalMeasureCamera(
                 Spacer(Modifier.width(24.dp))
                 // 포인트 추가
                 YeobaegButton(
-                    text = "중앙에 포인트 추가",
+                    text = "포인트 추가",
                     onClick = {
                         val f = frame ?: return@YeobaegButton
                         if (f.camera.trackingState != TrackingState.TRACKING) return@YeobaegButton
@@ -313,13 +315,7 @@ fun HorizontalMeasureCamera(
 
                         lastPoint?.let { prev ->
                             val len = distance(prev, world)
-                            val line = CylinderNode(
-                                engine = engine,
-                                radius = 0.003f,
-                                height = BASE_LINE_HEIGHT
-                            )
-                                .apply { isShadowCaster = false }
-                            updateCylinderBetweenGround(line, prev, world)
+                            val line = createCubeBetweenGround(materialLoader, prev, world)
                             nodes += line
                             segments += Seg(anchorNode, marker, line, len, world)
                         } ?: run {

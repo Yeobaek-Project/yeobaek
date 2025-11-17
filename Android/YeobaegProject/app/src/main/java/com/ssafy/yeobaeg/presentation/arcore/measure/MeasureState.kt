@@ -3,7 +3,7 @@ package com.ssafy.yeobaeg.presentation.arcore.measure
 import com.google.ar.core.Pose
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.math.Position
-import io.github.sceneview.node.CylinderNode
+import io.github.sceneview.node.Node
 import io.github.sceneview.node.SphereNode
 
 
@@ -17,7 +17,7 @@ data class MeasureState(
 data class Seg(
     val anchorNode: AnchorNode,
     val marker: SphereNode,
-    val line: CylinderNode?,
+    val line: Node?, // 수평: CubeNode, 수직: CylinderNode
     val lengthM: Float,
     val world: Position
 )
