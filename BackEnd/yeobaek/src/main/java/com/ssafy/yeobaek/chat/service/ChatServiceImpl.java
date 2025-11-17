@@ -193,7 +193,7 @@ public class ChatServiceImpl implements ChatService {
                 messagePage.getSize(),
                 messagePage.getTotalElements(),
                 messagePage.getTotalPages(),
-                messagePage.isLast()
+                messagePage.hasNext()
         );
 
         return new ChatRoomDetailData(chatRoomSummary, chatMessages, pagination);
@@ -320,7 +320,7 @@ public class ChatServiceImpl implements ChatService {
                 chatRoomInfoPage.getSize(),
                 chatRoomInfoPage.getTotalElements(),
                 chatRoomInfoPage.getTotalPages(),
-                chatRoomInfoPage.isLast()
+                chatRoomInfoPage.hasNext()
         );
 
         return new ChatRoomListData(chatRoomInfoPage.getContent(), pagination);
