@@ -39,23 +39,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
-import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import kotlinx.coroutines.launch
 
-private val PopupCardBrown = Color(0xFF5A4533)
-private val PopupCardBrownDark = Color(0xFF3E3025)
+// ---------- 색상: 화이트 배경 + 브라운/골드 포인트 ----------
+
+// 카드/배경
+private val CardBackground = Color(0xFFFFFFFF)
+private val CardStroke = Color(0xFFE5E0DA)
+
+// 텍스트
+private val TextOnCardPrimary = Color(0xFF5A4533)      // 진한 브라운
+private val TextOnCardSecondary = Color(0xFF8B6E57)    // 보조 브라운
+private val TextOnCardTertiary = Color(0xFFB0B0B0)
+
+// 이미지 위 텍스트
+private val TextOnImagePrimary = Color(0xFFFFFFFF)
+private val TextOnImageSecondary = Color(0xFFE5E7EB)
+
+// 포인트 컬러
 private val PrimaryGold = Color(0xFFD6A05E)
 
-private val TextPrimary = Color(0xFFFFFFFF)
-private val TextSecondary = Color(0xFFE5E7EB)
-private val TextTertiary = Color(0xFFB0B0B0)
+// 슬롯 칩
+private val SlotAvailableBg = Color(0xFFEBDDCB)        // 전시 가능
+private val SlotAvailableBorder = Color(0xFFD6A05E)
+private val SlotUnavailableBg = Color(0xFFF3F3F3)      // 전시 중
+private val SlotUnavailableBorder = Color(0xFFD1D1D1)
 
-private val SlotActiveBorder = PrimaryGold
-private val SlotDisabledBorder = Color(0xFF7A6957)
-private val SlotDisabledBg = Color(0xFF4A3A2C)
-
+// 인디케이터
 private val IndicatorActive = PrimaryGold
-private val IndicatorInactive = Color(0xFF3C3A39)
+private val IndicatorInactive = Color(0xFFDDDDDD)
 
 @Composable
 fun RecommendedCafePopup(
@@ -73,7 +85,6 @@ fun RecommendedCafePopup(
     val offsetX = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
-    // 다음/이전 카페로 전환하는 함수
     fun animateToPage(targetIndex: Int) {
         scope.launch {
             val direction = if (targetIndex > currentIndex) -1f else 1f
@@ -89,7 +100,7 @@ fun RecommendedCafePopup(
     Box(
         modifier = modifier.fillMaxSize()
     ) {
-        // 이전 카페 (왼쪽)
+        // 이전 카페 (왼쪽 뒤)
         if (currentIndex > 0) {
             CafeCard(
                 cafe = recommendedCafes[currentIndex - 1],
@@ -109,7 +120,7 @@ fun RecommendedCafePopup(
             )
         }
 
-        // 다음 카페 (오른쪽)
+        // 다음 카페 (오른쪽 뒤)
         if (currentIndex < recommendedCafes.lastIndex) {
             CafeCard(
                 cafe = recommendedCafes[currentIndex + 1],
@@ -129,7 +140,7 @@ fun RecommendedCafePopup(
             )
         }
 
-        // 현재 카페 (드래그 가능)
+        // 현재 카페 (가운데, 드래그 가능)
         CafeCard(
             cafe = recommendedCafes[currentIndex],
             modifier = Modifier
@@ -174,7 +185,7 @@ fun RecommendedCafePopup(
             onDetailClick = onDetailClick
         )
 
-        // 페이지 인디케이터 (카드 밖, 하단 중앙)
+        // 페이지 인디케이터
         Row(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -197,6 +208,48 @@ fun RecommendedCafePopup(
             }
         }
 
+        // 좌우 화살표 (원하면 지워도 됨)
+        if (recommendedCafes.size > 1) {
+            IconButton(
+                onClick = {
+                    if (currentIndex > 0) animateToPage(currentIndex - 1)
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 8.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .border(1.dp, CardStroke, CircleShape)
+                    .zIndex(4f)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChevronLeft,
+                    contentDescription = "이전",
+                    tint = TextOnCardPrimary
+                )
+            }
+
+            IconButton(
+                onClick = {
+                    if (currentIndex < recommendedCafes.lastIndex) animateToPage(currentIndex + 1)
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 8.dp)
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .border(1.dp, CardStroke, CircleShape)
+                    .zIndex(4f)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.ChevronRight,
+                    contentDescription = "다음",
+                    tint = TextOnCardPrimary
+                )
+            }
+        }
     }
 }
 
@@ -210,10 +263,10 @@ private fun CafeCard(
         modifier = modifier,
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = PopupCardBrown,
-            contentColor = TextPrimary
+            containerColor = CardBackground,
+            contentColor = TextOnCardPrimary
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -222,7 +275,7 @@ private fun CafeCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(260.dp)
                     .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
             ) {
                 AsyncImage(
@@ -258,7 +311,7 @@ private fun CafeCard(
                                 Text(
                                     text = cafe.cafeName,
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = TextPrimary,
+                                    color = TextOnImagePrimary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -266,7 +319,7 @@ private fun CafeCard(
                                 Text(
                                     text = cafe.address,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = TextSecondary,
+                                    color = TextOnImageSecondary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -283,7 +336,7 @@ private fun CafeCard(
                                 Spacer(Modifier.width(4.dp))
                                 Text(
                                     text = String.format("%.1f", cafe.totalReviewScore),
-                                    color = TextPrimary,
+                                    color = TextOnImagePrimary,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
@@ -298,20 +351,22 @@ private fun CafeCard(
                     .fillMaxWidth()
                     .padding(horizontal = 20.dp, vertical = 16.dp)
             ) {
-                Text(
-                    text = cafe.categories.joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = TextSecondary,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (cafe.categories.isNotEmpty()) {
+                    Text(
+                        text = cafe.categories.joinToString(" · "),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextOnCardSecondary,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
-                Spacer(Modifier.height(20.dp))
+                    Spacer(Modifier.height(16.dp))
+                }
 
                 Text(
                     text = "전시 슬롯 상태",
                     style = MaterialTheme.typography.titleSmall,
-                    color = TextPrimary
+                    color = TextOnCardPrimary
                 )
 
                 Spacer(Modifier.height(12.dp))
@@ -351,11 +406,11 @@ private fun SlotStatusChip(
 ) {
     val isExhibiting = slot.isExhibiting
 
-    val bgColor = if (isExhibiting) SlotDisabledBg else PopupCardBrownDark
-    val borderColor = if (isExhibiting) SlotDisabledBorder else SlotActiveBorder
-    val titleColor = if (isExhibiting) TextTertiary else TextPrimary
+    val bgColor = if (isExhibiting) SlotUnavailableBg else SlotAvailableBg
+    val borderColor = if (isExhibiting) SlotUnavailableBorder else SlotAvailableBorder
+    val titleColor = if (isExhibiting) TextOnCardTertiary else TextOnCardPrimary
     val subLabel = if (isExhibiting) "전시 중" else "전시 가능"
-    val subColor = if (isExhibiting) TextTertiary else PrimaryGold
+    val subColor = if (isExhibiting) TextOnCardTertiary else PrimaryGold
 
     Column(
         modifier = modifier
