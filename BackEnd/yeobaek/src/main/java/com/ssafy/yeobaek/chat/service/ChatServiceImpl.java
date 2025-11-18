@@ -61,15 +61,24 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public ChatRoomData createChatRoom(Long userId, Long partnerId) {
-
+        log.info("채팅방 생성 시작 - 사용자 ID: {}, 상대방 ID: {}", userId, partnerId);
         // 1. 유효성 검증
-        if (userId.equals(partnerId)) throw new CustomException(ResponseCode.MESSAGE_SELF_SEND_NOT_ALLOWED);
+        if (userId.equals(partnerId)) {
+            log.warn("채팅방 생성 실패 - 자신에게 채팅을 시도했습니다. 사용자 ID: {}", userId);
+            throw new CustomException(ResponseCode.MESSAGE_SELF_SEND_NOT_ALLOWED);
+        }
 
         // 2. 사용자 조회
         User user = userService.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 생성 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
         User partner = userService.findById(partnerId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 생성 실패 - 존재하지 않는 상대방 ID: {}", partnerId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // 3. 기존 1:1 채팅방 확인 (leftAt 상태와 상관없이 모든 멤버 조회)
         List<ChatRoomMember> senderRooms = chatRoomMemberRepository.findByUser(user);
@@ -89,11 +98,13 @@ public class ChatServiceImpl implements ChatService {
         // 4. 기존 채팅방이 있으면 해당 채팅방 정보 반환
         if (existingRoomOpt.isPresent()) {
             ChatRoom existingChatRoom = existingRoomOpt.get();
+            log.info("기존 채팅방을 재사용합니다 - 채팅방 ID: {}", existingChatRoom.getId());
 
             // 현재 사용자의 ChatRoomMember를 찾아 leftAt을 null로 업데이트 (재참여)
             chatRoomMemberRepository.findByChatRoomAndUser_Id(existingChatRoom, userId)
                     .ifPresent(member -> {
                         if (member.getLeftAt() != null) {
+                            log.info("사용자가 채팅방에 재입장합니다. leftAt을 null로 업데이트합니다. - 사용자 ID: {}, 채팅방 ID: {}", userId, existingChatRoom.getId());
                             member.setLeftAt(null);
                             chatRoomMemberRepository.save(member);
                         }
@@ -105,6 +116,7 @@ public class ChatServiceImpl implements ChatService {
             // 5. 새로운 채팅방 생성
             ChatRoom newChatRoom = ChatRoom.builder().build();
             chatRoomRepository.save(newChatRoom);
+            log.info("새로운 채팅방을 생성했습니다 - 채팅방 ID: {}", newChatRoom.getId());
 
             // 6. 채팅방 멤버 생성
             ChatRoomMember senderMember = ChatRoomMember.builder()
@@ -131,8 +143,10 @@ public class ChatServiceImpl implements ChatService {
                     .eventType(EventType.CHAT_ROOM_CREATED)
                     .build();
             webSocketMessageService.sendEventToUser(partner.getId(), eventDto);
+            log.info("상대방에게 채팅방 생성 이벤트를 전송했습니다 - 상대방 ID: {}", partner.getId());
         }
 
+        log.info("채팅방 생성/조회 완료 - 채팅방 ID: {}", chatRoomData.getChatRoom().getChatRoomId());
         return chatRoomData;
     }
 
@@ -147,24 +161,36 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public ChatRoomDetailData getChatRoomMessages(Long userId, Long chatRoomId, Integer page, Integer size) {
-
+        log.info("채팅방 메시지 조회 시작 - 사용자 ID: {}, 채팅방 ID: {}, 페이지: {}, 사이즈: {}", userId, chatRoomId, page, size);
         // 1. 채팅방 조회
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 메시지 조회 실패 - 존재하지 않는 채팅방 ID: {}", chatRoomId);
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND);
+                });
 
         // 2. 사용자 권한 확인 (채팅방 멤버인지 확인)
         chatRoomMemberRepository.findByChatRoomAndUser_Id(chatRoom, userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 메시지 조회 실패 - 권한 없음. 사용자 ID: {}, 채팅방 ID: {}", userId, chatRoomId);
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN);
+                });
 
         // 3. 해당 채팅방의 안 읽은 메시지를 모두 읽음 처리
-        messageRepository.updateReadStatusInBulk(chatRoomId, userId);
+        int updatedCount = messageRepository.updateReadStatusInBulk(chatRoomId, userId);
+        if (updatedCount > 0) {
+            log.info("{}개의 메시지를 읽음 처리했습니다 - 채팅방 ID: {}, 사용자 ID: {}", updatedCount, chatRoomId, userId);
+        }
 
         // 4. 상대방 정보 조회
         User partner = chatRoom.getMembers().stream()
                 .map(ChatRoomMember::getUser)
                 .filter(user -> !user.getId().equals(userId))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("채팅방에 상대방이 존재하지 않습니다 - 채팅방 ID: {}", chatRoomId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         String partnerImageUrl = s3Service.generatePresignedUrlForThumbnail(partner.getProfileImageUrl());
 
@@ -196,6 +222,7 @@ public class ChatServiceImpl implements ChatService {
                 messagePage.hasNext()
         );
 
+        log.info("채팅방 메시지 조회 완료 - 조회된 메시지 수: {}", chatMessages.size());
         return new ChatRoomDetailData(chatRoomSummary, chatMessages, pagination);
     }
 
@@ -207,29 +234,38 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public void sendMessage(Long userId, ChatMessageRequest request) {
-        log.info("[ChatService] Start sending message from userId: {} in chatRoomId: {}", userId, request.getChatRoomId());
+        log.info("채팅 메시지 전송 시작 - 발신자 ID: {}, 채팅방 ID: {}", userId, request.getChatRoomId());
 
         // 1. 채팅방 유효성 검증
         ChatRoom chatRoom = chatRoomRepository.findById(request.getChatRoomId())
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND));
-        log.info("[ChatService] ChatRoom found: {}", chatRoom.getId());
+                .orElseThrow(() -> {
+                    log.warn("채팅 메시지 전송 실패 - 존재하지 않는 채팅방 ID: {}", request.getChatRoomId());
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND);
+                });
 
         // 2. 발신자 유효성 검증
         User sender = userService.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
-        log.info("[ChatService] Sender found: {}", sender.getId());
+                .orElseThrow(() -> {
+                    log.warn("채팅 메시지 전송 실패 - 존재하지 않는 발신자 ID: {}", userId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // 3. 사용자 권한 확인 (채팅방 멤버인지 확인)
         chatRoomMemberRepository.findByChatRoomAndUser_Id(chatRoom, userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN));
-        log.info("[ChatService] Sender {} is a valid member of chatRoom {}", userId, chatRoom.getId());
+                .orElseThrow(() -> {
+                    log.warn("채팅 메시지 전송 실패 - 사용자가 채팅방 멤버가 아님. 사용자 ID: {}, 채팅방 ID: {}", userId, chatRoom.getId());
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN);
+                });
 
         // 4. 받는 사람 조회
         User recipient = chatRoom.getMembers().stream()
                 .map(ChatRoomMember::getUser)
                 .filter(user -> !user.getId().equals(userId))
                 .findFirst()
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("채팅방에 상대방이 존재하지 않습니다 - 채팅방 ID: {}", chatRoom.getId());
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // 5. 받는 사람이 현재 채팅방에 접속해 있는지 확인
         boolean isPresent = chatPresenceService.isUserPresent(request.getChatRoomId(), recipient.getId());
@@ -238,7 +274,7 @@ public class ChatServiceImpl implements ChatService {
         Message message = chatMapper.toMessageEntity(chatRoom, sender, request);
         message.setIsRead(isPresent);
         messageRepository.save(message);
-        log.info("[ChatService] Message saved to DB with id: {}. isRead: {}", message.getId(), isPresent);
+        log.info("메시지 DB 저장 완료 - 메시지 ID: {}. 읽음 상태: {}", message.getId(), isPresent);
 
         // 7. ChatMessage 생성 후 반환
         ChatMessage chatMessage = chatMapper.toChatMessage(message);
@@ -246,7 +282,6 @@ public class ChatServiceImpl implements ChatService {
             String presignedUrl = s3Service.generatePresignedUrlForDownload(message.getImageUrl());
             chatMessage.setImageUrl(presignedUrl);
         }
-        log.info("[ChatService] Returning ChatMessage DTO: {}", chatMessage);
 
         // 8. WebSocket을 통해 메시지 전송
         webSocketMessageService.sendChatMessage(request.getChatRoomId(), chatMessage);
@@ -256,6 +291,7 @@ public class ChatServiceImpl implements ChatService {
                 .eventType(EventType.NEW_MESSAGE_RECEIVED)
                 .build();
         webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
+        log.info("채팅 메시지 전송 완료 - 채팅방 ID: {}", request.getChatRoomId());
     }
 
     /**
@@ -268,10 +304,13 @@ public class ChatServiceImpl implements ChatService {
      */
     @Override
     public ChatRoomListData getChatRoomList(Long userId, ChatSortBy sortBy, Integer page, Integer size) {
-
+        log.info("채팅방 목록 조회 시작 - 사용자 ID: {}, 정렬 기준: {}, 페이지: {}, 사이즈: {}", userId, sortBy, page, size);
         // 1. 사용자 조회
         User currentUser = userService.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 목록 조회 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // 2. 사용자가 참여하고 있는 모든 채팅방 멤버 조회
         List<ChatRoomMember> chatRoomMembers = chatRoomMemberRepository.findByUserAndLeftAtIsNull(currentUser);
@@ -286,7 +325,10 @@ public class ChatServiceImpl implements ChatService {
                     .map(ChatRoomMember::getUser)
                     .filter(user -> !user.getId().equals(userId))
                     .findFirst()
-                    .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                    .orElseThrow(() -> {
+                        log.error("채팅방에 상대방이 존재하지 않습니다 - 채팅방 ID: {}", chatRoom.getId());
+                        return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                    });
 
             String partnerImageUrl = s3Service.generatePresignedUrlForThumbnail(partner.getProfileImageUrl());
 
@@ -323,6 +365,7 @@ public class ChatServiceImpl implements ChatService {
                 chatRoomInfoPage.hasNext()
         );
 
+        log.info("채팅방 목록 조회 완료 - 조회된 채팅방 수: {}", chatRoomInfoPage.getNumberOfElements());
         return new ChatRoomListData(chatRoomInfoPage.getContent(), pagination);
     }
 
@@ -334,18 +377,25 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public void leaveChatRoom(Long userId, Long chatRoomId) {
-
+        log.info("채팅방 나가기 시작 - 사용자 ID: {}, 채팅방 ID: {}", userId, chatRoomId);
         // 1. 채팅방 조회
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 나가기 실패 - 존재하지 않는 채팅방 ID: {}", chatRoomId);
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND);
+                });
 
         // 2. 나가려는 사용자가 채팅방의 멤버이며, 아직 나가지 않은 상태인지 확인
         ChatRoomMember member = chatRoomMemberRepository.findByChatRoomAndUser_IdAndLeftAtIsNull(chatRoom, userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN));
+                .orElseThrow(() -> {
+                    log.warn("채팅방 나가기 실패 - 사용자가 멤버가 아니거나 이미 나간 상태입니다. 사용자 ID: {}, 채팅방 ID: {}", userId, chatRoomId);
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_FORBIDDEN);
+                });
 
         // 3. 나간 시간 업데이트하여 소프트 삭제 처리
         member.setLeftAt(LocalDateTime.now());
         chatRoomMemberRepository.save(member);
+        log.info("채팅방 나가기 완료 - 사용자 ID: {}, 채팅방 ID: {}", userId, chatRoomId);
     }
 
     /**
@@ -359,13 +409,14 @@ public class ChatServiceImpl implements ChatService {
     @Override
     @Transactional
     public void sendSystemMessage(Long chatRoomId, String messageContent, MessageType messageType, Exhibition exhibition, User sender) {
-
-        log.info("[ChatService] Start sending system message in chatRoomId: {}", chatRoomId);
+        log.info("시스템 메시지 전송 시작 - 채팅방 ID: {}, 메시지 타입: {}", chatRoomId, messageType);
 
         // 1. 채팅방 유효성 검증
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND));
-        log.info("[ChatService] ChatRoom found: {}", chatRoom.getId());
+                .orElseThrow(() -> {
+                    log.warn("시스템 메시지 전송 실패 - 존재하지 않는 채팅방 ID: {}", chatRoomId);
+                    return new CustomException(ResponseCode.MESSAGE_ROOM_NOT_FOUND);
+                });
 
         // 2. 메시지 엔티티 생성 및 저장
         Message message = Message.builder()
@@ -376,11 +427,10 @@ public class ChatServiceImpl implements ChatService {
                 .content(messageContent)
                 .build();
         messageRepository.save(message);
-        log.info("[ChatService] System message saved to DB with id: {}", message.getId());
+        log.info("시스템 메시지 DB 저장 완료 - 메시지 ID: {}", message.getId());
 
         // 3. ChatMessage 생성 후 반환
         ChatMessage chatMessage = chatMapper.toChatMessage(message, exhibition);
-        log.info("[ChatService] Returning ChatMessage DTO: {}", chatMessage);
 
         // 4. WebSocket을 통해 메시지 전송
         webSocketMessageService.sendChatMessage(chatRoomId, chatMessage);
@@ -396,7 +446,10 @@ public class ChatServiceImpl implements ChatService {
                     .map(ChatRoomMember::getUser)
                     .filter(user -> !user.getId().equals(sender.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                    .orElseThrow(() -> {
+                        log.error("시스템 메시지 알림 전송 실패 - 채팅방에 상대방이 없습니다. 채팅방 ID: {}", chatRoomId);
+                        return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                    });
             webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
         } else {
             // 발신자가 없는 시스템 메시지의 경우, 모든 멤버에게 알림
@@ -404,5 +457,6 @@ public class ChatServiceImpl implements ChatService {
                 webSocketMessageService.sendEventToUser(member.getUser().getId(), eventDto);
             });
         }
+        log.info("시스템 메시지 전송 완료 - 채팅방 ID: {}", chatRoomId);
     }
 }

@@ -24,7 +24,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
     @Override
     public void trainArtworkModel(List<RatingData> ratings) {
-        log.info("Training artwork recommendation model with {} ratings", ratings.size());
+        log.info("작품 추천 모델 학습을 시작합니다. 평점 데이터 수: {}", ratings.size());
 
         TrainRequest request = TrainRequest.builder()
                 .ratings(ratings)
@@ -37,18 +37,18 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .retrieve()
                     .bodyToMono(TrainResponse.class)
                     .retryWhen(Retry.backoff(maxRetryAttempts, Duration.ofSeconds(1)))
-                    .doOnSuccess(response -> log.info("Artwork model training completed: {}", response.getMessage()))
-                    .doOnError(error -> log.error("Failed to train artwork model", error))
+                    .doOnSuccess(response -> log.info("작품 모델 학습이 완료되었습니다: {}", response.getMessage()))
+                    .doOnError(error -> log.error("작품 모델 학습에 실패했습니다.", error))
                     .block();
         } catch (Exception e) {
-            log.error("Error training artwork model", e);
-            throw new RuntimeException("Failed to train artwork recommendation model", e);
+            log.error("작품 모델 학습 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("작품 추천 모델 학습에 실패했습니다.", e);
         }
     }
 
     @Override
     public void trainCafeModel(List<RatingData> ratings) {
-        log.info("Training cafe recommendation model with {} ratings", ratings.size());
+        log.info("카페 추천 모델 학습을 시작합니다. 평점 데이터 수: {}", ratings.size());
 
         TrainRequest request = TrainRequest.builder()
                 .ratings(ratings)
@@ -61,18 +61,18 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .retrieve()
                     .bodyToMono(TrainResponse.class)
                     .retryWhen(Retry.backoff(maxRetryAttempts, Duration.ofSeconds(1)))
-                    .doOnSuccess(response -> log.info("Cafe model training completed: {}", response.getMessage()))
-                    .doOnError(error -> log.error("Failed to train cafe model", error))
+                    .doOnSuccess(response -> log.info("카페 모델 학습이 완료되었습니다: {}", response.getMessage()))
+                    .doOnError(error -> log.error("카페 모델 학습에 실패했습니다.", error))
                     .block();
         } catch (Exception e) {
-            log.error("Error training cafe model", e);
-            throw new RuntimeException("Failed to train cafe recommendation model", e);
+            log.error("카페 모델 학습 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("카페 추천 모델 학습에 실패했습니다.", e);
         }
     }
 
     @Override
     public EmbeddingResponse generateEmbedding(String text) {
-        log.debug("Generating embedding for text (length: {})", text.length());
+        log.debug("텍스트 임베딩 생성을 시작합니다. (텍스트 길이: {})", text.length());
 
         EmbeddingRequest request = EmbeddingRequest.builder()
                 .text(text)
@@ -85,17 +85,17 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .retrieve()
                     .bodyToMono(EmbeddingResponse.class)
                     .retryWhen(Retry.backoff(maxRetryAttempts, Duration.ofSeconds(1)))
-                    .doOnError(error -> log.error("Failed to generate embedding", error))
+                    .doOnError(error -> log.error("임베딩 생성에 실패했습니다.", error))
                     .block();
         } catch (Exception e) {
-            log.error("Error generating embedding", e);
-            throw new RuntimeException("Failed to generate text embedding", e);
+            log.error("임베딩 생성 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("텍스트 임베딩 생성에 실패했습니다.", e);
         }
     }
 
     @Override
     public BatchEmbeddingResponse generateEmbeddingsBatch(List<String> texts) {
-        log.info("Generating batch embeddings for {} texts", texts.size());
+        log.info("배치 임베딩 생성을 시작합니다. 텍스트 수: {}", texts.size());
 
         BatchEmbeddingRequest request = BatchEmbeddingRequest.builder()
                 .texts(texts)
@@ -108,18 +108,18 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .retrieve()
                     .bodyToMono(BatchEmbeddingResponse.class)
                     .retryWhen(Retry.backoff(maxRetryAttempts, Duration.ofSeconds(1)))
-                    .doOnSuccess(response -> log.info("Batch embeddings generated for {} texts", texts.size()))
-                    .doOnError(error -> log.error("Failed to generate batch embeddings", error))
+                    .doOnSuccess(response -> log.info("텍스트 {}개에 대한 배치 임베딩이 생성되었습니다.", texts.size()))
+                    .doOnError(error -> log.error("배치 임베딩 생성에 실패했습니다.", error))
                     .block();
         } catch (Exception e) {
-            log.error("Error generating batch embeddings", e);
-            throw new RuntimeException("Failed to generate batch embeddings", e);
+            log.error("배치 임베딩 생성 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("배치 임베딩 생성에 실패했습니다.", e);
         }
     }
 
     @Override
     public ArtworkHybridResponse recommendArtworksForSlot(Long slotId, Integer topN) {
-        log.info("Requesting artwork recommendations for slot {} (top {})", slotId, topN);
+        log.info("슬롯 ID {}에 대한 작품 추천을 요청합니다. (상위 {}개)", slotId, topN);
 
         ArtworkRecommendRequest request = ArtworkRecommendRequest.builder()
                 .slotId(slotId)
@@ -133,18 +133,18 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .retrieve()
                     .bodyToMono(ArtworkHybridResponse.class)
                     .retryWhen(Retry.backoff(maxRetryAttempts, Duration.ofSeconds(1)))
-                    .doOnSuccess(response -> log.info("Received {} artwork recommendations", response.getRecommendations().size()))
-                    .doOnError(error -> log.error("Failed to get artwork recommendations", error))
+                    .doOnSuccess(response -> log.info("작품 추천을 {}개 받았습니다.", response.getRecommendations().size()))
+                    .doOnError(error -> log.error("작품 추천을 받아오는데 실패했습니다.", error))
                     .block();
         } catch (Exception e) {
-            log.error("Error getting artwork recommendations for slot {}", slotId, e);
-            throw new RuntimeException("Failed to get artwork recommendations", e);
+            log.error("슬롯 ID {}에 대한 작품 추천 중 오류가 발생했습니다.", slotId, e);
+            throw new RuntimeException("작품 추천을 받아오는데 실패했습니다.", e);
         }
     }
 
     @Override
     public CafeHybridResponse recommendCafesForArtwork(Long artworkId, Integer topN) {
-        log.info("Requesting cafe recommendations for artwork {} (top {})", artworkId, topN);
+        log.info("작품 ID {}에 대한 카페 추천을 요청합니다. (상위 {}개)", artworkId, topN);
 
         CafeRecommendRequest request = CafeRecommendRequest.builder()
                 .artworkId(artworkId)
@@ -158,12 +158,12 @@ public class RecommendationServiceImpl implements RecommendationService {
                     .retrieve()
                     .bodyToMono(CafeHybridResponse.class)
                     .retryWhen(Retry.backoff(maxRetryAttempts, Duration.ofSeconds(1)))
-                    .doOnSuccess(response -> log.info("Received {} cafe recommendations", response.getRecommendations().size()))
-                    .doOnError(error -> log.error("Failed to get cafe recommendations", error))
+                    .doOnSuccess(response -> log.info("카페 추천을 {}개 받았습니다.", response.getRecommendations().size()))
+                    .doOnError(error -> log.error("카페 추천을 받아오는데 실패했습니다.", error))
                     .block();
         } catch (Exception e) {
-            log.error("Error getting cafe recommendations for artwork {}", artworkId, e);
-            throw new RuntimeException("Failed to get cafe recommendations", e);
+            log.error("작품 ID {}에 대한 카페 추천 중 오류가 발생했습니다.", artworkId, e);
+            throw new RuntimeException("카페 추천을 받아오는데 실패했습니다.", e);
         }
     }
 }

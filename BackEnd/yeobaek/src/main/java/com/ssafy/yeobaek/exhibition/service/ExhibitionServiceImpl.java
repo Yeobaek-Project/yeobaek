@@ -21,6 +21,7 @@ import com.ssafy.yeobaek.exhibition.repository.ExhibitionRepository;
 import com.ssafy.yeobaek.user.entity.User;
 import com.ssafy.yeobaek.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -56,23 +58,37 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     @Override
     @Transactional
     public void createExhibitionProposal(Long userId, CreateExhibitionRequest request) {
+        log.info("전시 제안 생성 시작 - 제안자 ID: {}, 카페 ID: {}, 작품 ID: {}", userId, request.getCafeId(), request.getArtworkId());
 
         // 1. 현재 사용자 조회
         User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 제안 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.USER_NOT_FOUND);
+                });
 
         // 2. Cafe, Artwork, DisplaySlot 조회
         Cafe cafe = cafeRepository.findById(request.getCafeId())
-                .orElseThrow(() -> new CustomException(ResponseCode.CAFE_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 제안 실패 - 존재하지 않는 카페 ID: {}", request.getCafeId());
+                    return new CustomException(ResponseCode.CAFE_NOT_FOUND);
+                });
 
         Artwork artwork = artworkRepository.findById(request.getArtworkId())
-                .orElseThrow(() -> new CustomException(ResponseCode.ARTWORK_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 제안 실패 - 존재하지 않는 작품 ID: {}", request.getArtworkId());
+                    return new CustomException(ResponseCode.ARTWORK_NOT_FOUND);
+                });
 
         DisplaySlot displaySlot = displaySlotRepository.findById(request.getSlotId())
-                .orElseThrow(() -> new CustomException(ResponseCode.SLOT_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 제안 실패 - 존재하지 않는 슬롯 ID: {}", request.getSlotId());
+                    return new CustomException(ResponseCode.SLOT_NOT_FOUND);
+                });
 
         // 3. 슬롯이 해당 카페에 속하는지 확인
         if (!displaySlot.getWall().getCafe().getId().equals(cafe.getId())) {
+            log.warn("전시 제안 실패 - 슬롯이 카페에 속하지 않음. 슬롯 ID: {}, 카페 ID: {}", request.getSlotId(), cafe.getId());
             throw new CustomException(ResponseCode.SLOT_NOT_FOUND_IN_CAFE);
         }
 
@@ -81,21 +97,25 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         LocalDate endDate = request.getEndDate();
 
         if (endDate.isBefore(startDate)) {
+            log.warn("전시 제안 실패 - 종료일이 시작일보다 빠름. 시작일: {}, 종료일: {}", startDate, endDate);
             throw new CustomException(ResponseCode.EXHIBITION_INVALID_EXHIBITION_DATE);
         }
 
         if (startDate.isBefore(LocalDate.now())) {
+            log.warn("전시 제안 실패 - 시작일이 과거 날짜임. 시작일: {}", startDate);
             throw new CustomException(ResponseCode.EXHIBITION_DATE_PAST);
         }
 
         // 5. 중복 체크 (같은 기간에 슬롯이나 작품이 이미 예약되어 있는지)
         boolean slotConflict = exhibitionRepository.existsConflictingSlot(request.getSlotId(), startDate, endDate);
         if (slotConflict) {
+            log.warn("전시 제안 실패 - 해당 기간에 슬롯이 이미 예약됨. 슬롯 ID: {}, 기간: {} ~ {}", request.getSlotId(), startDate, endDate);
             throw new CustomException(ResponseCode.SLOT_ALREADY_RESERVED);
         }
 
         boolean artworkConflict = exhibitionRepository.existsConflictingArtwork(request.getArtworkId(), startDate, endDate);
         if (artworkConflict) {
+            log.warn("전시 제안 실패 - 해당 기간에 작품이 이미 예약됨. 작품 ID: {}, 기간: {} ~ {}", request.getArtworkId(), startDate, endDate);
             throw new CustomException(ResponseCode.ARTWORK_ALREADY_RESERVED);
         }
 
@@ -105,7 +125,8 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
         if (currentUser.getUserType() == UserRole.CAFE_OWNER) {
             // 카페 사장이 제안
-            if (!cafe.getId().equals(userId)) {
+            if (!cafe.getCafeOwner().getId().equals(userId)) {
+                log.warn("전시 제안 실패 - 카페 소유주가 아님. 사용자 ID: {}, 카페 소유주 ID: {}", userId, cafe.getCafeOwner().getId());
                 throw new CustomException(ResponseCode.CAFE_FORBIDDEN_UPDATE_DELETE);
             }
             cafeAgreed = true;  // 제안자가 먼저 동의
@@ -113,11 +134,13 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         } else if (currentUser.getUserType() == UserRole.ARTIST) {
             // 작가가 제안
             if (!artwork.getArtist().getUser().getId().equals(userId)) {
+                log.warn("전시 제안 실패 - 작품 소유주가 아님. 사용자 ID: {}, 작품 소유주 ID: {}", userId, artwork.getArtist().getUser().getId());
                 throw new CustomException(ResponseCode.ARTWORK_FORBIDDEN);
             }
             artistAgreed = true;  // 제안자가 먼저 동의
 
         } else {
+            log.warn("전시 제안 실패 - 권한 없는 사용자 유형. 사용자 ID: {}, 유형: {}", userId, currentUser.getUserType());
             throw new CustomException(ResponseCode.FORBIDDEN);
         }
 
@@ -127,15 +150,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
         );
 
         // 8. 저장
-        exhibitionRepository.save(exhibition);
+        Exhibition savedExhibition = exhibitionRepository.save(exhibition);
+        log.info("전시 제안 정보 저장 완료 - 전시 ID: {}", savedExhibition.getId());
 
         // 9. 채팅방 ID 파생 및 시스템 메시지 전송
-        Long cafeOwnerId = cafe.getId();
+        Long cafeOwnerId = cafe.getCafeOwner().getId();
         Long artistId = artwork.getArtist().getUser().getId();
         ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
         Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
 
-        chatService.sendSystemMessage(chatRoomId, null, MessageType.PROPOSAL, exhibition, currentUser);
+        chatService.sendSystemMessage(chatRoomId, null, MessageType.PROPOSAL, savedExhibition, currentUser);
+        log.info("전시 제안 생성 완료 및 시스템 메시지 전송 - 전시 ID: {}", savedExhibition.getId());
     }
 
     /**
@@ -151,55 +176,68 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     @Override
     @Transactional
     public void agreeExhibition(Long userId, Long exhibitionId) {
+        log.info("전시 제안 동의 시작 - 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
         // 1. 전시 조회 및 PENDING 상태 검증
         Exhibition exhibition = validatePendingExhibition(exhibitionId);
 
         // 2. 현재 사용자 조회
         User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 동의 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.USER_NOT_FOUND);
+                });
 
         // 3. 권한 확인 및 동의 처리
         if (currentUser.getUserType() == UserRole.CAFE_OWNER) {
             // 카페 사장: 해당 전시의 카페 소유자인지 확인
-            if (!exhibition.getCafe().getId().equals(userId)) {
+            if (!exhibition.getCafe().getCafeOwner().getId().equals(userId)) {
+                log.warn("전시 동의 실패 - 권한 없음 (카페 소유주 아님). 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
                 throw new CustomException(ResponseCode.EXHIBITION_FORBIDDEN);
             }
 
             // 이미 동의했는지 확인
             if (exhibition.getCafeAgreed()) {
+                log.warn("전시 동의 실패 - 이미 동의한 상태. 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
                 throw new CustomException(ResponseCode.EXHIBITION_ALREADY_AGREED);
             }
 
             // 카페 사장 동의 처리
             exhibition.agreeByCafe();
+            log.info("카페 사장 동의 처리 완료 - 전시 ID: {}", exhibitionId);
 
         } else if (currentUser.getUserType() == UserRole.ARTIST) {
             // 작가: 해당 전시의 작품 작가인지 확인
             if (!exhibition.getArtwork().getArtist().getUser().getId().equals(userId)) {
+                log.warn("전시 동의 실패 - 권한 없음 (작품 소유주 아님). 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
                 throw new CustomException(ResponseCode.EXHIBITION_FORBIDDEN);
             }
 
             // 이미 동의했는지 확인
             if (exhibition.getArtistAgreed()) {
+                log.warn("전시 동의 실패 - 이미 동의한 상태. 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
                 throw new CustomException(ResponseCode.EXHIBITION_ALREADY_AGREED);
             }
 
             // 작가 동의 처리
             exhibition.agreeByArtist();
+            log.info("작가 동의 처리 완료 - 전시 ID: {}", exhibitionId);
 
         } else {
             // 카페 사장도 작가도 아닌 경우
+            log.warn("전시 동의 실패 - 권한 없는 사용자 유형. 사용자 ID: {}, 유형: {}", userId, currentUser.getUserType());
             throw new CustomException(ResponseCode.EXHIBITION_FORBIDDEN);
         }
 
         // 4. 양측 모두 동의하여 전시가 확정된 경우 시스템 메시지 전송
         if (exhibition.getState() == ExhibitionState.APPROVED) {
-            Long cafeOwnerId = exhibition.getCafe().getId();
+            log.info("양측 모두 동의하여 전시가 확정되었습니다. - 전시 ID: {}", exhibitionId);
+            Long cafeOwnerId = exhibition.getCafe().getCafeOwner().getId();
             Long artistId = exhibition.getArtwork().getArtist().getUser().getId();
             ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
             Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
 
             chatService.sendSystemMessage(chatRoomId, null, MessageType.AGREED, exhibition, currentUser);
+            log.info("전시 확정 시스템 메시지 전송 완료 - 전시 ID: {}", exhibitionId);
         }
     }
 
@@ -215,33 +253,40 @@ public class ExhibitionServiceImpl implements ExhibitionService {
     @Override
     @Transactional
     public void rejectExhibition(Long userId, Long exhibitionId) {
+        log.info("전시 제안 거절 시작 - 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
         // 1. 전시 조회 및 PENDING 상태 검증
         Exhibition exhibition = validatePendingExhibition(exhibitionId);
 
         // 2. 현재 사용자 조회
         User currentUser = userRepository.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 거절 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.USER_NOT_FOUND);
+                });
 
         // 3. 권한 확인
         boolean isCafeOwner = currentUser.getUserType() == UserRole.CAFE_OWNER
-                && exhibition.getCafe().getId().equals(userId);
+                && exhibition.getCafe().getCafeOwner().getId().equals(userId);
         boolean isArtist = currentUser.getUserType() == UserRole.ARTIST
                 && exhibition.getArtwork().getArtist().getUser().getId().equals(userId);
 
         if (!isCafeOwner && !isArtist) {
+            log.warn("전시 거절 실패 - 권한 없음. 사용자 ID: {}, 전시 ID: {}", userId, exhibitionId);
             throw new CustomException(ResponseCode.EXHIBITION_FORBIDDEN);
         }
 
         // 4. 거절 처리
         exhibition.reject();
+        log.info("전시 제안 거절 처리 완료 - 전시 ID: {}", exhibitionId);
 
         // 5. 채팅방 ID 파생 및 시스템 메시지 전송
-        Long cafeOwnerId = exhibition.getCafe().getId();
+        Long cafeOwnerId = exhibition.getCafe().getCafeOwner().getId();
         Long artistId = exhibition.getArtwork().getArtist().getUser().getId();
         ChatRoomData chatRoomData = chatService.createChatRoom(cafeOwnerId, artistId);
         Long chatRoomId = chatRoomData.getChatRoom().getChatRoomId();
 
         chatService.sendSystemMessage(chatRoomId, null, MessageType.REJECTED, exhibition, currentUser);
+        log.info("전시 거절 시스템 메시지 전송 완료 - 전시 ID: {}", exhibitionId);
     }
 
     /**
@@ -251,9 +296,13 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     private Exhibition validatePendingExhibition(Long exhibitionId) {
         Exhibition exhibition = exhibitionRepository.findById(exhibitionId)
-                .orElseThrow(() -> new CustomException(ResponseCode.EXHIBITION_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("보류 중인 전시 검증 실패 - 존재하지 않는 전시 ID: {}", exhibitionId);
+                    return new CustomException(ResponseCode.EXHIBITION_NOT_FOUND);
+                });
 
         if (exhibition.getState() != ExhibitionState.PENDING) {
+            log.warn("보류 중인 전시 검증 실패 - 전시가 PENDING 상태가 아님. 전시 ID: {}, 현재 상태: {}", exhibitionId, exhibition.getState());
             throw new CustomException(ResponseCode.EXHIBITION_NOT_PENDING);
         }
 
@@ -270,6 +319,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     @Override
     public Optional<Exhibition> getCurrentExhibitionByArtwork(Long artworkId) {
+        log.debug("작품의 현재 전시 조회 - 작품 ID: {}", artworkId);
         LocalDate today = LocalDate.now();
         return exhibitionRepository.findCurrentExhibitionByArtworkId(artworkId, today);
     }
@@ -281,6 +331,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     @Override
     public Optional<Exhibition> findCurrentOrUpcomingExhibitionBySlot(DisplaySlot displaySlot) {
+        log.debug("슬롯의 현재 또는 예정된 전시 조회 - 슬롯 ID: {}", displaySlot.getId());
         return exhibitionRepository.findFirstByDisplaySlotAndStateInOrderByStartDateAsc(
                 displaySlot, List.of(ExhibitionState.ONGOING, ExhibitionState.APPROVED)
         );
@@ -293,6 +344,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     @Override
     public Optional<Exhibition> findOngoingExhibitionBySlot(DisplaySlot displaySlot) {
+        log.debug("슬롯의 현재 진행 중인 전시 조회 - 슬롯 ID: {}", displaySlot.getId());
         return exhibitionRepository.findFirstByDisplaySlotAndStateInOrderByStartDateAsc(displaySlot, List.of(ExhibitionState.ONGOING));
     }
 
@@ -305,6 +357,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     @Override
     public Integer getCurrentExhibitionCountByArtist(Long artistId) {
+        log.debug("작가의 현재 전시 중인 작품 수 조회 - 작가 ID: {}", artistId);
         LocalDate today = LocalDate.now();
         return exhibitionRepository.countCurrentExhibitionsByArtistId(artistId, today);
     }
@@ -319,12 +372,18 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     @Override
     public ExhibitionSummaryResponse getExhibitionSummary(Long exhibitionId) {
+        log.info("전시 요약 정보 조회 시작 - 전시 ID: {}", exhibitionId);
         // 1. 전시 조회
         Exhibition exhibition = exhibitionRepository.findById(exhibitionId)
-                .orElseThrow(() -> new CustomException(ResponseCode.EXHIBITION_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("전시 요약 정보 조회 실패 - 존재하지 않는 전시 ID: {}", exhibitionId);
+                    return new CustomException(ResponseCode.EXHIBITION_NOT_FOUND);
+                });
 
         // 2. DTO 변환 및 반환
-        return exhibitionMapper.toExhibitionSummaryResponse(exhibition);
+        ExhibitionSummaryResponse response = exhibitionMapper.toExhibitionSummaryResponse(exhibition);
+        log.info("전시 요약 정보 조회 완료 - 전시 ID: {}", exhibitionId);
+        return response;
     }
 
     /**
@@ -339,16 +398,22 @@ public class ExhibitionServiceImpl implements ExhibitionService {
      */
     @Override
     public List<ExhibitionSummaryResponse> getExhibitionsBySlot(Long slotId, LocalDate from) {
+        log.info("슬롯별 전시 일정 목록 조회 시작 - 슬롯 ID: {}, 기준일: {}", slotId, from);
         // 1. 슬롯 존재 여부 확인
         DisplaySlot displaySlot = displaySlotRepository.findById(slotId)
-                .orElseThrow(() -> new CustomException(ResponseCode.SLOT_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("슬롯별 전시 일정 조회 실패 - 존재하지 않는 슬롯 ID: {}", slotId);
+                    return new CustomException(ResponseCode.SLOT_NOT_FOUND);
+                });
 
         // 2. 전시 목록 조회
         List<Exhibition> exhibitions = exhibitionRepository.findBySlotIdAndFromDate(slotId, from);
 
         // 3. DTO 변환 및 반환
-        return exhibitions.stream()
+        List<ExhibitionSummaryResponse> responses = exhibitions.stream()
                 .map(exhibitionMapper::toSlotExhibitionSummaryResponse)
                 .toList();
+        log.info("슬롯별 전시 일정 목록 조회 완료 - 슬롯 ID: {}, 조회된 전시 수: {}", slotId, responses.size());
+        return responses;
     }
 }

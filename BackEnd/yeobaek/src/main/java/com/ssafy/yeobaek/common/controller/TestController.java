@@ -7,8 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 @Tag(name = "테스트 컨트롤러", description = "기능 테스트용 API")
 @RestController
 @RequestMapping("/api/v1/test")
@@ -29,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 public class TestController {
 
     private final GeocoderService geocoderService;
-    private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -50,23 +49,23 @@ public class TestController {
     public ResponseEntity<String> resetDatabase() {
         try {
             // Truncate
-            logger.info("Starting database truncation...");
+            log.info("Starting database truncation...");
             String truncateSql = readSqlFile("truncate.sql");
             executeSqlScript(truncateSql);
-            logger.info("Database truncation finished.");
+            log.info("Database truncation finished.");
 
             // Insert
-            logger.info("Starting data insertion...");
+            log.info("Starting data insertion...");
             String insertSql = readSqlFile("insert.sql");
             executeSqlScript(insertSql);
-            logger.info("Data insertion finished.");
+            log.info("Data insertion finished.");
 
             return ResponseEntity.ok("Database has been reset.");
         } catch (IOException e) {
-            logger.error("Could not read SQL files", e);
+            log.error("Could not read SQL files", e);
             return ResponseEntity.internalServerError().body("Could not read SQL files: " + e.getMessage());
         } catch (Exception e) {
-            logger.error("Error resetting database", e);
+            log.error("Error resetting database", e);
             return ResponseEntity.internalServerError().body("Error resetting database: " + e.getMessage());
         }
     }
@@ -80,7 +79,7 @@ public class TestController {
         for (String s : statements) {
             String trimmedStatement = s.trim();
             if (!trimmedStatement.isEmpty()) {
-                logger.info("Executing SQL statement: {}", trimmedStatement);
+                log.info("Executing SQL statement: {}", trimmedStatement);
                 entityManager.createNativeQuery(trimmedStatement).executeUpdate();
             }
         }

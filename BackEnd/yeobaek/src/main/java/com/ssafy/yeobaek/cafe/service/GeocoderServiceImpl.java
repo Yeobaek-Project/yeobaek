@@ -4,8 +4,7 @@ import com.ssafy.yeobaek.cafe.dto.response.Coordinates;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import com.ssafy.yeobaek.common.code.ResponseCode;
 import com.ssafy.yeobaek.common.exception.CustomException;
 
+@Slf4j
 @Service
 public class GeocoderServiceImpl implements GeocoderService {
 
@@ -34,10 +34,9 @@ public class GeocoderServiceImpl implements GeocoderService {
     @Value("${vworld.api.url}")
     private String url;
 
-    private static final Logger logger = LoggerFactory.getLogger(GeocoderServiceImpl.class);
-
     @Override
     public Coordinates getCoordinates(String address) {
+        log.info("주소 좌표 변환 시작 - 주소: '{}'", address);
 
         StringBuilder sb = new StringBuilder(url);
         sb.append("?service=address");
@@ -60,16 +59,16 @@ public class GeocoderServiceImpl implements GeocoderService {
             String status = (String) jsrs.get("status");
             if (!"OK".equals(status)) {
                 if ("NOT_FOUND".equals(status)) {
-                    logger.warn("Geocoding failed for address '{}': Status NOT_FOUND", address);
+                    log.warn("주소 좌표 변환 실패 - 주소를 찾을 수 없음: '{}'", address);
                     throw new CustomException(ResponseCode.CAFE_INVALID_ADDRESS);
                 } else if ("ERROR".equals(status)) {
                     JSONObject jsError = (JSONObject) jsrs.get("error");
                     String errorCode = (String) jsError.get("code");
                     String errorText = (String) jsError.get("text");
-                    logger.error("VWorld Geocoding API returned ERROR. Code: {}, Text: {}", errorCode, errorText);
+                    log.error("VWorld Geocoding API 오류 발생. 코드: {}, 메시지: {}", errorCode, errorText);
                     throw new CustomException(ResponseCode.GEOCODING_API_ERROR);
                 }
-                logger.error("VWorld Geocoding API returned an unexpected status: {}", status);
+                log.error("VWorld Geocoding API에서 예상치 못한 상태 반환: {}", status);
                 throw new CustomException(ResponseCode.GEOCODING_API_ERROR);
             }
 
@@ -79,10 +78,11 @@ public class GeocoderServiceImpl implements GeocoderService {
             double longitude = Double.parseDouble((String) jsPoint.get("x"));
             double latitude = Double.parseDouble((String) jsPoint.get("y"));
 
+            log.info("주소 좌표 변환 성공 - 위도: {}, 경도: {}", latitude, longitude);
             return new Coordinates(longitude, latitude);
 
         } catch (IOException | ParseException | NullPointerException e) {
-            logger.error("Exception during geocoding for address '{}'", address, e);
+            log.error("주소 좌표 변환 중 예외 발생 - 주소: '{}'", address, e);
             throw new CustomException(ResponseCode.GEOCODING_API_ERROR);
         }
     }

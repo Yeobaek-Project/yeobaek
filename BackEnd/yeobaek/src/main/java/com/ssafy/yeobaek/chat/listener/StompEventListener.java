@@ -55,12 +55,12 @@ public class StompEventListener {
                 }
                 
                 if (authentication == null) {
-                    log.warn("Cannot track presence for non-authenticated user on subscribe. Authentication object not found in event or session.");
+                    log.warn("구독 이벤트에서 인증 객체를 찾을 수 없어 사용자 추적이 불가능합니다.");
                     return;
                 }
                                 
                 if (!(authentication.getPrincipal() instanceof JwtUserPrincipal)) {
-                    log.warn("Cannot track presence for non-authenticated user on subscribe. Authentication's principal is not JwtUserPrincipal.");
+                    log.warn("인증 Principal이 JwtUserPrincipal 타입이 아니므로 사용자 추적이 불가능합니다.");
                     return;
                 }
                 
@@ -74,11 +74,11 @@ public class StompEventListener {
                 Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
                 if (sessionAttributes != null) {
                     sessionAttributes.put(PRESENCE_INFO_KEY, new PresenceInfo(userId, roomId));
-                    log.debug("Stored presence info in session {} for user {} in room {}", accessor.getSessionId(), userId, roomId);
+                    log.debug("세션 {}에 접속 정보 저장 - 사용자 ID: {}, 채팅방 ID: {}", accessor.getSessionId(), userId, roomId);
                 }
 
             } catch (NumberFormatException e) {
-                log.warn("Could not parse roomId from destination: {}", destination);
+                log.warn("Destination에서 채팅방 ID를 파싱할 수 없습니다: {}", destination);
             }
         }
     }
@@ -97,10 +97,10 @@ public class StompEventListener {
             PresenceInfo presenceInfo = (PresenceInfo) sessionAttributes.get(PRESENCE_INFO_KEY);
             if (presenceInfo != null) {
                 chatPresenceService.userLeft(presenceInfo.roomId(), presenceInfo.userId());
-                log.info("User {} disconnected from room {}.", presenceInfo.userId(), presenceInfo.roomId());
+                log.info("사용자 연결 해제 - 사용자 ID: {}, 채팅방 ID: {}", presenceInfo.userId(), presenceInfo.roomId());
             }
         } else {
-            log.debug("No presence info found for disconnected session {}", accessor.getSessionId());
+            log.debug("연결이 끊어진 세션 {}에서 접속 정보를 찾을 수 없습니다.", accessor.getSessionId());
         }
     }
 

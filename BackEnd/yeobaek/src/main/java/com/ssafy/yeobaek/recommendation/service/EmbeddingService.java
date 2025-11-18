@@ -33,22 +33,22 @@ public class EmbeddingService {
     @Async("recommendationTaskExecutor")
     @Transactional
     public void generateAndSaveArtworkEmbedding(Long artworkId) {
-        log.info("Starting async embedding generation for artwork {}", artworkId);
+        log.info("작품 ID {}에 대한 비동기 임베딩 생성을 시작합니다.", artworkId);
 
         try {
             // Artwork 조회
             Artwork artwork = artworkRepository.findById(artworkId)
-                    .orElseThrow(() -> new IllegalArgumentException("Artwork not found: " + artworkId));
+                    .orElseThrow(() -> new IllegalArgumentException("작품을 찾을 수 없습니다: " + artworkId));
 
             // 이미 임베딩이 있으면 스킵
             if (artwork.getDescriptionEmbedding() != null && !artwork.getDescriptionEmbedding().isEmpty()) {
-                log.info("Artwork {} already has embedding, skipping", artworkId);
+                log.info("작품 ID {}에 이미 임베딩이 존재하므로 건너뜁니다.", artworkId);
                 return;
             }
 
             // description이 없으면 스킵
             if (artwork.getDescription() == null || artwork.getDescription().trim().isEmpty()) {
-                log.warn("Artwork {} has no description, skipping embedding generation", artworkId);
+                log.warn("작품 ID {}에 설명이 없어 임베딩 생성을 건너뜁니다.", artworkId);
                 return;
             }
 
@@ -60,10 +60,10 @@ public class EmbeddingService {
             artwork.setDescriptionEmbedding(embeddingJson);
             artworkRepository.save(artwork);
 
-            log.info("Successfully generated and saved embedding for artwork {}", artworkId);
+            log.info("작품 ID {}에 대한 임베딩을 성공적으로 생성하고 저장했습니다.", artworkId);
 
         } catch (Exception e) {
-            log.error("Failed to generate embedding for artwork {}", artworkId, e);
+            log.error("작품 ID {}에 대한 임베딩 생성 중 오류가 발생했습니다.", artworkId, e);
             // 비동기이므로 예외를 던지지 않고 로그만 남김
         }
     }
@@ -76,22 +76,22 @@ public class EmbeddingService {
     @Async("recommendationTaskExecutor")
     @Transactional
     public void generateAndSaveSlotEmbedding(Long slotId) {
-        log.info("Starting async embedding generation for slot {}", slotId);
+        log.info("슬롯 ID {}에 대한 비동기 임베딩 생성을 시작합니다.", slotId);
 
         try {
             // DisplaySlot 조회
             DisplaySlot slot = displaySlotRepository.findById(slotId)
-                    .orElseThrow(() -> new IllegalArgumentException("DisplaySlot not found: " + slotId));
+                    .orElseThrow(() -> new IllegalArgumentException("전시 슬롯을 찾을 수 없습니다: " + slotId));
 
             // 이미 임베딩이 있으면 스킵
             if (slot.getRequirementsEmbedding() != null && !slot.getRequirementsEmbedding().isEmpty()) {
-                log.info("Slot {} already has embedding, skipping", slotId);
+                log.info("슬롯 ID {}에 이미 임베딩이 존재하므로 건너뜁니다.", slotId);
                 return;
             }
 
             // requirements가 없으면 스킵
             if (slot.getRequirements() == null || slot.getRequirements().trim().isEmpty()) {
-                log.warn("Slot {} has no requirements, skipping embedding generation", slotId);
+                log.warn("슬롯 ID {}에 요구사항이 없어 임베딩 생성을 건너뜁니다.", slotId);
                 return;
             }
 
@@ -103,10 +103,10 @@ public class EmbeddingService {
             slot.setRequirementsEmbedding(embeddingJson);
             displaySlotRepository.save(slot);
 
-            log.info("Successfully generated and saved embedding for slot {}", slotId);
+            log.info("슬롯 ID {}에 대한 임베딩을 성공적으로 생성하고 저장했습니다.", slotId);
 
         } catch (Exception e) {
-            log.error("Failed to generate embedding for slot {}", slotId, e);
+            log.error("슬롯 ID {}에 대한 임베딩 생성 중 오류가 발생했습니다.", slotId, e);
             // 비동기이므로 예외를 던지지 않고 로그만 남김
         }
     }
@@ -121,8 +121,8 @@ public class EmbeddingService {
         try {
             return objectMapper.writeValueAsString(embedding);
         } catch (JsonProcessingException e) {
-            log.error("Failed to convert embedding to JSON", e);
-            throw new RuntimeException("Failed to convert embedding to JSON", e);
+            log.error("임베딩을 JSON으로 변환하는 데 실패했습니다.", e);
+            throw new RuntimeException("임베딩을 JSON으로 변환하는 데 실패했습니다.", e);
         }
     }
 }

@@ -40,6 +40,7 @@ public class S3ServiceImpl implements S3Service {
      */
     @Override
     public PresignedUrlListData generatePresignedUrlsForUpload(PresignedUrlRequest request) {
+        log.info("업로드용 Presigned URL 다중 생성 시작 - 폴더: {}, 개수: {}", request.getFolder(), request.getCount());
         List<PresignedUrl> presignedUrls = new ArrayList<>();
         StorageFolder folder = StorageFolder.valueOf(request.getFolder());
 
@@ -48,6 +49,7 @@ public class S3ServiceImpl implements S3Service {
             presignedUrls.add(generatePresignedUrlPair(fileKey));
         }
 
+        log.info("업로드용 Presigned URL {}개 생성 완료", presignedUrls.size());
         return new PresignedUrlListData(presignedUrls);
     }
 
@@ -58,9 +60,12 @@ public class S3ServiceImpl implements S3Service {
      */
     @Override
     public PresignedUrl generatePresignedUrlPair(String fileKey) {
+        log.debug("Presigned URL 쌍 생성 시작 - 파일 키: {}", fileKey);
         String uploadUrl = generatePresignedUrlForUpload(fileKey);
         String downloadUrl = generatePresignedUrlForDownload(fileKey);
-        return PresignedUrl.of(fileKey, uploadUrl, downloadUrl);
+        PresignedUrl presignedUrl = PresignedUrl.of(fileKey, uploadUrl, downloadUrl);
+        log.debug("Presigned URL 쌍 생성 완료 - 파일 키: {}", fileKey);
+        return presignedUrl;
     }
 
     /**
@@ -70,6 +75,7 @@ public class S3ServiceImpl implements S3Service {
      */
     @Override
     public String generatePresignedUrlForUpload(String fileKey) {
+        log.debug("업로드용 Presigned URL 생성 - 파일 키: {}", fileKey);
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileKey)
@@ -94,6 +100,7 @@ public class S3ServiceImpl implements S3Service {
         if (fileKey == null) {
             return null;
         }
+        log.debug("조회용 Presigned URL 생성 - 파일 키: {}", fileKey);
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(bucketName)
@@ -119,6 +126,7 @@ public class S3ServiceImpl implements S3Service {
         if (fileKeys == null) {
             return new ArrayList<>();
         }
+        log.debug("조회용 Presigned URL 다중 생성 시작 - 파일 키 개수: {}", fileKeys.size());
 
         return fileKeys.stream()
                 .map(this::generatePresignedUrlForDownload)
@@ -138,6 +146,7 @@ public class S3ServiceImpl implements S3Service {
         if (fileKey == null) {
             return null;
         }
+        log.debug("썸네일용 Presigned URL 생성 시작 - 원본 키: {}", fileKey);
 
         String thumbnailKey = "thumbnail/" + fileKey;
 
@@ -161,15 +170,16 @@ public class S3ServiceImpl implements S3Service {
                     .getObjectRequest(getObjectRequest)
                     .build();
 
+            log.debug("썸네일 발견, 썸네일 URL 반환 - 썸네일 키: {}", thumbnailKey);
             return s3Presigner.presignGetObject(presignRequest).url().toString();
 
         } catch (NoSuchKeyException e) {
             // 썸네일이 없으면 원본 이미지 URL 반환
-            log.debug("Thumbnail not found for {}, returning original image URL", fileKey);
+            log.debug("썸네일을 찾을 수 없어 원본 이미지 URL을 반환합니다 - 원본 키: {}", fileKey);
             return generatePresignedUrlForDownload(fileKey);
         } catch (Exception e) {
             // 기타 에러 발생 시에도 원본 이미지 URL 반환
-            log.warn("Error checking thumbnail for {}: {}, returning original image URL", fileKey, e.getMessage());
+            log.warn("썸네일 확인 중 오류 발생, 원본 이미지 URL을 반환합니다 - 원본 키: {}, 오류: {}", fileKey, e.getMessage());
             return generatePresignedUrlForDownload(fileKey);
         }
     }
@@ -185,6 +195,7 @@ public class S3ServiceImpl implements S3Service {
         if (fileKeys == null) {
             return new ArrayList<>();
         }
+        log.debug("썸네일용 Presigned URL 다중 생성 시작 - 파일 키 개수: {}", fileKeys.size());
 
         return fileKeys.stream()
                 .map(this::generatePresignedUrlForThumbnail)
@@ -197,12 +208,14 @@ public class S3ServiceImpl implements S3Service {
      */
     @Override
     public void deleteFile(String fileKey) {
+        log.info("S3 파일 삭제 시작 - 파일 키: {}", fileKey);
         DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileKey)
                 .build();
 
         s3Client.deleteObject(deleteObjectRequest);
+        log.info("S3 파일 삭제 완료 - 파일 키: {}", fileKey);
     }
 
     /**
@@ -212,6 +225,8 @@ public class S3ServiceImpl implements S3Service {
      */
     private String generateFileKey(StorageFolder folder) {
         String uuid = UUID.randomUUID().toString();
-        return String.format("%s/%s", folder.getPath(), uuid);
+        String fileKey = String.format("%s/%s", folder.getPath(), uuid);
+        log.debug("새로운 파일 키 생성 - 폴더: {}, 키: {}", folder, fileKey);
+        return fileKey;
     }
 }

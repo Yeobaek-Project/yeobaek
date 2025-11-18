@@ -32,7 +32,7 @@ public class EmbeddingBatchService {
      */
     @Transactional
     public int batchGenerateArtworkEmbeddings() {
-        log.info("Starting batch embedding generation for artworks");
+        log.info("작품에 대한 배치 임베딩 생성을 시작합니다.");
 
         // 임베딩이 없고 description이 있는 Artwork 조회
         List<Artwork> artworksWithoutEmbedding = artworkRepository.findAll().stream()
@@ -42,11 +42,11 @@ public class EmbeddingBatchService {
                 .collect(Collectors.toList());
 
         if (artworksWithoutEmbedding.isEmpty()) {
-            log.info("No artworks need embedding generation");
+            log.info("임베딩 생성이 필요한 작품이 없습니다.");
             return 0;
         }
 
-        log.info("Found {} artworks without embeddings", artworksWithoutEmbedding.size());
+        log.info("임베딩이 없는 작품 {}개를 찾았습니다.", artworksWithoutEmbedding.size());
 
         try {
             // 모든 description 수집
@@ -68,12 +68,12 @@ public class EmbeddingBatchService {
 
             artworkRepository.saveAll(artworksWithoutEmbedding);
 
-            log.info("Successfully generated embeddings for {} artworks", artworksWithoutEmbedding.size());
+            log.info("작품 {}개에 대한 임베딩을 성공적으로 생성하고 저장했습니다.", artworksWithoutEmbedding.size());
             return artworksWithoutEmbedding.size();
 
         } catch (Exception e) {
-            log.error("Failed to batch generate artwork embeddings", e);
-            throw new RuntimeException("Failed to batch generate artwork embeddings", e);
+            log.error("작품 배치 임베딩 생성 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("작품 배치 임베딩 생성에 실패했습니다.", e);
         }
     }
 
@@ -84,7 +84,7 @@ public class EmbeddingBatchService {
      */
     @Transactional
     public int batchGenerateSlotEmbeddings() {
-        log.info("Starting batch embedding generation for display slots");
+        log.info("전시 슬롯에 대한 배치 임베딩 생성을 시작합니다.");
 
         // 임베딩이 없고 requirements가 있는 DisplaySlot 조회
         List<DisplaySlot> slotsWithoutEmbedding = displaySlotRepository.findAll().stream()
@@ -94,11 +94,11 @@ public class EmbeddingBatchService {
                 .collect(Collectors.toList());
 
         if (slotsWithoutEmbedding.isEmpty()) {
-            log.info("No display slots need embedding generation");
+            log.info("임베딩 생성이 필요한 전시 슬롯이 없습니다.");
             return 0;
         }
 
-        log.info("Found {} display slots without embeddings", slotsWithoutEmbedding.size());
+        log.info("임베딩이 없는 전시 슬롯 {}개를 찾았습니다.", slotsWithoutEmbedding.size());
 
         try {
             // 모든 requirements 수집
@@ -120,12 +120,12 @@ public class EmbeddingBatchService {
 
             displaySlotRepository.saveAll(slotsWithoutEmbedding);
 
-            log.info("Successfully generated embeddings for {} display slots", slotsWithoutEmbedding.size());
+            log.info("전시 슬롯 {}개에 대한 임베딩을 성공적으로 생성하고 저장했습니다.", slotsWithoutEmbedding.size());
             return slotsWithoutEmbedding.size();
 
         } catch (Exception e) {
-            log.error("Failed to batch generate slot embeddings", e);
-            throw new RuntimeException("Failed to batch generate slot embeddings", e);
+            log.error("전시 슬롯 배치 임베딩 생성 중 오류가 발생했습니다.", e);
+            throw new RuntimeException("전시 슬롯 배치 임베딩 생성에 실패했습니다.", e);
         }
     }
 
@@ -139,8 +139,8 @@ public class EmbeddingBatchService {
         try {
             return objectMapper.writeValueAsString(embedding);
         } catch (JsonProcessingException e) {
-            log.error("Failed to convert embedding to JSON", e);
-            throw new RuntimeException("Failed to convert embedding to JSON", e);
+            log.error("임베딩을 JSON으로 변환하는 데 실패했습니다.", e);
+            throw new RuntimeException("임베딩을 JSON으로 변환하는 데 실패했습니다.", e);
         }
     }
 }

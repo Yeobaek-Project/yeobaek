@@ -13,9 +13,11 @@ import com.ssafy.yeobaek.common.exception.CustomException;
 import com.ssafy.yeobaek.user.entity.User;
 import com.ssafy.yeobaek.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -35,7 +37,10 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
      */
     @Override
     public boolean isBookmarked(Long userId, Long cafeId) {
-        return cafeBookmarkRepository.existsByUser_IdAndCafe_Id(userId, cafeId);
+        log.info("카페 북마크 여부 확인 시작 - 사용자 ID: {}, 카페 ID: {}", userId, cafeId);
+        boolean isBookmarked = cafeBookmarkRepository.existsByUser_IdAndCafe_Id(userId, cafeId);
+        log.info("카페 북마크 여부 확인 완료 - 결과: {}", isBookmarked);
+        return isBookmarked;
     }
 
     /**
@@ -47,17 +52,22 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
     @Override
     @Transactional
     public BookmarkToggleResponse toggleBookmark(Long userId, Long cafeId) {
+        log.info("카페 북마크 토글 시작 - 사용자 ID: {}, 카페 ID: {}", userId, cafeId);
 
-        // 북마크 여부 확인
-        boolean isBookmarked = isBookmarked(userId, cafeId);
+        boolean isBookmarked = cafeBookmarkRepository.existsByUser_IdAndCafe_Id(userId, cafeId);
+        log.info("현재 북마크 상태: {}", isBookmarked);
 
-        // 북마크 토글 (북마크면 삭제, 아니면 생성)
-        if(isBookmarked)
+        if(isBookmarked) {
+            log.info("북마크 삭제를 진행합니다.");
             deleteBookmark(userId, cafeId);
-        else
+        } else {
+            log.info("북마크 생성을 진행합니다.");
             createBookmark(userId, cafeId);
+        }
 
-        return cafeBookmarkMapper.toBookmarkToggleData(!isBookmarked);
+        BookmarkToggleResponse response = cafeBookmarkMapper.toBookmarkToggleData(!isBookmarked);
+        log.info("카페 북마크 토글 완료 - 최종 상태: {}", response.getIsBookmarked());
+        return response;
     }
 
     /**
@@ -66,14 +76,20 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
      * @param cafeId 카페 ID
      */
     private void createBookmark(Long userId, Long cafeId){
-
+        log.info("카페 북마크 생성 - 사용자 ID: {}, 카페 ID: {}", userId, cafeId);
         // 사용자 정보 조회
         User user = userService.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("카페 북마크 생성 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // 카페 조회
         Cafe cafe = cafeRepository.findById(cafeId)
-                .orElseThrow(() -> new CustomException(ResponseCode.CAFE_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("카페 북마크 생성 실패 - 존재하지 않는 카페 ID: {}", cafeId);
+                    return new CustomException(ResponseCode.CAFE_NOT_FOUND);
+                });
 
         // 북마크 수 증가
         cafe.increaseBookmarkCount();
@@ -84,6 +100,7 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
 
         // 북마크 이벤트 기록
         analyticsService.recordBookmarkEvent(userId, cafeId, TargetType.CAFE);
+        log.info("카페 북마크 생성 완료");
     }
 
     /**
@@ -92,14 +109,19 @@ public class CafeBookmarkServiceImpl implements CafeBookmarkService {
      * @param cafeId 카페 ID
      */
     private void deleteBookmark(Long userId, Long cafeId){
+        log.info("카페 북마크 삭제 - 사용자 ID: {}, 카페 ID: {}", userId, cafeId);
         // 카페 조회
         Cafe cafe = cafeRepository.findById(cafeId)
-                .orElseThrow(() -> new CustomException(ResponseCode.CAFE_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("카페 북마크 삭제 실패 - 존재하지 않는 카페 ID: {}", cafeId);
+                    return new CustomException(ResponseCode.CAFE_NOT_FOUND);
+                });
 
         // 북마크 수 감소
         cafe.decreaseBookmarkCount();
 
         // 북마크 삭제
         cafeBookmarkRepository.deleteCafeBookmarkByUser_IdAndCafe_Id(userId, cafeId);
+        log.info("카페 북마크 삭제 완료");
     }
 }

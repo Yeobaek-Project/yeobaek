@@ -29,5 +29,5 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Message m SET m.isRead = true WHERE m.chatRoom.id = :chatRoomId AND m.user.id != :currentUserId AND m.isRead = false")
-    void updateReadStatusInBulk(@Param("chatRoomId") Long chatRoomId, @Param("currentUserId") Long currentUserId);
+    int updateReadStatusInBulk(@Param("chatRoomId") Long chatRoomId, @Param("currentUserId") Long currentUserId);
 }

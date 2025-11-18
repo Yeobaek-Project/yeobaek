@@ -27,15 +27,15 @@ public class RecommendationScheduler {
      */
     @Scheduled(cron = "0 0 0,6,12,18 * * *")
     public void trainArtworkRecommendationModel() {
-        log.info("Starting artwork recommendation model training...");
+        log.info("작품 추천 모델 학습 스케줄러를 시작합니다.");
 
         try {
             // 1. 암묵적 피드백 점수 계산
             List<ImplicitFeedbackScore> feedbackScores = implicitFeedbackService.calculateArtworkImplicitScores();
-            log.info("Calculated {} implicit feedback scores for artworks", feedbackScores.size());
+            log.info("작품에 대한 암묵적 피드백 점수 {}개를 계산했습니다.", feedbackScores.size());
 
             if (feedbackScores.isEmpty()) {
-                log.warn("No feedback data available for artwork model training. Skipping...");
+                log.warn("작품 모델 학습을 위한 피드백 데이터가 없어 스케줄러를 건너뜁니다.");
                 return;
             }
 
@@ -50,10 +50,10 @@ public class RecommendationScheduler {
 
             // 3. 파이썬 서버로 모델 학습 요청
             recommendationService.trainArtworkModel(ratings);
-            log.info("Artwork recommendation model training completed successfully");
+            log.info("작품 추천 모델 학습을 성공적으로 완료했습니다.");
 
         } catch (Exception e) {
-            log.error("Failed to train artwork recommendation model", e);
+            log.error("작품 추천 모델 학습 중 오류가 발생했습니다.", e);
         }
     }
 
@@ -64,15 +64,15 @@ public class RecommendationScheduler {
      */
     @Scheduled(cron = "0 0 0,6,12,18 * * *")
     public void trainCafeRecommendationModel() {
-        log.info("Starting cafe recommendation model training...");
+        log.info("카페 추천 모델 학습 스케줄러를 시작합니다.");
 
         try {
             // 1. 암묵적 피드백 점수 계산
             List<ImplicitFeedbackScore> feedbackScores = implicitFeedbackService.calculateCafeImplicitScores();
-            log.info("Calculated {} implicit feedback scores for cafes", feedbackScores.size());
+            log.info("카페에 대한 암묵적 피드백 점수 {}개를 계산했습니다.", feedbackScores.size());
 
             if (feedbackScores.isEmpty()) {
-                log.warn("No feedback data available for cafe model training. Skipping...");
+                log.warn("카페 모델 학습을 위한 피드백 데이터가 없어 스케줄러를 건너뜁니다.");
                 return;
             }
 
@@ -87,10 +87,10 @@ public class RecommendationScheduler {
 
             // 3. 파이썬 서버로 모델 학습 요청
             recommendationService.trainCafeModel(ratings);
-            log.info("Cafe recommendation model training completed successfully");
+            log.info("카페 추천 모델 학습을 성공적으로 완료했습니다.");
 
         } catch (Exception e) {
-            log.error("Failed to train cafe recommendation model", e);
+            log.error("카페 추천 모델 학습 중 오류가 발생했습니다.", e);
         }
     }
 }

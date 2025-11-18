@@ -26,19 +26,19 @@ public class WebSocketChatController {
             StompHeaderAccessor accessor,
             @Payload ChatMessageRequest chatMessageRequest
     ) {
-        log.info("[WebSocket] Received message: {}", chatMessageRequest.getContent());
+        log.info("웹소켓 메시지 수신: {}", chatMessageRequest.getContent());
 
         // StompHeaderAccessor에서 세션 속성을 직접 꺼내 사용
         Map<String, Object> sessionAttributes = accessor.getSessionAttributes();
         if (sessionAttributes == null) {
-            log.error("[WebSocket] Session attributes are null!");
+            log.error("웹소켓 메시지 처리 실패: 세션 속성이 null입니다.");
             return;
         }
 
         Authentication authentication = (Authentication) sessionAttributes.get("userAuthentication");
 
         if (authentication == null || authentication.getPrincipal() == null) {
-            log.error("[WebSocket] Authentication object not found or principal is null in session attributes!");
+            log.error("웹소켓 메시지 처리 실패: 세션 속성에서 인증 객체를 찾을 수 없거나 principal이 null입니다.");
             return;
         }
 
@@ -48,11 +48,11 @@ public class WebSocketChatController {
 
         try {
             // 2. 메시지 처리 로직 수행
-            log.info("[WebSocket] Calling chatService.sendMessage for userId: {}", userId);
+            log.info("chatService.sendMessage 호출 - 사용자 ID: {}", userId);
             chatService.sendMessage(userId, chatMessageRequest);
 
         } catch (Exception e) {
-            log.error("[WebSocket] Error during message processing for userId: {}", userId, e);
+            log.error("웹소켓 메시지 처리 중 오류 발생 - 사용자 ID: {}", userId, e);
         }
     }
 }

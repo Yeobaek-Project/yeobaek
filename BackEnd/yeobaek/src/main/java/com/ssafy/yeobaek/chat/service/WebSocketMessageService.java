@@ -15,16 +15,16 @@ public class WebSocketMessageService {
     private final SimpMessagingTemplate messagingTemplate;
 
     public void sendChatMessage(Long chatRoomId, ChatMessage chatMessage) {
-        log.info("[WebSocketMessageSenderService] Sending message to WebSocket for chatRoomId: {}", chatRoomId);
+        log.info("WebSocket으로 채팅 메시지 전송 시작 - 채팅방 ID: {}", chatRoomId);
         String destination = "/sub/chat/room/" + chatRoomId;
         messagingTemplate.convertAndSend(destination, chatMessage);
-        log.info("[WebSocketMessageSenderService] Message sent to destination: {}", destination);
+        log.info("WebSocket 메시지 전송 완료 - 목적지: {}", destination);
     }
 
     public void sendEventToUser(Long userId, EventDto eventDto) {
-        log.info("[WebSocketMessageSenderService] Sending event to user ID: {} with type: {}", userId, eventDto.getEventType());
+        log.info("사용자에게 이벤트 전송 시작 - 사용자 ID: {}, 이벤트 타입: {}", userId, eventDto.getEventType());
         String destination = "/sub/notifications/" + userId;
         messagingTemplate.convertAndSend(destination, eventDto);
-        log.info("[WebSocketMessageSenderService] Event sent to user ID: {} on destination: {}", userId, destination);
+        log.info("사용자에게 이벤트 전송 완료 - 목적지: {}", destination);
     }
 }

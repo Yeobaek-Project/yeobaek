@@ -4,7 +4,6 @@ import com.ssafy.yeobaek.recommendation.service.EmbeddingBatchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
 @RestController
 @RequestMapping("/api/v1/admin/embeddings/batch")
 @RequiredArgsConstructor
@@ -25,8 +23,6 @@ public class EmbeddingBatchController {
     @PostMapping("/artworks")
     @Operation(summary = "작품 임베딩 배치 생성", description = "임베딩이 없는 모든 작품에 대해 배치로 임베딩을 생성합니다.")
     public ResponseEntity<Map<String, Object>> batchGenerateArtworkEmbeddings() {
-        log.info("Received request to batch generate artwork embeddings");
-
         int processedCount = embeddingBatchService.batchGenerateArtworkEmbeddings();
 
         Map<String, Object> response = new HashMap<>();
@@ -40,8 +36,6 @@ public class EmbeddingBatchController {
     @PostMapping("/slots")
     @Operation(summary = "슬롯 임베딩 배치 생성", description = "임베딩이 없는 모든 디스플레이 슬롯에 대해 배치로 임베딩을 생성합니다.")
     public ResponseEntity<Map<String, Object>> batchGenerateSlotEmbeddings() {
-        log.info("Received request to batch generate slot embeddings");
-
         int processedCount = embeddingBatchService.batchGenerateSlotEmbeddings();
 
         Map<String, Object> response = new HashMap<>();
@@ -55,8 +49,6 @@ public class EmbeddingBatchController {
     @PostMapping("/all")
     @Operation(summary = "전체 임베딩 배치 생성", description = "임베딩이 없는 모든 작품과 슬롯에 대해 배치로 임베딩을 생성합니다.")
     public ResponseEntity<Map<String, Object>> batchGenerateAllEmbeddings() {
-        log.info("Received request to batch generate all embeddings");
-
         int artworkCount = embeddingBatchService.batchGenerateArtworkEmbeddings();
         int slotCount = embeddingBatchService.batchGenerateSlotEmbeddings();
 

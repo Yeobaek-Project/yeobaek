@@ -64,6 +64,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional
     public void createArtwork(Long userId, CreateArtworkRequest request) {
+        log.info("작품 등록 시작 - 사용자 ID: {}, 작품명: {}", userId, request.getTitle());
         // Artist 프록시 객체 참조
         Artist artist = userService.getArtistReference(userId);
 
@@ -88,6 +89,7 @@ public class ArtworkServiceImpl implements ArtworkService {
 
         // 비동기로 임베딩 생성 및 저장
         embeddingService.generateAndSaveArtworkEmbedding(savedArtwork.getId());
+        log.info("작품 등록 완료 - 작품 ID: {}", savedArtwork.getId());
     }
 
     /**
@@ -99,12 +101,17 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional
     public void updateArtwork(Long userId, Long artworkId, UpdateArtworkRequest request) {
+        log.info("작품 수정 시작 - 사용자 ID: {}, 작품 ID: {}", userId, artworkId);
         // 작품 조회
         Artwork artwork = artworkRepository.findById(artworkId)
-                .orElseThrow(() -> new CustomException(ResponseCode.ARTWORK_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("작품 수정 실패 - 존재하지 않는 작품 ID: {}", artworkId);
+                    return new CustomException(ResponseCode.ARTWORK_NOT_FOUND);
+                });
 
         // 권한 검증: 본인의 작품만 수정 가능
         if (!artwork.getArtist().getUser().getId().equals(userId)) {
+            log.warn("작품 수정 권한 없음 - 사용자 ID: {}, 작품 소유자 ID: {}", userId, artwork.getArtist().getUser().getId());
             throw new CustomException(ResponseCode.ARTWORK_FORBIDDEN);
         }
 
@@ -113,6 +120,7 @@ public class ArtworkServiceImpl implements ArtworkService {
                                  (request.getHeightCm() != null && !request.getHeightCm().equals(artwork.getHeightCm().intValue()));
 
         if (artwork.getIsExhibiting() && isSizeChanging) {
+            log.warn("전시 중인 작품 규격 변경 시도 - 작품 ID: {}", artworkId);
             throw new CustomException(ResponseCode.ARTWORK_EXHIBITING_SIZE_CHANGE);
         }
 
@@ -148,6 +156,7 @@ public class ArtworkServiceImpl implements ArtworkService {
 
         // 변경 사항 저장
         artworkRepository.save(artwork);
+        log.info("작품 수정 완료 - 작품 ID: {}", artworkId);
     }
 
     /**
@@ -159,9 +168,13 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional
     public ArtworkDetailResponse getArtworkDetail(Long artworkId, Long userId) {
+        log.info("작품 상세 조회 시작 - 작품 ID: {}, 사용자 ID: {}", artworkId, userId);
         // 작품 조회 (없으면 예외 발생)
         Artwork artwork = artworkRepository.findById(artworkId)
-                .orElseThrow(() -> new CustomException(ResponseCode.ARTWORK_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("작품 상세 조회 실패 - 존재하지 않는 작품 ID: {}", artworkId);
+                    return new CustomException(ResponseCode.ARTWORK_NOT_FOUND);
+                });
 
         // 조회수 증가
         artwork.incrementViewCount();
@@ -185,7 +198,9 @@ public class ArtworkServiceImpl implements ArtworkService {
         }
 
         // DTO로 변환하여 반환
-        return artworkMapper.toArtworkDetailData(artwork, isBookmarked, artworkImageUrls, artistProfileImageUrl, exhibitionDto);
+        ArtworkDetailResponse response = artworkMapper.toArtworkDetailData(artwork, isBookmarked, artworkImageUrls, artistProfileImageUrl, exhibitionDto);
+        log.info("작품 상세 조회 완료 - 작품 ID: {}", artworkId);
+        return response;
     }
 
     /**
@@ -218,6 +233,8 @@ public class ArtworkServiceImpl implements ArtworkService {
             Integer page,
             Integer size
     ) {
+        log.info("작품 검색 시작 - 사용자 ID: {}, 키워드: '{}', 카테고리: {}, 규격: [w: {}-{}, h: {}-{}], 정렬: {}, 페이지: {}, 사이즈: {}",
+                userId, keyword, categories, minWidth, maxWidth, minHeight, maxHeight, sortBy, page, size);
         // 규격 필터 권한 검증 (카페 사장만 사용 가능)
         validateSpecFilter(userId, minWidth, maxWidth, minHeight, maxHeight);
 
@@ -243,7 +260,9 @@ public class ArtworkServiceImpl implements ArtworkService {
         // Pagination DTO 생성
         Pagination pagination = artworkMapper.toPagination(artworkPage);
 
-        return artworkMapper.toArtworkListData(artistRespons, artworkSummaries, pagination);
+        ArtworkListResponse response = artworkMapper.toArtworkListData(artistRespons, artworkSummaries, pagination);
+        log.info("작품 검색 완료 - 조회된 작품 수: {}", artworkPage.getNumberOfElements());
+        return response;
     }
 
     /**
@@ -253,9 +272,13 @@ public class ArtworkServiceImpl implements ArtworkService {
         boolean hasSpecFilter = minWidth != null || maxWidth != null || minHeight != null || maxHeight != null;
         if (hasSpecFilter && userId != null) {
             User user = userService.findById(userId)
-                    .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                    .orElseThrow(() -> {
+                        log.warn("규격 필터 검증 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                        return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                    });
 
             if (user.getUserType() != UserRole.CAFE_OWNER) {
+                log.warn("규격 필터 사용 권한 없음 - 사용자 ID: {}, 사용자 유형: {}", userId, user.getUserType());
                 throw new CustomException(ResponseCode.ARTWORK_SIZE_FILTER_FORBIDDEN);
             }
         }
@@ -308,6 +331,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkListResponse getUserArtworks(Long userId, Integer page, Integer size) {
+        log.info("특정 사용자 작품 목록 조회 시작 - 사용자 ID: {}, 페이지: {}, 사이즈: {}", userId, page, size);
         // Artist 엔티티 조회
         Artist artist = userService.getArtistReference(userId);
 
@@ -333,7 +357,9 @@ public class ArtworkServiceImpl implements ArtworkService {
         Pagination pagination = artworkMapper.toPagination(artworkPage);
 
         // artists는 null로 설정 (작가 검색이 아니므로)
-        return artworkMapper.toArtworkListData(null, artworkSummaries, pagination);
+        ArtworkListResponse response = artworkMapper.toArtworkListData(null, artworkSummaries, pagination);
+        log.info("특정 사용자 작품 목록 조회 완료 - 조회된 작품 수: {}", artworkPage.getNumberOfElements());
+        return response;
     }
 
     /**
@@ -347,6 +373,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtistHomeResponse getArtistHome(Long userId) {
+        log.info("작가 홈 조회 시작 - 작가 ID: {}", userId);
         // 1. Artist 엔티티 조회
         Artist artist = userService.getArtistReference(userId);
 
@@ -385,7 +412,9 @@ public class ArtworkServiceImpl implements ArtworkService {
                 })
                 .collect(Collectors.toList());
 
-        return artworkMapper.toArtistHomeResponse(artistDto, artworkSummaries);
+        ArtistHomeResponse response = artworkMapper.toArtistHomeResponse(artistDto, artworkSummaries);
+        log.info("작가 홈 조회 완료 - 작가 ID: {}, 인기 작품 수: {}", userId, artworkSummaries.size());
+        return response;
     }
 
     /**
@@ -398,6 +427,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkListResponse getBookmarkedArtworks(Long userId, Integer page, Integer size) {
+        log.info("북마크 작품 목록 조회 시작 - 사용자 ID: {}, 페이지: {}, 사이즈: {}", userId, page, size);
         // Pageable 생성
         Pageable pageable = PageRequest.of(page, size);
 
@@ -435,7 +465,9 @@ public class ArtworkServiceImpl implements ArtworkService {
         Pagination pagination = artworkMapper.toPagination(bookmarkPage);
 
         // artists는 null로 설정 (북마크 목록이므로)
-        return artworkMapper.toArtworkListData(null, artworkSummaries, pagination);
+        ArtworkListResponse response = artworkMapper.toArtworkListData(null, artworkSummaries, pagination);
+        log.info("북마크 작품 목록 조회 완료 - 조회된 작품 수: {}", bookmarkPage.getNumberOfElements());
+        return response;
     }
 
     /**
@@ -446,6 +478,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkListResponse getPopularArtworks(Integer size) {
+        log.info("인기 작품 목록 조회 시작 - 사이즈: {}", size);
         // Pageable 생성
         Pageable pageable = PageRequest.of(0, size);
 
@@ -479,7 +512,9 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .collect(Collectors.toList());
 
         // artists와 pagination은 null로 설정 (인기 작품 목록이므로)
-        return artworkMapper.toArtworkListData(null, artworkSummaries, null);
+        ArtworkListResponse response = artworkMapper.toArtworkListData(null, artworkSummaries, null);
+        log.info("인기 작품 목록 조회 완료 - 조회된 작품 수: {}", artworkSummaries.size());
+        return response;
     }
 
     /**
@@ -490,8 +525,10 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkListResponse getRecommendedArtworks(Long slotId) {
+        log.info("추천 작품 조회 시작 - 슬롯 ID: {}", slotId);
         // 1. 슬롯 존재 여부 확인
         if (!displaySlotRepository.existsById(slotId)) {
+            log.warn("추천 작품 조회 실패 - 존재하지 않는 슬롯 ID: {}", slotId);
             throw new CustomException(ResponseCode.SLOT_NOT_FOUND);
         }
 
@@ -504,6 +541,7 @@ public class ArtworkServiceImpl implements ArtworkService {
             List<Long> recommendedArtworkIds = recommendationResponse.getRecommendations().stream()
                     .map(ArtworkHybridResponse.ArtworkItem::getArtworkId)
                     .toList();
+            log.info("추천 서버로부터 작품 추천 응답 받음 - 추천된 작품 수: {}", recommendedArtworkIds.size());
 
             // DB에서 작품 조회 (추천 순서 유지)
             List<Artwork> artworks = recommendedArtworkIds.stream()
@@ -524,7 +562,9 @@ public class ArtworkServiceImpl implements ArtworkService {
                     .collect(Collectors.toList());
 
             // artists는 null로 설정 (추천 목록이므로), pagination도 null
-            return artworkMapper.toArtworkListData(null, artworkSummaries, null);
+            ArtworkListResponse response = artworkMapper.toArtworkListData(null, artworkSummaries, null);
+            log.info("추천 작품 조회 완료 - 슬롯 ID: {}", slotId);
+            return response;
 
         } catch (Exception e) {
             log.error("Failed to get artwork recommendations from Python server for slot {}", slotId, e);
@@ -565,8 +605,10 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkAvailableDatesResponse getArtworkAvailableDates(Long artworkId, LocalDate startDate) {
+        log.info("작품 전시 가능일 조회 시작 - 작품 ID: {}, 시작일: {}", artworkId, startDate);
         // 1. 작품 존재 여부 확인
         if (!artworkRepository.existsById(artworkId)) {
+            log.warn("작품 전시 가능일 조회 실패 - 존재하지 않는 작품 ID: {}", artworkId);
             throw new CustomException(ResponseCode.ARTWORK_NOT_FOUND);
         }
 
@@ -574,6 +616,7 @@ public class ArtworkServiceImpl implements ArtworkService {
         LocalDate today = LocalDate.now();
         LocalDate queryStartDate = (startDate != null) ? startDate : today;
         if (queryStartDate.isBefore(today)) {
+            log.warn("작품 전시 가능일 조회 실패 - 조회 시작일이 오늘보다 이전입니다: {}", queryStartDate);
             throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
         }
 
@@ -606,7 +649,9 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .collect(Collectors.toList());
 
         // 8. DTO 변환 및 반환
-        return artworkMapper.toArtworkAvailableDatesResponse(availableDates);
+        ArtworkAvailableDatesResponse response = artworkMapper.toArtworkAvailableDatesResponse(availableDates);
+        log.info("작품 전시 가능일 조회 완료 - 작품 ID: {}, 가능한 날짜 수: {}", artworkId, availableDates.size());
+        return response;
     }
 
     /**
@@ -621,8 +666,10 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkListResponse getAvailableArtworks(Long artistId, LocalDate startDate, LocalDate endDate) {
+        log.info("전시 가능한 작품 목록 조회 시작 - 작가 ID: {}, 기간: {} ~ {}", artistId, startDate, endDate);
         // 1. 작가 존재 여부 확인
         if (!userService.existsArtistById(artistId)) {
+            log.warn("전시 가능한 작품 목록 조회 실패 - 존재하지 않는 작가 ID: {}", artistId);
             throw new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
         }
 
@@ -644,6 +691,8 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .collect(Collectors.toList());
 
         // 5. artists와 pagination은 null로 설정 (전시 가능한 작품 목록이므로)
-        return artworkMapper.toArtworkListData(null, artworkSummaries, null);
+        ArtworkListResponse response = artworkMapper.toArtworkListData(null, artworkSummaries, null);
+        log.info("전시 가능한 작품 목록 조회 완료 - 작가 ID: {}, 가능한 작품 수: {}", artistId, artworkSummaries.size());
+        return response;
     }
 }

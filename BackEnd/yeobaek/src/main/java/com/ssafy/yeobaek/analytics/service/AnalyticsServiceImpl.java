@@ -33,9 +33,14 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     @Override
     @Transactional
     public void recordEvent(Long userId, RecordEventRequest request) {
+        log.info("사용자 행동 이벤트 기록 시작 - 사용자 ID: {}, 이벤트 타입: {}, 대상 타입: {}, 대상 ID: {}",
+                userId, request.getEventType(), request.getTargetType(), request.getTargetId());
         // 사용자 조회
         User user = userService.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("사용자 행동 이벤트 기록 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // String을 Enum으로 변환
         EventType eventType = EventType.valueOf(request.getEventType());
@@ -58,6 +63,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .build();
 
         userBehaviorEventRepository.save(event);
+        log.info("사용자 행동 이벤트 기록 완료 - 이벤트 ID: {}", event.getId());
     }
 
     /**
@@ -67,9 +73,11 @@ public class AnalyticsServiceImpl implements AnalyticsService {
      */
     private void validateUserTypeAndTargetType(UserRole userRole, TargetType targetType) {
         if (userRole == UserRole.CAFE_OWNER && targetType == TargetType.CAFE) {
+            log.warn("유효하지 않은 이벤트 수집 시도 - 사용자 유형: {}, 대상 타입: {}", userRole, targetType);
             throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
         }
         if (userRole == UserRole.ARTIST && targetType == TargetType.ARTWORK) {
+            log.warn("유효하지 않은 이벤트 수집 시도 - 사용자 유형: {}, 대상 타입: {}", userRole, targetType);
             throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
         }
     }
@@ -80,9 +88,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     @Override
     @Transactional
     public void recordBookmarkEvent(Long userId, Long targetId, TargetType targetType) {
+        log.info("북마크 이벤트 기록 시작 - 사용자 ID: {}, 대상 ID: {}, 대상 타입: {}", userId, targetId, targetType);
         // 사용자 조회
         User user = userService.findById(userId)
-                .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.warn("북마크 이벤트 기록 실패 - 존재하지 않는 사용자 ID: {}", userId);
+                    return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
+                });
 
         // 사용자 유형에 따른 이벤트 수집 제한 검증
         validateUserTypeAndTargetType(user.getUserType(), targetType);
@@ -96,6 +108,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 .build();
 
         userBehaviorEventRepository.save(event);
+        log.info("북마크 이벤트 기록 완료 - 이벤트 ID: {}", event.getId());
     }
 
     /**
@@ -105,18 +118,22 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         switch (eventType) {
             case DWELL:
                 if (request.getDurationSeconds() == null) {
+                    log.warn("DWELL 이벤트 필드 오류 - durationSeconds가 null입니다.");
                     throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
                 }
                 if (request.getMaxScrollPercent() != null) {
+                    log.warn("DWELL 이벤트 필드 오류 - maxScrollPercent는 null이어야 합니다.");
                     throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
                 }
                 break;
 
             case SCROLL:
                 if (request.getMaxScrollPercent() == null) {
+                    log.warn("SCROLL 이벤트 필드 오류 - maxScrollPercent가 null입니다.");
                     throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
                 }
                 if (request.getDurationSeconds() != null) {
+                    log.warn("SCROLL 이벤트 필드 오류 - durationSeconds는 null이어야 합니다.");
                     throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
                 }
                 break;
@@ -125,6 +142,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             case CHAT:
             case BOOKMARK:
                 if (request.getDurationSeconds() != null || request.getMaxScrollPercent() != null) {
+                    log.warn("{} 이벤트 필드 오류 - durationSeconds와 maxScrollPercent는 null이어야 합니다.", eventType);
                     throw new CustomException(ResponseCode.INVALID_INPUT_VALUE);
                 }
                 break;
