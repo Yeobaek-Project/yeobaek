@@ -37,7 +37,7 @@ interface ExhibitionApiService {
         @Path("exhibitionId") exhibitionId: Long
     ): BaseResponse<GetExhibitionInfoResponse>
 
-    @POST("exhibition/{exhibitionId}/agree")
+    @POST("exhibitions/{exhibitionId}/agree")
     suspend fun agreeExhibitionPropose(
         @Path("exhibitionId") exhibitionId: Long
     ): BaseResponse<Unit>
@@ -51,8 +51,14 @@ interface ExhibitionApiService {
 
     @GET("cafes/{cafeId}/available-slots")
     suspend fun getPossibleSlots(
-        @Path("cafeId") cafeId:Long,
+        @Path("cafeId") cafeId: Long,
         @Query("startDate") startDate: String,
         @Query("endDate") endDate: String
     ): BaseResponse<GetPossibleSlotsResponse>
+
+    @POST("exhibitions/{exhibitionId}/reject")
+    suspend fun rejectExhibition(
+        @Path("exhibitionId") exhibitionId: Long
+    ): BaseResponse<Unit>
+
 }

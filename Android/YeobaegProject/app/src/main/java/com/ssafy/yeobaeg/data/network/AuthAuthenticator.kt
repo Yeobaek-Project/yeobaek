@@ -1,6 +1,6 @@
 package com.ssafy.yeobaeg.data.network
 
-import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.local.AuthDataSource
 import com.ssafy.yeobaeg.data.datasource.remote.AuthApiService
 import com.ssafy.yeobaeg.data.model.BaseResponse
 import com.ssafy.yeobaeg.data.model.auth.TokenResponse
@@ -18,7 +18,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class AuthAuthenticator @Inject constructor(
-    private val tokenDataSource: TokenDataSource,
+    private val authDataSource: AuthDataSource,
     private val authApiService: AuthApiService,
     private val authSessionManager: AuthSessionManager
 ) : Authenticator {
@@ -27,10 +27,10 @@ class AuthAuthenticator @Inject constructor(
         // refresh token으로 새 토큰 발급
         return runBlocking {
             try {
-                val refreshToken = tokenDataSource.getRefreshToken()
+                val refreshToken = authDataSource.getRefreshToken()
                 if (refreshToken == null) {
                     // refresh token이 없으면 로그아웃 처리
-                    tokenDataSource.clearTokens()
+                    authDataSource.clearTokens()
                     return@runBlocking null
                 }
 
@@ -45,7 +45,7 @@ class AuthAuthenticator @Inject constructor(
                     
                     if (tokenResponse != null) {
                         // 새 토큰 저장
-                        tokenDataSource.saveTokens(
+                        authDataSource.saveTokens(
                             accessToken = tokenResponse.accessToken,
                             refreshToken = tokenResponse.refreshToken
                         )
@@ -56,19 +56,19 @@ class AuthAuthenticator @Inject constructor(
                             .build()
                     } else {
                         // 응답이 비어있으면 로그아웃 + 로그인 화면 이동 이벤트 발행
-                        tokenDataSource.clearTokens()
+                        authDataSource.clearTokens()
                         authSessionManager.emitTokenExpired()
                         null
                     }
                 } else {
                     // refresh 실패 시 로그아웃 처리 + 로그인 화면 이동 이벤트 발행
-                    tokenDataSource.clearTokens()
+                    authDataSource.clearTokens()
                     authSessionManager.emitTokenExpired()
                     null
                 }
             } catch (e: Exception) {
                 // 예외 발생 시 로그아웃 처리 + 로그인 화면 이동 이벤트 발행
-                tokenDataSource.clearTokens()
+                authDataSource.clearTokens()
                 authSessionManager.emitTokenExpired()
                 null
             }

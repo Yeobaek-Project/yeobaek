@@ -1,7 +1,7 @@
 package com.ssafy.yeobaeg.data.session
 
 import android.util.Log
-import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.local.AuthDataSource
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
 import com.ssafy.yeobaeg.domain.model.AuthEvent
 import com.ssafy.yeobaeg.domain.model.UserRole
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class
 
 AuthSessionManagerImpl @Inject constructor(
-    private val tokenDataSource: TokenDataSource
+    private val authDataSource: AuthDataSource
 ) : AuthSessionManager {
     
     private val _currentUserRole = MutableStateFlow<UserRole?>(null)
@@ -32,7 +32,7 @@ AuthSessionManagerImpl @Inject constructor(
     override val authEvents: SharedFlow<AuthEvent> = _authEvents.asSharedFlow()
     
     override suspend fun isLoggedIn(): Boolean {
-        val token = tokenDataSource.getAccessToken()
+        val token = authDataSource.getAccessToken()
         return token != null
     }
     
@@ -66,7 +66,7 @@ AuthSessionManagerImpl @Inject constructor(
         _currentUserRole.value = null
         _currentUserId.value = null
         // 토큰 삭제
-        tokenDataSource.clearTokens()
+        authDataSource.clearTokens()
         _authEvents.emit(AuthEvent.LoggedOut)
         Log.d("AuthSessionManager", "User logged out - role, userId and tokens cleared")
     }

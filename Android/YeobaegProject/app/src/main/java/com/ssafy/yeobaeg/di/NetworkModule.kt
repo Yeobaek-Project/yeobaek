@@ -2,7 +2,7 @@ package com.ssafy.yeobaeg.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.ssafy.yeobaeg.BuildConfig
-import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.local.AuthDataSource
 import com.ssafy.yeobaeg.data.datasource.remote.AnalyticsApiService
 import com.ssafy.yeobaeg.data.datasource.remote.ArtworkApiService
 import com.ssafy.yeobaeg.data.datasource.remote.AuthApiService
@@ -164,8 +164,8 @@ object NetworkModule {
     @Provides
     @Singleton
     fun provideChatWebSocketService(
-        tokenDataSource: TokenDataSource
-    ): ChatWebSocketService = ChatWebSocketService(tokenDataSource)
+        authDataSource: AuthDataSource
+    ): ChatWebSocketService = ChatWebSocketService(authDataSource)
 
     @Provides
     @Singleton

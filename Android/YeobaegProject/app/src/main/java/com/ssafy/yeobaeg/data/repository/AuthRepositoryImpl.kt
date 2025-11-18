@@ -1,6 +1,6 @@
 package com.ssafy.yeobaeg.data.repository
 
-import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.local.AuthDataSource
 import com.ssafy.yeobaeg.data.datasource.remote.AuthApiService
 import com.ssafy.yeobaeg.data.model.BaseResponse
 import com.ssafy.yeobaeg.data.model.auth.EmailCheckRequest
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService,
-    private val tokenDataSource: TokenDataSource,
+    private val authDataSource: AuthDataSource,
     @StoreJson private val json: Json
 ) : AuthRepository {
     
@@ -84,11 +84,14 @@ class AuthRepositoryImpl @Inject constructor(
                 
                 if (loginResponse != null) {
                     // 토큰 저장
-                    tokenDataSource.saveTokens(
+                    authDataSource.saveTokens(
                         accessToken = loginResponse.accessToken,
                         refreshToken = loginResponse.refreshToken
                     )
-                    
+
+                    // userId 저장
+                    authDataSource.saveUserId(loginResponse.userId)
+
                     // UserRole 변환
                     val role = when (loginResponse.userType) {
                         "GENERAL" -> UserRole.GENERAL
@@ -128,7 +131,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun logout(): Result<Unit> {
         return try {
             // 토큰 삭제
-            tokenDataSource.clearTokens()
+            authDataSource.clearTokens()
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)

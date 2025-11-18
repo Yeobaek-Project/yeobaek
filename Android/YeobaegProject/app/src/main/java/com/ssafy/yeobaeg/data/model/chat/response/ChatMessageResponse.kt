@@ -25,7 +25,7 @@ fun ChatMessageResponse.toDomain(): ChatMessage {
         content = content,
         imageUrl = imageUrl,
         exhibitionId = exhibitionId,
-        exhibition = exhibition,
+        exhibition = exhibition?.toDomain(),
         isRead = isRead,
         createdAt = createdAt
     )

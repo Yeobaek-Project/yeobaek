@@ -37,8 +37,8 @@ class ExhibitionRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun agreeExhibitionPropose(exhibitionId: Long) {
-        runCatching { exhibitionApiService.agreeExhibitionPropose(exhibitionId) }
+    override suspend fun agreeExhibitionPropose(exhibitionId: Long): Result<Unit> {
+        return runCatching { exhibitionApiService.agreeExhibitionPropose(exhibitionId) }
     }
 
     override suspend fun getPossibleArtworks(
@@ -69,6 +69,10 @@ class ExhibitionRepositoryImpl @Inject constructor(
             )
             response.data?.toDomain() ?: throw IllegalStateException("데이터가 존재하지 않습니다.")
         }
+    }
+
+    override suspend fun rejectExhibition(exhibitionId: Long):Result<Unit> {
+        return runCatching { exhibitionApiService.rejectExhibition(exhibitionId) }
     }
 
 }

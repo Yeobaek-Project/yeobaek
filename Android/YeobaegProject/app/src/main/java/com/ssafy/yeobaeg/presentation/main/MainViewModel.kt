@@ -14,6 +14,7 @@ import com.ssafy.yeobaeg.navigation.FullScreen
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
 import com.ssafy.yeobaeg.presentation.common.util.SnackbarMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +32,14 @@ internal class MainViewModel @Inject constructor(
 
     val userRole: StateFlow<UserRole?> = authSessionManager.currentUserRole
 
+    private val _chatListRefreshFlow = MutableSharedFlow<Unit>()
+    val chatListRefreshFlow = _chatListRefreshFlow
+
     private val _snackbarMessage = MutableStateFlow<SnackbarMessage?>(null)
     val snackbarMessage: StateFlow<SnackbarMessage?> = _snackbarMessage.asStateFlow()
+
+    // 현재 채팅 목록 화면에 있는지 추적
+    private val _isOnChatListScreen = MutableStateFlow(false)
 
     init {
         // SnackbarController 이벤트 구독
@@ -71,6 +78,24 @@ internal class MainViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            chatWebSocketRepository.receiveGlobalEvents().collect { msg ->
+                Log.d("MainViewModel", "🔔 Global event received: $msg")
+                // 채팅 목록 화면에 있을 때만 새로고침
+                if (_isOnChatListScreen.value) {
+                    Log.d("MainViewModel", "♻️ Refreshing chat list")
+                    _chatListRefreshFlow.emit(Unit)
+                } else {
+                    Log.d("MainViewModel", "⏭️ Skipping refresh - not on chat list screen")
+                }
+            }
+        }
+    }
+
+    fun setOnChatListScreen(isOnScreen: Boolean) {
+        _isOnChatListScreen.value = isOnScreen
+        Log.d("MainViewModel", "📍 Chat list screen status: $isOnScreen")
+
     }
 
     fun clearSnackbarMessage() {

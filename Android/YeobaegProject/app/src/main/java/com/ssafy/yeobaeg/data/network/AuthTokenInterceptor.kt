@@ -1,7 +1,7 @@
 package com.ssafy.yeobaeg.data.network
 
 import android.util.Log
-import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.local.AuthDataSource
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -13,7 +13,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class AuthTokenInterceptor @Inject constructor(
-    private val tokenDataSource: TokenDataSource
+    private val authDataSource: AuthDataSource
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -21,7 +21,7 @@ class AuthTokenInterceptor @Inject constructor(
 
         // DataStore에서 토큰 가져오기 (코루틴 블로킹)
         val accessToken = runBlocking {
-            tokenDataSource.getAccessToken()
+            authDataSource.getAccessToken()
         }
 
         // 토큰이 있으면 헤더에 추가

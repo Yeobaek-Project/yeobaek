@@ -3,11 +3,16 @@ package com.ssafy.yeobaeg.data.datasource.remote
 import android.annotation.SuppressLint
 import android.util.Log
 import com.ssafy.yeobaeg.BuildConfig
-import com.ssafy.yeobaeg.data.datasource.local.TokenDataSource
+import com.ssafy.yeobaeg.data.datasource.local.AuthDataSource
 import com.ssafy.yeobaeg.data.model.ws.resquest.SendMessageRequest
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import ua.naiksoftware.stomp.HeartBeatTask
@@ -22,18 +27,27 @@ private const val TAG = "ChatWebSocketService"
 
 @Singleton
 class ChatWebSocketService @Inject constructor(
-    private val tokenDataSource: TokenDataSource,
+    private val authDataSource: AuthDataSource,
     private val wsUrl: String = BuildConfig.WS_URL
 ) {
     private var stompClient: StompClient? = null
     private var lifecycleDisposable: Disposable? = null
     private var globalSubscriptionDisposable: Disposable? = null
     private val subscriptions = mutableMapOf<Long, Disposable>()
-    private val _messageChannel = Channel<String>(Channel.BUFFERED)
-    val messageFlow = _messageChannel.receiveAsFlow()
+    private val _chatMessageFlow = MutableSharedFlow<String>(
+        replay = 1,
+        extraBufferCapacity = 10
+    )
+    val chatMessageFlow = _chatMessageFlow.asSharedFlow()
+
+    private val _globalEventFlow = MutableSharedFlow<String>(
+        replay = 0,
+        extraBufferCapacity = 10
+    )
+    val globalEventFlow = _globalEventFlow.asSharedFlow()
+
 
     private var isConnected = false
-
     fun initClient() {
         if (stompClient == null) {
             stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl).apply {
@@ -44,22 +58,27 @@ class ChatWebSocketService @Inject constructor(
         }
     }
 
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
     suspend fun connect() {
 
         if (isConnected) {
             return
         }
-        val accessToken = tokenDataSource.getAccessToken()
+        val accessToken = authDataSource.getAccessToken()
         val headers = listOf(StompHeader("Authorization", "Bearer $accessToken"))
 
-        lifecycleDisposable=stompClient?.lifecycle()?.subscribe { event ->
+        lifecycleDisposable = stompClient?.lifecycle()?.subscribe { event ->
             when (event.type) {
                 LifecycleEvent.Type.OPENED -> {
                     Log.d("ChatWebSocketService", "✅ WebSocket connected")
                     isConnected = true
                     Log.d(TAG, "connect: 전역 구독 호출")
                     //전역 구독 호출
-                    runCatching { subscribeGlobal() }
+                    coroutineScope.launch {
+                        subscribeGlobal()
+                    }
+
                 }
 
                 LifecycleEvent.Type.CLOSED -> {
@@ -80,13 +99,16 @@ class ChatWebSocketService @Inject constructor(
     }
 
     //전역 구독
-    private fun subscribeGlobal() {
-        val destination = "/sub/notifications"
+    suspend fun subscribeGlobal() {
+        val userId = authDataSource.getUserId()
+
+        val destination = "/sub/notifications/${userId}"
         Log.d(TAG, "📡 Attempting to subscribe global topic: $destination")
 
         try {
-            globalSubscriptionDisposable=stompClient?.topic(destination)?.subscribe({ msg ->
+            globalSubscriptionDisposable = stompClient?.topic(destination)?.subscribe({ msg ->
                 Log.d(TAG, "📢 Global notification: ${msg.payload}")
+                _globalEventFlow.tryEmit(msg.payload)
             }, { e ->
                 Log.w(
                     TAG,
@@ -116,7 +138,8 @@ class ChatWebSocketService @Inject constructor(
         }
         val destination = "/sub/chat/room/$chatRoomId"
         val disposable = stompClient?.topic(destination)?.subscribe({ msg ->
-            _messageChannel.trySend(msg.payload)
+            Log.d("CHANNEL", "메시지 수신: ${msg.payload}")
+            _chatMessageFlow.tryEmit(msg.payload)
         }, { e ->
             Log.e("ChatWebSocketService", "❌ Chat room subscription error: ${e.message}", e)
         })
@@ -146,7 +169,7 @@ class ChatWebSocketService @Inject constructor(
             Log.d("ChatWebSocketService", "📤 Message sent successfully")
         }, { e ->
             Log.e("ChatWebSocketService", "❌ Send failed: ${e.message}", e)
-        })?.let{disposable -> }
+        })?.let { disposable -> }
     }
 
     //연결 끊기

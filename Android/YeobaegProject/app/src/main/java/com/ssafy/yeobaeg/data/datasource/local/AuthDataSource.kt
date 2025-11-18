@@ -13,17 +13,18 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private val Context.tokenDataStore: DataStore<Preferences> by preferencesDataStore(name = "token_preferences")
+private val Context.authDataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_preferences")
 
 @Singleton
-class TokenDataSource @Inject constructor(
+class AuthDataSource @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val dataStore = context.tokenDataStore
+    private val dataStore = context.authDataStore
 
     private object PreferencesKeys {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
         val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        val USER_ID = stringPreferencesKey("user_id")
     }
 
     suspend fun saveTokens(accessToken: String, refreshToken: String) {
@@ -57,10 +58,29 @@ class TokenDataSource @Inject constructor(
         }
     }
 
+    suspend fun saveUserId(userId: Long) {
+        dataStore.edit { preferences ->
+            preferences[PreferencesKeys.USER_ID] = userId.toString()
+        }
+    }
+
+    suspend fun getUserId(): Long? {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKeys.USER_ID]?.toLongOrNull()
+        }.first()
+    }
+
+    fun getUserIdFlow(): Flow<Long?> {
+        return dataStore.data.map { preferences ->
+            preferences[PreferencesKeys.USER_ID]?.toLongOrNull()
+        }
+    }
+
     suspend fun clearTokens() {
         dataStore.edit { preferences ->
             preferences.remove(PreferencesKeys.ACCESS_TOKEN)
             preferences.remove(PreferencesKeys.REFRESH_TOKEN)
+            preferences.remove(PreferencesKeys.USER_ID)
         }
     }
 }
