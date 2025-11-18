@@ -21,7 +21,7 @@ interface ExhibitionRepository {
     ): Result<List<ExhibitionSchedule>>
 
     suspend fun proposeExhibition(info: ProposeExhibition)
-    suspend fun getExhibitionInfo(exhibitionId: Long): Result<ExhibitionInfo>
+    suspend fun getExhibitionInfo(exhibitionId: Long?): Result<ExhibitionInfo>
     suspend fun agreeExhibitionPropose(exhibitionId: Long): Result<Unit>
     suspend fun getPossibleArtworks(
         artistId: Long,

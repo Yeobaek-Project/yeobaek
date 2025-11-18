@@ -34,7 +34,7 @@ interface ExhibitionApiService {
 
     @GET("exhibitions/{exhibitionId}")
     suspend fun getExhibitionInfo(
-        @Path("exhibitionId") exhibitionId: Long
+        @Path("exhibitionId") exhibitionId: Long?
     ): BaseResponse<GetExhibitionInfoResponse>
 
     @POST("exhibitions/{exhibitionId}/agree")

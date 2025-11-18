@@ -30,7 +30,7 @@ class ExhibitionRepositoryImpl @Inject constructor(
         runCatching { exhibitionApiService.proposeExhibition(info.toDto()) }
     }
 
-    override suspend fun getExhibitionInfo(exhibitionId: Long): Result<ExhibitionInfo> {
+    override suspend fun getExhibitionInfo(exhibitionId: Long?): Result<ExhibitionInfo> {
         return runCatching {
             val response = exhibitionApiService.getExhibitionInfo(exhibitionId)
             response.data?.toDomain() ?: throw IllegalStateException("데이터가 존재하지 않습니다.")

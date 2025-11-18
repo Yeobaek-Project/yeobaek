@@ -3,6 +3,7 @@ package com.ssafy.yeobaeg.domain.repository
 import com.ssafy.yeobaeg.domain.model.chat.ChatList
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoom
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoomMessages
+import com.ssafy.yeobaeg.domain.model.chat.WriteReview
 
 interface ChatRepository {
 
@@ -18,4 +19,8 @@ interface ChatRepository {
         chatRoomId: Long, page: Int = 0,
         size: Int = 20
     ): Result<ChatRoomMessages>
+
+    suspend fun writeReview(
+        request: WriteReview
+    ):Result<Unit>
 }

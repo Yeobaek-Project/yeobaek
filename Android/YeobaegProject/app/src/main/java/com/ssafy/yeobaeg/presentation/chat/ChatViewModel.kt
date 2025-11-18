@@ -10,6 +10,7 @@ import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoomInfo
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoomMessages
 import com.ssafy.yeobaeg.domain.model.chat.MessageType
+import com.ssafy.yeobaeg.domain.model.chat.WriteReview
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionInfo
 import com.ssafy.yeobaeg.domain.model.ws.SendMessage
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
@@ -39,6 +40,7 @@ data class ChatUiState(
     val isLoadingMore: Boolean = false,
     val chatRoomMessages: ChatRoomMessages = ChatRoomMessages(),
     val exhibitionInfo: ExhibitionInfo = ExhibitionInfo(),
+    val review: WriteReview= WriteReview(),
     val errorMessage: String? = null,
 )
 
@@ -60,6 +62,7 @@ class ChatViewModel @Inject constructor(
     private var receiveJob: Job? = null
     val myUserId: StateFlow<Long?> = authSessionManager.currentUserId
     val myUserRole: StateFlow<UserRole?> = authSessionManager.currentUserRole
+
 
     /** 채팅방 구독 시작 (입장 시) */
     fun subscribeToChatRoom(chatRoomId: Long) {
@@ -86,10 +89,18 @@ class ChatViewModel @Inject constructor(
 
         receiveJob = viewModelScope.launch {
             chatWebSocketRepository.receiveChatMessages().collect { newMessage ->
+                if (newMessage.messageType == MessageType.STARTED ||
+                    newMessage.messageType == MessageType.ENDED) {
+
+                    Log.d(TAG, "startReceivingMessages: 전시 종료")
+                    newMessage.exhibition?.exhibitionId.let { id ->
+                        loadExhibitionInfo(id)
+                    }
+                }
+
                 if (newMessage.senderId != myUserId.value) {
 
                     _uiState.update { state ->
-                        val currentSize = state.chatRoomMessages.messages.size
                         val filtered = state.chatRoomMessages.messages.filterNot {
                             it.messageType == newMessage.messageType && it.messageId < 0
                         }
@@ -183,6 +194,7 @@ class ChatViewModel @Inject constructor(
         chatRepository.getChatRoomMessages(chatRoomId, page = 0)
             .onSuccess { result ->
                 Log.d(TAG, "loadChatMessages success - messages: ${result.messages.size}, pagination: ${result.pagination}")
+
                 _uiState.update { current ->
                     current.copy(
                         chatRoomMessages = result.copy(
@@ -192,6 +204,17 @@ class ChatViewModel @Inject constructor(
                         isLoading = false,
                         errorMessage = null
                     )
+                }
+                val systemMsg = result.messages.firstOrNull { msg ->
+                    msg.messageType == MessageType.STARTED || msg.messageType == MessageType.ENDED
+                }
+
+                systemMsg?.let { msg ->
+                    val id = msg.exhibitionId ?: msg.exhibition?.exhibitionId
+                    if (id != null) {
+                        Log.d(TAG, "📌 채팅방 입장 시 전시 상세 조회 호출: exhibitionId=$id")
+                        loadExhibitionInfo(id)   // ← 여기서 API 호출!
+                    }
                 }
             }
             .onFailure { e ->
@@ -323,13 +346,45 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun submitReview(
+        exhibitionId: Long,
+        targetUserId:Long,
+    ) {
+        viewModelScope.launch {
+
+            // 로딩 시작
+            _uiState.update { it.copy(isLoading = true) }
+
+            val reviewData = uiState.value.review.copy(
+                exhibitionId = exhibitionId,
+                reviewId = targetUserId
+            )
+
+            chatRepository.writeReview(reviewData)
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            review = WriteReview()
+                        )
+                    }
+                }
+                .onFailure { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "작성 완료된 리뷰입니다."
+                        )
+                    }
+                }        }
+    }
 
 
     fun clearErrorMessage() {
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    fun loadExhibitionInfo(exhibitionId: Long) = viewModelScope.launch {
+    fun loadExhibitionInfo(exhibitionId: Long?) = viewModelScope.launch {
         exhibitionRepository.getExhibitionInfo(exhibitionId)
             .onSuccess { info ->
                 _uiState.update { state ->
@@ -425,4 +480,17 @@ class ChatViewModel @Inject constructor(
         Log.d(TAG, "🧹 ViewModel cleared - stopping all jobs")
         stopReceivingMessages()
     }
+
+    fun updateRating(value: Int) {
+        _uiState.update { state ->
+            state.copy(review = state.review.copy(rating = value))
+        }
+    }
+
+    fun updateComment(text: String) {
+        _uiState.update { state ->
+            state.copy(review = state.review.copy(comment = text))
+        }
+    }
+
 }

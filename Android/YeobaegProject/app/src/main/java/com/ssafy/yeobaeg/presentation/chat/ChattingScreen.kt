@@ -61,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -71,6 +72,7 @@ import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.R
 import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
 import com.ssafy.yeobaeg.domain.model.chat.MessageType
+import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionInfo
 import com.ssafy.yeobaeg.presentation.common.component.SnackbarType
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegSnackbarHost
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
@@ -102,6 +104,7 @@ fun ChattingScreen(
     var showMatchingInfoDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val errorMessage = uiState.errorMessage
+    var showReviewDialog by remember { mutableStateOf(false) }
 
     // 이미지 선택 런처
     val pickImageLauncher = rememberLauncherForActivityResult(
@@ -136,6 +139,7 @@ fun ChattingScreen(
         profileImg = uiState.chatRoomMessages.chatRoom.partnerImageUrl,
         messages = uiState.chatRoomMessages.messages,
         partnerName = uiState.chatRoomMessages.chatRoom.partnerName,
+        exhibitionInfo = uiState.exhibitionInfo,
         isLoading = uiState.isLoading,
         isLoadingMore = uiState.isLoadingMore,
         hasNext = uiState.chatRoomMessages.pagination.hasNext,
@@ -153,7 +157,7 @@ fun ChattingScreen(
                 uiState.chatRoomMessages.chatRoom.partnerId,
             )
         },
-        onImageClick={
+        onImageClick = {
             pickImageLauncher.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
@@ -169,7 +173,8 @@ fun ChattingScreen(
             viewModel.loadMoreMessages(chatRoomId)
         },
         myUserId = myUserId,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onReviewClickShow = { showReviewDialog = true }
     )
     if (showMatchingInfoDialog) {
         MatchingInfoDialog(
@@ -181,6 +186,15 @@ fun ChattingScreen(
             }
         )
     }
+    if (showReviewDialog) {
+        ReviewDialog(
+            exhibitionId = uiState.exhibitionInfo.exhibitionId,
+            targetUserId = uiState.chatRoomMessages.chatRoom.partnerId,
+            viewModel = viewModel,
+            onDismiss = { showReviewDialog = false }
+        )
+    }
+
 }
 
 /**
@@ -192,6 +206,7 @@ fun ChattingScreenContent(
     title: String,
     profileImg: String?,
     partnerName: String,
+    exhibitionInfo: ExhibitionInfo,
     messages: List<ChatMessage> = emptyList(),
     isLoading: Boolean = false,
     isLoadingMore: Boolean = false,
@@ -201,10 +216,11 @@ fun ChattingScreenContent(
     onSendClick: (String) -> Unit = {},
     onBackClick: (() -> Unit)? = null,
     onMatchingClick: () -> Unit = {},
-    onImageClick:()->Unit={},
+    onImageClick: () -> Unit = {},
     onProposeAccept: (Long) -> Unit,
     onReject: ((Long) -> Unit)? = null,
     onLoadMore: () -> Unit = {},
+    onReviewClickShow: () -> Unit,
     snackbarHostState: SnackbarHostState,
     myUserId: Long?
 ) {
@@ -232,12 +248,15 @@ fun ChattingScreenContent(
             .collect { (lastVisibleItemIndex, totalItems, _) ->
                 // reverseLayout이므로 마지막 인덱스(가장 오래된 메시지)가 보일 때 로드
                 val shouldLoad = lastVisibleItemIndex != null &&
-                    totalItems > 0 &&
-                    lastVisibleItemIndex >= totalItems - 5 &&
-                    hasNext &&
-                    !isLoadingMore
+                        totalItems > 0 &&
+                        lastVisibleItemIndex >= totalItems - 5 &&
+                        hasNext &&
+                        !isLoadingMore
 
-                android.util.Log.d(TAG, "Scroll Check - lastIndex: $lastVisibleItemIndex, total: $totalItems, hasNext: $hasNext, isLoading: $isLoadingMore, shouldLoad: $shouldLoad")
+                android.util.Log.d(
+                    TAG,
+                    "Scroll Check - lastIndex: $lastVisibleItemIndex, total: $totalItems, hasNext: $hasNext, isLoading: $isLoadingMore, shouldLoad: $shouldLoad"
+                )
 
                 if (shouldLoad) {
                     android.util.Log.d(TAG, "Loading more messages...")
@@ -364,13 +383,30 @@ fun ChattingScreenContent(
                             // 전시 수락 / 거절 / 취소 / 시작 / 종료 (시스템 메시지)
                             MessageType.AGREED,
                             MessageType.REJECTED,
-                            MessageType.CANCELLED,
-                            MessageType.STARTED,
-                            MessageType.ENDED -> {
+                            MessageType.CANCELLED -> {
                                 MatchingStatusMessageBubble(
                                     message = msg,
                                     partnerName = partnerName,
                                     myId = myUserId
+                                )
+                            }
+
+                            MessageType.STARTED -> {
+                                val info = exhibitionInfo
+
+                                ExhibitionEndedMessage(
+                                    type = "STARTED",
+                                    info = info,
+                                    onReviewClick = { onReviewClickShow() },
+                                )
+                            }
+
+                            MessageType.ENDED -> {
+                                val info = exhibitionInfo
+                                ExhibitionEndedMessage(
+                                    type = "ENDED",
+                                    info = info,
+                                    onReviewClick = { onReviewClickShow() },
                                 )
                             }
 
@@ -395,7 +431,7 @@ fun PartnerMessageBubble(message: ChatMessage, profileImg: String?) {
         horizontalArrangement = Arrangement.Start
     ) {
         AsyncImage(
-            model = profileImg?: R.drawable.profile,
+            model = profileImg ?: R.drawable.profile,
             contentDescription = null,
             modifier = Modifier
                 .size(40.dp)
@@ -652,12 +688,6 @@ fun MatchingStatusMessageBubble(
                 MessageType.CANCELLED ->
                     "전시가 취소되었습니다."
 
-                MessageType.STARTED ->
-                    "전시가 시작되었습니다."
-
-                MessageType.ENDED ->
-                    "전시가 종료되었습니다."
-
                 else -> ""
             }
 
@@ -729,7 +759,7 @@ fun ChatInputBar(
     onMatchingClick: () -> Unit = {},
     onImageClick: () -> Unit = {},
 
-) {
+    ) {
     val trimmedValue = value.trim()
     val isSendEnabled = trimmedValue.isNotEmpty()
     var showDialog by remember { mutableStateOf(false) }
@@ -848,7 +878,7 @@ fun ChatInputBar(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     DialogOption("사진", Color(0xFFE3F2FD)) {
-                        showDialog=false
+                        showDialog = false
                         onImageClick()
                     }
                     DialogOption("매칭 요청", Color(0xFFFFF8E1)) {
@@ -879,6 +909,178 @@ fun DialogOption(text: String, color: Color, onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun ExhibitionEndedMessage(
+    type: String,
+    info: ExhibitionInfo,
+    onReviewClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth(),
+//            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        shadowElevation = 1.dp,
+        color = Color.White
+    ) {
+        Column {
+            // 상단 베이지 바
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFD2C1A5))
+                    .padding(15.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_end), // 종료 아이콘
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(22.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = when (type) {
+                            "STARTED" -> "전시 시작"
+                            "ENDED" -> "전시 종료"
+                            else -> {
+                                ""
+                            }
+                        },
+                        fontFamily = jansilFont,
+                        fontSize = 15.sp,
+                        color = Color.White
+                    )
+
+                }
+            }
+            Column(
+                modifier = Modifier.padding(15.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+
+
+                // 작가
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_profile),
+                        contentDescription = null,
+                        tint = YeobaegBlack,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "작가: ${info.artwork.artistName}",
+                        fontFamily = jansilFont,
+                        fontSize = 14.sp,
+                        color = YeobaegBlack
+                    )
+                }
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_profile),
+                        contentDescription = null,
+                        tint = YeobaegBlack,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "카페: ${info.cafe.cafeName}",
+                        fontFamily = jansilFont,
+                        fontSize = 14.sp,
+                        color = YeobaegBlack
+                    )
+                }
+                // 벽
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_pin),
+                        contentDescription = null,
+                        tint = YeobaegBlack,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "전시 공간: ${info.slot.wallName}",
+                        fontFamily = jansilFont,
+                        fontSize = 14.sp,
+                        color = YeobaegBlack
+                    )
+                }
+
+                // 기간
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_cal),
+                        contentDescription = null,
+                        tint = YeobaegBlack,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "기간: ${info.startDate} - ${info.endDate}",
+                        fontFamily = jansilFont,
+                        fontSize = 14.sp,
+                        color = YeobaegBlack
+                    )
+                }
+
+                // 리뷰하기 버튼
+                if (type == "ENDED") {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(46.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(Color(0xFF6A4E2F))
+                            .clickable { onReviewClick() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_star),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(18.dp)
+                            )
+
+                            Spacer(Modifier.width(6.dp))
+
+                            Text(
+                                text = "리뷰하기",
+                                fontFamily = jansilFont,
+                                fontSize = 16.sp,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
+                // 하단 문구
+                Text(
+                    text = when (type) {
+                        "STARTED" -> "전시가 시작되었습니다! ✨"
+                        "ENDED" -> "전시가 성공적으로 종료되었습니다.!"
+                        else -> {
+                            ""
+                        }
+                    },
+                    fontFamily = jansilFont,
+                    fontSize = 14.sp,
+                    color = YeobaegTextGray,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
+        }
+    }
+}
+
+
 @Preview(showBackground = true)
 @Composable
 fun ChattingScreenPreview() {
@@ -893,10 +1095,12 @@ fun ChattingScreenPreview() {
         messages = dummyMessages,
         profileImg = "",
         myUserId = 0,
+        exhibitionInfo = ExhibitionInfo(),
         partnerName = "fff",
         isLoadingMore = false,
         hasNext = false,
         onProposeAccept = {},
-        snackbarHostState = SnackbarHostState()
+        snackbarHostState = SnackbarHostState(),
+        onReviewClickShow = {}
     )
 }

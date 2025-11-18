@@ -2,10 +2,12 @@ package com.ssafy.yeobaeg.data.repository
 
 import com.ssafy.yeobaeg.data.datasource.remote.ChatApiService
 import com.ssafy.yeobaeg.data.model.chat.request.CreateChatRoomRequest
+import com.ssafy.yeobaeg.data.model.chat.request.WriteReviewRequest
 import com.ssafy.yeobaeg.data.model.chat.response.toDomain
 import com.ssafy.yeobaeg.domain.model.chat.ChatList
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoom
 import com.ssafy.yeobaeg.domain.model.chat.ChatRoomMessages
+import com.ssafy.yeobaeg.domain.model.chat.WriteReview
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import javax.inject.Inject
 
@@ -47,12 +49,25 @@ class ChatRepositoryImpl @Inject constructor(
     ): Result<ChatRoomMessages> {
         return runCatching {
             val response = chatApiService.getChattingMessages(
-                chatRoomId=chatRoomId,
+                chatRoomId = chatRoomId,
                 page = page,
                 size = size
             )
             response.data?.toDomain()
                 ?: throw IllegalStateException("Chat Room Messages response data is null")
+        }
+    }
+
+    override suspend fun writeReview(request: WriteReview): Result<Unit> {
+        return runCatching {
+            val body = WriteReviewRequest(
+                exhibitionId = request.exhibitionId,
+                revieweeId = request.reviewId,
+                rating = request.rating,
+                comment = request.comment
+            )
+
+            chatApiService.writeReview(body)
         }
     }
 }

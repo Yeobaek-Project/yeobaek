@@ -2,6 +2,7 @@ package com.ssafy.yeobaeg.data.datasource.remote
 
 import com.ssafy.yeobaeg.data.model.BaseResponse
 import com.ssafy.yeobaeg.data.model.chat.request.CreateChatRoomRequest
+import com.ssafy.yeobaeg.data.model.chat.request.WriteReviewRequest
 import com.ssafy.yeobaeg.data.model.chat.response.ChatListResponse
 import com.ssafy.yeobaeg.data.model.chat.response.ChatRoomMessagesResponse
 import com.ssafy.yeobaeg.data.model.chat.response.ChatRoomResponse
@@ -30,4 +31,9 @@ interface ChatApiService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 20
     ): BaseResponse<ChatRoomMessagesResponse>
+
+    @POST("reviews")
+    suspend fun writeReview(
+        @Body request: WriteReviewRequest
+    ): BaseResponse<Unit>
 }

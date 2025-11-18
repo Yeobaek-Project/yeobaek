@@ -68,6 +68,8 @@ private fun getDisplayMessage(type: String?, message: String?): String {
         "AGREE" -> "매칭을 수락했습니다"
         "PROPOSAL" -> "매칭 제안을 보냈습니다"
         "REJECTED" -> "매칭이 거절 되었습니다."
+        "STARTED" -> "전시가 시작되었습니다."
+        "ENDED" -> "전시가 종료되었습니다."
         else -> ""
     }
 }
@@ -192,7 +194,7 @@ fun ChatListItem(chat: ChatRoomInfo, onClick: () -> Unit) {
             )
 
 //            읽음처리 기능 일단 보류
-            if (chat.unreadCount!=null&&chat.unreadCount > 0) {
+            if (chat.unreadCount != null && chat.unreadCount > 0) {
                 Box(
                     modifier = Modifier
                         .size(24.dp)
