@@ -203,50 +203,6 @@ fun RecommendedArtworkCards(
             }
         }
 
-        // 좌우 화살표
-        if (artworks.size > 1) {
-            IconButton(
-                onClick = {
-                    if (currentIndex > 0) {
-                        animateToPage(currentIndex - 1)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .zIndex(3f)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ChevronLeft,
-                    contentDescription = "이전",
-                    tint = Color.White
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    if (currentIndex < artworks.lastIndex) {
-                        animateToPage(currentIndex + 1)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .zIndex(3f)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ChevronRight,
-                    contentDescription = "다음",
-                    tint = Color.White
-                )
-            }
-        }
     }
 }
 

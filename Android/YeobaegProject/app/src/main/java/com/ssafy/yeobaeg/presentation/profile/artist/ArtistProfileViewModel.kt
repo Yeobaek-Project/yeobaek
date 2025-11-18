@@ -3,7 +3,10 @@ package com.ssafy.yeobaeg.presentation.profile.artist
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yeobaeg.domain.model.Pagination
 import com.ssafy.yeobaeg.domain.model.profile.ArtistInfo
+import com.ssafy.yeobaeg.domain.model.profile.Artwork
+import com.ssafy.yeobaeg.domain.model.profile.ArtworkSummary
 import com.ssafy.yeobaeg.domain.model.profile.UserInfo
+import com.ssafy.yeobaeg.domain.repository.ArtRepository
 import com.ssafy.yeobaeg.domain.repository.ProfileRepository
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
 import com.ssafy.yeobaeg.navigation.navigator.Navigator
@@ -21,8 +24,8 @@ data class ArtistProfileUiState(
     val isLoading: Boolean = false,
     val artistInfo: ArtistInfo? = null,
     val userInfo: UserInfo = UserInfo(),
-    val pagination: Pagination = Pagination(),
-    val images: List<String> = emptyList(),
+    val pagination: Pagination? = null,
+    val artworks: List<ArtworkSummary> = emptyList(),
     val errorMessage: String? = null,
     val bookmarkCount: Int = 0
 )
@@ -31,12 +34,11 @@ data class ArtistProfileUiState(
 class ArtistProfileViewModel @Inject constructor(
     private val navigator: Navigator,
     private val profileRepository: ProfileRepository,
+    private val artRepository: ArtRepository,
     authSessionManager: AuthSessionManager
 ) : ProfileViewModel(navigator, authSessionManager) {
     private val _uiState = MutableStateFlow(ArtistProfileUiState())
     val uiState: StateFlow<ArtistProfileUiState> = _uiState.asStateFlow()
-    private var page = 0
-    private val pageSize = 12
 
     fun loadArtistProfile(userId: Long?) {
         viewModelScope.launch {
@@ -57,11 +59,41 @@ class ArtistProfileViewModel @Inject constructor(
                             artistInfo = profile.artistInfo,
                         )
                     }
-                    loadNextArtworks(reset = true)
 
                     // 내 프로필인 경우에만 북마크 개수 로드
                     if (userId == null) {
                         loadBookmarkCount()
+                    }
+                }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "알 수 없는 오류"
+                        )
+                    }
+                }
+        }
+    }
+
+    fun loadArtworks(userId: Long? = null) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            val result = if (userId == null) {
+                artRepository.getMyArtworks()
+            } else {
+                artRepository.getUserArtworks(userId)
+            }
+
+            result
+                .onSuccess { artwork ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            artworks = artwork.artworks,
+                            pagination = artwork.pagination
+                        )
                     }
                 }
                 .onFailure { error ->
@@ -94,37 +126,40 @@ class ArtistProfileViewModel @Inject constructor(
 
 
     /** 페이징 로드 (더미 이미지 기반) */
-    fun loadNextArtworks(reset: Boolean = false) {
+    fun loadNextArtworks(userId: Long? = null) {
         viewModelScope.launch {
             if (_uiState.value.isLoading) return@launch
 
             _uiState.update { it.copy(isLoading = true) }
 
-            delay(500) // 로딩 효과 시각화용 딜레이
+            val pagination = _uiState.value.pagination ?: return@launch
+            if(!pagination.hasNext) return@launch
 
-            val nextPage = if (reset) 0 else page + 1
-            val startIndex = nextPage * pageSize
-
-            val newImages = List(pageSize) { index ->
-                "https://picsum.photos/200/200?random=${startIndex + index}"
+            val result = if (userId == null) {
+                artRepository.getMyArtworks(page = pagination.currentPage + 1, size = pagination.pageSize)
+            } else {
+                artRepository.getUserArtworks(userId, page = pagination.currentPage + 1, size = pagination.pageSize)
             }
 
-            _uiState.update {
-                it.copy(
-                    images = if (reset) newImages else it.images + newImages,
-                    pagination = it.pagination.copy(hasNext = nextPage < 4), // 5페이지까지 존재한다고 가정
-                    isLoading = false
-                )
-            }
-
-            page = nextPage
+            result
+                .onSuccess { artwork ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            artworks = it.artworks + artwork.artworks,
+                            pagination = artwork.pagination
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = error.message ?: "알 수 없는 오류"
+                        )
+                    }
+                }
         }
-    }
-
-    fun refresh() {
-        page = 0
-        loadNextArtworks(reset = true)
-
     }
 
 }

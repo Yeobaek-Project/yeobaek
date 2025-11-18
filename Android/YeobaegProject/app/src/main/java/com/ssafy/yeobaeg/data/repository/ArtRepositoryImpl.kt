@@ -98,12 +98,22 @@ class ArtRepositoryImpl @Inject constructor(
         responseDto.toDomain()
     }
 
+    override suspend fun getUserArtworks(
+        userId: Long,
+        page: Int?,
+        size: Int?
+    ): Result<Artwork> = runCatching {
+        val responseDto = handleApi(json) { artworkApiService.getUserArtworks(userId, page, size) }
+        responseDto.toDomain()
+    }
+
     override suspend fun getRecommendedArtworks(
         slotId: Long,
         page: Int?,
         size: Int?
     ): Result<Artwork> = runCatching {
-        val responseDto = handleApi(json) { artworkApiService.getRecommendedArtworks(slotId, page, size) }
+        val responseDto =
+            handleApi(json) { artworkApiService.getRecommendedArtworks(slotId, page, size) }
         responseDto.toDomain()
     }
 }

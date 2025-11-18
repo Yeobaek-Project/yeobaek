@@ -54,7 +54,7 @@ private val SlotActiveBorder = PrimaryGold
 private val SlotDisabledBorder = Color(0xFF7A6957)
 private val SlotDisabledBg = Color(0xFF4A3A2C)
 
-private val IndicatorActive = Color.White
+private val IndicatorActive = PrimaryGold
 private val IndicatorInactive = Color(0xFF3C3A39)
 
 @Composable
@@ -197,54 +197,6 @@ fun RecommendedCafePopup(
             }
         }
 
-        // 좌우 화살표
-        if (recommendedCafes.size > 1) {
-            IconButton(
-                onClick = {
-                    if (currentIndex > 0) {
-                        animateToPage(currentIndex - 1)
-                    } else {
-                        animateToPage(recommendedCafes.lastIndex)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .zIndex(3f)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ChevronLeft,
-                    contentDescription = "이전",
-                    tint = TextPrimary
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    if (currentIndex < recommendedCafes.lastIndex) {
-                        animateToPage(currentIndex + 1)
-                    } else {
-                        animateToPage(0)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.5f))
-                    .zIndex(3f)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ChevronRight,
-                    contentDescription = "다음",
-                    tint = TextPrimary
-                )
-            }
-        }
     }
 }
 

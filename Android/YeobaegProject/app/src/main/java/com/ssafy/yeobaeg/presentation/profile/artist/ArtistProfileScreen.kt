@@ -68,6 +68,7 @@ fun ArtistProfileScreen(
     var selectedTab by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
         artistViewModel.loadArtistProfile(userId)
+        artistViewModel.loadArtworks(userId)
     }
 
     Scaffold(
@@ -106,10 +107,10 @@ fun ArtistProfileScreen(
             when (selectedTab) {
                 0 -> {
                     YeobaegGrid(
-                        imageUrls = uiState.images,
+                        artworks = uiState.artworks,
                         isLoading = uiState.isLoading,
-                        hasNext = uiState.pagination.hasNext,
-                        onLoadMore = { artistViewModel.loadNextArtworks() },
+                        hasNext = uiState.pagination?.hasNext ?: true,
+                        onLoadMore = { artistViewModel.loadNextArtworks(userId) },
                     )
                 }
 

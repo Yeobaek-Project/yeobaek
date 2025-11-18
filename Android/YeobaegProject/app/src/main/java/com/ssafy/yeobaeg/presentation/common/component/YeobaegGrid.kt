@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.shape.RoundedCornerShape
 import coil.compose.AsyncImage
+import com.ssafy.yeobaeg.domain.model.profile.ArtworkSummary
 import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.filter
 
 @Composable
 fun YeobaegGrid(
-    imageUrls: List<String>,
+    artworks: List<ArtworkSummary>,
     isLoading: Boolean,
     hasNext: Boolean,
     onLoadMore: () -> Unit,
@@ -56,9 +57,9 @@ fun YeobaegGrid(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        items(count = imageUrls.size, key = { index -> imageUrls[index] }) { index ->
+        items(artworks) { artwork ->
             AsyncImage(
-                model = imageUrls[index],
+                model = artwork.thumbnailUrl,
                 contentDescription = "Artwork Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
