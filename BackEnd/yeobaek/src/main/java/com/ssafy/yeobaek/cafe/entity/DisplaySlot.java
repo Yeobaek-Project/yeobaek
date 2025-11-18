@@ -30,4 +30,7 @@ public class DisplaySlot {
 
     @Column(name = "requirements")
     private String requirements;
+
+    @Column(name = "requirements_embedding", columnDefinition = "TEXT")
+    private String requirementsEmbedding;
 }

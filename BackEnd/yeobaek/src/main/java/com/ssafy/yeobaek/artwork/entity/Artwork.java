@@ -33,6 +33,9 @@ public class Artwork {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "description_embedding", columnDefinition = "TEXT")
+    private String descriptionEmbedding;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "art_category", nullable = false, length = 20)
     private ArtCategory artCategory;

@@ -72,6 +72,14 @@ logs/
 *.db
 *.sqlite3
 
+# ML Models & Cache
+models/
+*.pkl
+*.pth
+*.bin
+*.onnx
+*.lock
+
 # OS
 .DS_Store
 Thumbs.db

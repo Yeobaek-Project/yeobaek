@@ -3,28 +3,34 @@ import numpy as np
 from scipy.sparse import csr_matrix
 import implicit
 import pickle
-from typing import List, Dict, Tuple
+from typing import List, Dict
 from schemas.models import RatingData
 import os
 
 
-class ALSTrainer:
+class CFTrainer:
     """ALS 모델 학습을 담당하는 클래스"""
 
-    def __init__(self, model_path: str = "models/als_model.pkl"):
-        self.model_path = model_path
+    def __init__(self):
         self.ALPHA_VALUE = 40  # ALS 신뢰도 가중치
 
-    def train(self, ratings: List[RatingData]) -> Dict[str, int]:
+    def train(self, ratings: List[RatingData], model_path: str) -> Dict[str, int]:
         """
         평점 데이터를 받아서 ALS 모델을 학습하고 저장
 
         Args:
             ratings: 평점 데이터 리스트
+            model_path: 모델을 저장할 파일 경로
 
         Returns:
             학습 결과 통계 (사용자 수, 작품 수)
         """
+        if not ratings:
+            return {
+                'userCount': 0,
+                'itemCount': 0
+            }
+
         # 1. RatingData 리스트를 DataFrame으로 변환
         data_df = pd.DataFrame([
             {
@@ -80,9 +86,9 @@ class ALSTrainer:
         }
 
         # models 디렉토리가 없으면 생성
-        os.makedirs(os.path.dirname(self.model_path), exist_ok=True)
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
 
-        with open(self.model_path, 'wb') as file:
+        with open(model_path, 'wb') as file:
             pickle.dump(model_data, file)
 
         return {

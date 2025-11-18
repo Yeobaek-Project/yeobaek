@@ -3,10 +3,21 @@ fastapi>=0.104.1
 uvicorn[standard]>=0.24.0
 pydantic>=2.5.0
 
-# 데이터 처리 (pip로 설치 가능)
+# 데이터 처리
 numpy>=1.26.0
 pandas>=2.0.3
 scipy>=1.11.0
 
-# ALS 추천 모델 (Windows에서는 conda로 설치 필요)
+# ALS 추천 모델
 implicit>=0.7.0
+
+# CBF 추천 시스템
+torch>=2.0.0
+sentence-transformers>=2.2.2
+scikit-learn>=1.3.0
+
+# 데이터베이스 연결
+mysql-connector-python>=8.0.33
+
+# 환경 변수 관리
+python-dotenv>=1.0.0
