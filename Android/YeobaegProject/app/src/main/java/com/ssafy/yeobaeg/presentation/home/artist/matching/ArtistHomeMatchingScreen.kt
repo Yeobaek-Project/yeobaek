@@ -32,7 +32,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -43,7 +42,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.domain.model.profile.ArtworkSummary
-import com.ssafy.yeobaeg.domain.model.cafe.RecommendedCafe
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.presentation.common.lottie.YeobaegLottieLoading
@@ -82,7 +80,6 @@ fun ArtistHomeMatchingScreen(
             CafeSelectionStep(
                 state = state,
                 onCafeClick = viewModel::navigateToCafe,
-                onLoadMore = viewModel::loadMoreCafes,
                 onBackClick = viewModel::goBackStep
             )
         }
@@ -366,7 +363,6 @@ private fun ArtworkListItem(
 private fun CafeSelectionStep(
     state: ArtistHomeMatchingUiState,
     onCafeClick: (Long) -> Unit,
-    onLoadMore: () -> Unit,
     onBackClick: () -> Unit
 ) {
     Column(modifier = Modifier
@@ -377,107 +373,11 @@ private fun CafeSelectionStep(
             title = "카페 추천 결과",
             onBackClick = onBackClick
         )
-
-        CafeList(
-            cafes = state.cafes,
-            isLoading = state.isLoadingCafes,
-            isLoadingMore = state.isLoadingMoreCafes,
-            hasNext = state.cafePagination?.hasNext ?: false,
-            onItemClick = onCafeClick,
-            onLoadMore = onLoadMore,
-            modifier = Modifier.weight(1f)
+        RecommendedCafePopup(
+           recommendedCafes = state.cafes.take(3),
+            startIndex = 0,
+            onDetailClick = onCafeClick
         )
     }
 }
 
-@Composable
-private fun CafeList(
-    cafes: List<RecommendedCafe>,
-    isLoading: Boolean,
-    isLoadingMore: Boolean,
-    hasNext: Boolean,
-    onItemClick: (Long) -> Unit,
-    onLoadMore: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(listState, hasNext, isLoadingMore) {
-        snapshotFlow {
-            val info = listState.layoutInfo
-            val lastVisible = info.visibleItemsInfo.lastOrNull()?.index ?: -1
-            val total = info.totalItemsCount
-            Pair(lastVisible, total)
-        }
-            .map { (last, total) -> last >= total - 3 && total > 0 }
-            .distinctUntilChanged()
-            .collect { shouldLoadMore ->
-                if (shouldLoadMore && hasNext && !isLoadingMore && !isLoading) {
-                    coroutineScope.launch { onLoadMore() }
-                }
-            }
-    }
-
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp),
-        state = listState
-    ) {
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-        }
-
-        itemsIndexed(cafes) { _, cafe ->
-            CafeCard(
-                modifier = Modifier.padding(vertical = 8.dp),
-                imageUrl = cafe.primaryImageUrl,
-                title = cafe.cafeName,
-                address = cafe.address,
-                rating = cafe.totalReviewScore,
-                tags = cafe.slots.map { it.wallName to !it.isExhibiting },
-                onTagClick = {},
-                onClick = { onItemClick(cafe.cafeId) }
-            )
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-            if (isLoadingMore) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (isLoading && cafes.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            } else if (cafes.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "매칭 가능한 카페가 없습니다.",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal
-                    )
-                }
-            } else {
-                Spacer(modifier = Modifier.height(36.dp))
-            }
-        }
-    }
-}

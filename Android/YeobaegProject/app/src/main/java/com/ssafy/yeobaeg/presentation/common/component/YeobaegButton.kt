@@ -1,5 +1,6 @@
 package com.ssafy.yeobaeg.presentation.common.component
 
+import android.R.attr.enabled
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegDarkGray
 import com.ssafy.yeobaeg.ui.theme.YeobaegGray
@@ -39,6 +41,7 @@ fun YeobaegButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    bgColor: Color = YeobaegBrown,
     enabled: Boolean = true
 ) {
     Button(
@@ -48,7 +51,7 @@ fun YeobaegButton(
             .fillMaxWidth()
             .height(56.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = YeobaegDarkBrown,
+            containerColor = bgColor,
             disabledContainerColor = YeobaegTextGray.copy(alpha = 0.3f)
         ),
         shape = RoundedCornerShape(12.dp)
@@ -69,7 +72,7 @@ fun YeobaegButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    fontSize: TextUnit = 16.sp
+    fontSize: TextUnit
 ) {
     Button(
         onClick = onClick,

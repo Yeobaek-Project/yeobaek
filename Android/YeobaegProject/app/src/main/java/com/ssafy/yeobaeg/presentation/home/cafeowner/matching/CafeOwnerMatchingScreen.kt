@@ -22,7 +22,6 @@ import com.ssafy.yeobaeg.presentation.arcore.plan.FloorPlanPreview
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.presentation.common.lottie.YeobaegLottieLoading
-import com.ssafy.yeobaeg.presentation.home.artist.matching.ArtworkList
 
 @Composable
 fun CafeOwnerMatchingScreen(
@@ -117,15 +116,10 @@ private fun RecommendedArtworksScreen(
             onBackClick = onBackClick
         )
 
-        ArtworkList(
-            artworks = state.recommendedArtworks,
-            isLoading = state.isLoadingArtworks,
-            isLoadingMore = state.isLoadingMoreArtworks,
-            hasNext = state.artworkPagination?.hasNext ?: false,
-            onItemClick = onArtworkClick,
-            onLoadMore = onLoadMore,
-            selectedArtworkId = state.selectedArtworkId,
-            modifier = Modifier.weight(1f)
+        RecommendedArtworkCards(
+            artworks = state.recommendedArtworks.take(3),
+            startIndex = 0,
+            onArtworkClick = onArtworkClick
         )
     }
 }
