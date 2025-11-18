@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",        // Swagger API 문서
                                 "/swagger-ui/**",         // Swagger UI
                                 "/swagger-ui.html",       // Swagger UI HTML
+                                "/api/v1/test/**",        // 테스트 API
                                 "/ws/**"                  // WebSocket
                         ).permitAll()
                         // 나머지는 인증 필요
