@@ -756,15 +756,10 @@ public class ArtworkController {
     })
     @GetMapping("/recommendations")
     public ResponseEntity<ResponseDto<ArtworkListResponse>> getRecommendedArtworks(
-            @Parameter(description = "카페 ID", required = true)
-            @RequestParam Long cafeId,
-            @Parameter(description = "페이지 번호 (0부터 시작, 기본값: 0)")
-            @RequestParam(defaultValue = "0") Integer page,
-            @Parameter(description = "페이지 크기 (기본값: 20, 최대: 50)")
-            @RequestParam(defaultValue = "20") Integer size
+            @Parameter(description = "슬롯 ID", required = true)
+            @RequestParam Long slotId
     ) {
-        // TODO: 임시 구현: 인기순으로 작품 조회 (추후 추천 시스템 연결 예정)
-        ArtworkListResponse data = artworkService.getRecommendedArtworks(cafeId, page, size);
+        ArtworkListResponse data = artworkService.getRecommendedArtworks(slotId);
 
         return ResponseEntity
                 .status(HttpStatus.OK)

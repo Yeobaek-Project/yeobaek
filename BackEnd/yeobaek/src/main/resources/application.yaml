@@ -57,3 +57,12 @@ vworld:
     search-type: parcel
     epsg: epsg:4326
     url: https://api.vworld.kr/req/address
+
+python:
+  server:
+    url: ${PYTHON_SERVER_URL}
+    timeout:
+      connect: 5000  # 5 seconds
+      read: 30000    # 30 seconds
+    retry:
+      max-attempts: 3

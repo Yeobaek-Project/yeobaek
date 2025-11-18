@@ -112,17 +112,11 @@ public interface CafeService {
     AvailableSlotsData getAvailableSlots(Long cafeId, LocalDate startDate, LocalDate endDate);
 
     /**
-     * 추천 카페 목록 조회 (임시 구현 - 전체 카페 페이징)
-     * - 추천 시스템 구현 전까지 전체 카페를 ID 오름차순으로 반환
-     * - 각 카페의 리뷰 평균 평점 계산
-     * - 전시 가능한 슬롯만 포함
-     * - 페이징 지원
-     * @param artworkId 작품 ID (현재 미사용, 추후 추천 시스템 연결 시 활용 예정)
-     * @param page 페이지 번호 (0부터 시작)
-     * @param size 페이지 크기
-     * @return 추천 카페 목록 및 페이징 정보
+     * 추천 카페 목록 조회 (하이브리드 추천: CF + CBF)
+     * @param artworkId 작품 ID
+     * @return 추천 카페 목록 (상위 10개)
      */
-    CafeRecommendationResponse getRecommendedCafes(Long artworkId, Integer page, Integer size);
+    CafeRecommendationResponse getRecommendedCafes(Long artworkId);
 
     /**
      * 인기 카페 목록 조회

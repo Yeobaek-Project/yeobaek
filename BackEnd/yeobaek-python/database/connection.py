@@ -255,11 +255,9 @@ def get_slot_details_for_recommendation(slot_id: int) -> Optional[Dict[str, Any]
             ds.requirements_embedding,
             dw.width_cm,
             dw.height_cm,
-            dw.cafe_id,
-            c.owner_id
+            dw.cafe_id
         FROM display_slot AS ds
         JOIN display_wall AS dw ON ds.id = dw.id
-        JOIN cafe AS c ON dw.cafe_id = c.id
         WHERE ds.id = %s
     """
     results = Database.execute_query(query, (slot_id,))

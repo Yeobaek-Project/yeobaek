@@ -81,8 +81,8 @@ class HybridRecommender:
         if not artworks:
             return []
 
-        # 슬롯에 연결된 카페의 owner_id를 CF의 user_id로 사용
-        owner_id = slot_details.get('owner_id')
+        # 슬롯에 연결된 카페의 id를 CF의 user_id로 사용
+        owner_id = slot_details.get('cafe_id')
         if owner_id is None:
             raise ValueError(f"Owner ID not found for slot {slot_id}")
 

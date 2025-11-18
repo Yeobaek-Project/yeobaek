@@ -108,18 +108,11 @@ public interface ArtworkService {
     ArtworkListResponse getPopularArtworks(Integer size);
 
     /**
-     * 추천 작품 목록 조회 (임시 구현 - 인기순)
-     * - 추천 시스템 구현 전까지 인기순으로 작품 반환
-     * - 인기도 기준: 조회수 × 1 + 북마크수 × 9
-     * - 각 작품에 작가 정보 포함
-     * - 전시 중인 작품은 카페명 포함
-     * - 페이징 지원
-     * @param cafeId 카페 ID (현재 미사용, 추후 추천 시스템 연결 시 활용 예정)
-     * @param page 페이지 번호 (0부터 시작)
-     * @param size 페이지 크기
-     * @return 인기 작품 목록 및 페이징 정보
+     * 추천 작품 목록 조회 (하이브리드 추천: CF + CBF)
+     * @param slotId 슬롯 ID
+     * @return 추천 작품 목록 (상위 10개)
      */
-    ArtworkListResponse getRecommendedArtworks(Long cafeId, Integer page, Integer size);
+    ArtworkListResponse getRecommendedArtworks(Long slotId);
 
     /**
      * 작품의 전시 가능일 조회

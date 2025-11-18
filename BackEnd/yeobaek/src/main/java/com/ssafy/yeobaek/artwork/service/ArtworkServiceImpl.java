@@ -9,6 +9,7 @@ import com.ssafy.yeobaek.artwork.mapper.ArtworkMapper;
 import com.ssafy.yeobaek.artwork.repository.ArtworkBookmarkRepository;
 import com.ssafy.yeobaek.artwork.repository.ArtworkRepository;
 import com.ssafy.yeobaek.artwork.repository.ArtworkSpecification;
+import com.ssafy.yeobaek.cafe.repository.DisplaySlotRepository;
 import com.ssafy.yeobaek.common.code.ResponseCode;
 import com.ssafy.yeobaek.common.dto.Pagination;
 import com.ssafy.yeobaek.common.enums.ArtCategory;
@@ -22,6 +23,9 @@ import com.ssafy.yeobaek.storage.service.S3Service;
 import com.ssafy.yeobaek.user.entity.Artist;
 import com.ssafy.yeobaek.user.entity.User;
 import com.ssafy.yeobaek.user.service.UserService;
+import com.ssafy.yeobaek.recommendation.service.EmbeddingService;
+import com.ssafy.yeobaek.recommendation.service.RecommendationService;
+import com.ssafy.yeobaek.recommendation.dto.response.ArtworkHybridResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,11 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -52,6 +52,9 @@ public class ArtworkServiceImpl implements ArtworkService {
     private final S3Service s3Service;
     private final ExhibitionService exhibitionService;
     private final ExhibitionRepository exhibitionRepository;
+    private final DisplaySlotRepository displaySlotRepository;
+    private final EmbeddingService embeddingService;
+    private final RecommendationService recommendationService;
 
     /**
      * 작품 등록
@@ -81,7 +84,10 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .images(request.getImages())
                 .build();
 
-        artworkRepository.save(artwork);
+        Artwork savedArtwork = artworkRepository.save(artwork);
+
+        // 비동기로 임베딩 생성 및 저장
+        embeddingService.generateAndSaveArtworkEmbedding(savedArtwork.getId());
     }
 
     /**
@@ -477,26 +483,66 @@ public class ArtworkServiceImpl implements ArtworkService {
     }
 
     /**
-     * 추천 작품 목록 조회 (임시 구현 - 인기순)
-     * - 추천 시스템 구현 전까지 인기순으로 작품 반환
-     * @param cafeId 카페 ID (현재 미사용)
-     * @param page 페이지 번호
-     * @param size 페이지 크기
-     * @return 인기 작품 목록 및 페이징 정보
+     * 추천 작품 조회 (하이브리드 추천: CF + CBF)
+     * @param slotId 슬롯 ID
+     * @return 추천 작품 목록 (상위 10개)
      */
     @Override
     @Transactional(readOnly = true)
-    public ArtworkListResponse getRecommendedArtworks(Long cafeId, Integer page, Integer size) {
-        // Pageable 생성
-        Pageable pageable = PageRequest.of(page, size);
+    public ArtworkListResponse getRecommendedArtworks(Long slotId) {
+        // 1. 슬롯 존재 여부 확인
+        if (!displaySlotRepository.existsById(slotId)) {
+            throw new CustomException(ResponseCode.SLOT_NOT_FOUND);
+        }
 
-        // 인기 작품 조회 (조회수 1 + 북마크수 9 가중치) - 페이징
+        try {
+            // 파이썬 추천 서버로부터 추천 작품 ID 목록 받기 (CF + CBF 하이브리드)
+            int topN = 10;
+            ArtworkHybridResponse recommendationResponse = recommendationService.recommendArtworksForSlot(slotId, topN);
+
+            // 추천된 작품 ID 리스트 추출
+            List<Long> recommendedArtworkIds = recommendationResponse.getRecommendations().stream()
+                    .map(ArtworkHybridResponse.ArtworkItem::getArtworkId)
+                    .toList();
+
+            // DB에서 작품 조회 (추천 순서 유지)
+            List<Artwork> artworks = recommendedArtworkIds.stream()
+                    .map(id -> artworkRepository.findById(id).orElse(null))
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            // 작품을 ArtworkSummaryDto로 변환
+            List<ArtworkSummaryDto> artworkSummaries = artworks.stream()
+                    .map(artwork -> {
+                        // 썸네일 URL 변환 (첫 번째 이미지 사용)
+                        String thumbnailUrl = null;
+                        if (artwork.getImages() != null && !artwork.getImages().isEmpty()) {
+                            thumbnailUrl = s3Service.generatePresignedUrlForThumbnail(artwork.getImages().get(0));
+                        }
+                        return artworkMapper.toArtworkSummaryWithDetails(artwork, thumbnailUrl);
+                    })
+                    .collect(Collectors.toList());
+
+            // artists는 null로 설정 (추천 목록이므로), pagination도 null
+            return artworkMapper.toArtworkListData(null, artworkSummaries, null);
+
+        } catch (Exception e) {
+            log.error("Failed to get artwork recommendations from Python server for slot {}", slotId, e);
+            // 폴백: 인기순으로 작품 조회
+            log.info("Falling back to popularity-based recommendations");
+            return getFallbackRecommendations();
+        }
+    }
+
+    /**
+     * 추천 시스템 실패 시 폴백 로직 (인기순 상위 10개)
+     */
+    private ArtworkListResponse getFallbackRecommendations() {
+        Pageable pageable = PageRequest.of(0, 10);
         Page<Artwork> artworkPage = artworkRepository.findTopPopularArtworksPage(pageable);
 
-        // 작품을 ArtworkSummaryDto로 변환
         List<ArtworkSummaryDto> artworkSummaries = artworkPage.getContent().stream()
                 .map(artwork -> {
-                    // 썸네일 URL 변환 (첫 번째 이미지 사용)
                     String thumbnailUrl = null;
                     if (artwork.getImages() != null && !artwork.getImages().isEmpty()) {
                         thumbnailUrl = s3Service.generatePresignedUrlForThumbnail(artwork.getImages().get(0));
@@ -505,11 +551,7 @@ public class ArtworkServiceImpl implements ArtworkService {
                 })
                 .collect(Collectors.toList());
 
-        // Pagination DTO 생성
-        Pagination pagination = artworkMapper.toPagination(artworkPage);
-
-        // artists는 null로 설정 (추천 목록이므로)
-        return artworkMapper.toArtworkListData(null, artworkSummaries, pagination);
+        return artworkMapper.toArtworkListData(null, artworkSummaries, null);
     }
 
     /**
