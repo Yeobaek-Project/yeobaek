@@ -5,6 +5,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.*
@@ -19,6 +20,8 @@ import com.ssafy.yeobaeg.R
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTextField
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegErrorDialog
+import com.ssafy.yeobaeg.presentation.common.component.YeobaegOutlinedTextField
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegTextGray
 
@@ -67,46 +70,42 @@ fun LoginScreen(
                 .fillMaxSize()
                 .background(Color.White)
                 .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.logo_title),
                 contentDescription = "여백 로고",
-                modifier = Modifier.size(120.dp)
+                modifier = Modifier.size(200.dp)
             )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Column {
+                YeobaegOutlinedTextField(
+                    value = ui.email,
+                    onValueChange = onEmailChange,
+                    placeholder = "이메일을 입력하세요",
+                    modifier = Modifier.fillMaxWidth(),
+                    title = "이메일",
+                    essential = false
+                )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                text = "다시 만나서 반가워요!",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-
-            Spacer(modifier = Modifier.height(48.dp))
-
-            YeobaegTextField(
-                value = ui.email,
-                onValueChange = onEmailChange,
-                label = "이메일",
-                placeholder = "이메일을 입력하세요",
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            YeobaegTextField(
-                value = ui.password,
-                onValueChange = onPasswordChange,
-                label = "비밀번호",
-                placeholder = "비밀번호를 입력하세요",
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column {
+                YeobaegOutlinedTextField(
+                    value = ui.password,
+                    onValueChange = onPasswordChange,
+                    placeholder = "비밀번호를 입력하세요",
+                    visualTransformation = PasswordVisualTransformation(),
+                    modifier = Modifier.fillMaxWidth(),
+                    title = "비밀번호",
+                    essential = false
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -162,7 +161,10 @@ fun LoginScreen(
                     LinkAnnotation.Clickable(
                         tag = "SIGNUP",
                         styles = TextLinkStyles(
-                            style = SpanStyle(color = YeobaegDarkBrown, fontWeight = FontWeight.Bold)
+                            style = SpanStyle(
+                                color = YeobaegDarkBrown,
+                                fontWeight = FontWeight.Bold
+                            )
                         ),
                         linkInteractionListener = { onNavigateSignUp() }
                     )
