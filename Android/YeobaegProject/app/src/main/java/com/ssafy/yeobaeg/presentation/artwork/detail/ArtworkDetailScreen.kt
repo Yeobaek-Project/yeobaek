@@ -59,6 +59,7 @@ import com.ssafy.yeobaeg.domain.model.UserRole
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.presentation.common.util.formatPrice
+import com.ssafy.yeobaeg.presentation.common.util.noRippleClickable
 import com.ssafy.yeobaeg.presentation.common.util.removeTrailingZero
 import com.ssafy.yeobaeg.ui.theme.YeobaegBlack
 import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
@@ -282,34 +283,28 @@ private fun ArtistCard(
     artist: ArtistSummary,
     onArtistClick: () -> Unit = {}
 ) {
-    Surface(
-        color = Color.White,
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
-        onClick = onArtistClick
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(YeobaegLightGray)
+            .noRippleClickable{onArtistClick()}
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        AsyncImage(
+            model = artist.profileImageUrl,
+            contentDescription = null,
             modifier = Modifier
-                .padding(horizontal = 20.dp)
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFFF9FAFB))
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AsyncImage(
-                model = artist.profileImageUrl,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Spacer(Modifier.width(12.dp))
-            Column {
-                Text(artist.artistName, fontWeight = FontWeight.SemiBold)
-                Text("작가", color = YeobaegTextGray)
-            }
+                .size(48.dp)
+                .clip(CircleShape),
+            contentScale = ContentScale.Crop
+        )
+        Spacer(Modifier.width(12.dp))
+        Column {
+            Text(artist.artistName, fontWeight = FontWeight.SemiBold)
+            Text("작가", color = YeobaegTextGray)
         }
     }
 }
@@ -345,18 +340,19 @@ private fun DescriptionCard(text: String) {
 
 @Composable
 private fun ExhibitionCard(ex: ExhibitionSpot) {
-    Column(Modifier.padding(24.dp)) {
-        Text("전시 장소", fontWeight = FontWeight.SemiBold)
+    Column(Modifier.padding(horizontal = 20.dp, vertical = 24.dp)) {
+        Text("전시 장소", modifier = Modifier.padding(start = 4.dp), fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             AsyncImage(
                 model = ex.cafeImageUrl,
                 contentDescription = null,
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .size(72.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentScale = ContentScale.Crop
             )
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(16.dp))
             Column(Modifier.weight(1f)) {
                 Text(ex.cafeName, fontWeight = FontWeight.SemiBold)
                 Text(

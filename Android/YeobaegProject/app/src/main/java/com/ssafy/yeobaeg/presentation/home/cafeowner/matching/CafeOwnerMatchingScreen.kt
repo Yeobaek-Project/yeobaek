@@ -51,8 +51,8 @@ fun CafeOwnerMatchingScreen(
         )
 
         MatchingMode.LOADING_RECOMMEND -> YeobaegLottieLoading(listOf(
-            "취향에 맞는 카페를 찾는 중…",
-            "작품과 어울리는 카페를 추천하고 있어요…",
+            "취향에 맞는 작품을 찾는 중…",
+            "카페에 어울리는 작품을 추천하고 있어요…",
             "이용 패턴을 분석해 추천 중…"
         ))
     }

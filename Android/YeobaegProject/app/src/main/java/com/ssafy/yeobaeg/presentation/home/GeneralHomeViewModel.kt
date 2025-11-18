@@ -62,7 +62,7 @@ class GeneralHomeViewModel @Inject constructor(
 
     fun navigateToCafeDetail(cafeId: Long) = viewModelScope.launch {
         // TODO: 카페 상세 페이지 추가 시 구현
-        // navigator.navigate(FullScreen.CafeDetail(cafeId))
+         navigator.navigate(FullScreen.CafeDetail(cafeId))
     }
 
     fun navigateToArtworkDetail(artworkId: Long) = viewModelScope.launch {

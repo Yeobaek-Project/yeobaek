@@ -348,8 +348,17 @@ fun SearchResultContent(
             }
     }
 
-    if(artists.isEmpty() && artworks.isEmpty()) {
-        Text("검색 결과가 없습니다.", fontSize = 14.sp, color = YeobaegTextGray)
+    if (artists.isEmpty() && artworks.isEmpty()) {
+        Box(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(vertical = 80.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("검색 결과가 없습니다.", fontSize = 14.sp, color = YeobaegTextGray)
+        }
+
+        return
     }
 
     ArtworkGrid(
@@ -361,8 +370,12 @@ fun SearchResultContent(
             .fillMaxSize(),
         topContent = {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                if(artists.isNotEmpty()) ArtistResultSection(artists = artists)
-                if(artworks.isNotEmpty()) Text(text = "작품", modifier = Modifier.padding(8.dp), color = YeobaegTextGray)
+                if (artists.isNotEmpty()) ArtistResultSection(artists = artists)
+                if (artworks.isNotEmpty()) Text(
+                    text = "작품",
+                    modifier = Modifier.padding(8.dp),
+                    color = YeobaegTextGray
+                )
             }
         }
     )

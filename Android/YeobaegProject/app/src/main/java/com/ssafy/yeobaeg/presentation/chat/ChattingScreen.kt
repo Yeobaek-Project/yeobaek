@@ -80,6 +80,7 @@ import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.presentation.common.component.showYeobaegSnackbar
 import com.ssafy.yeobaeg.presentation.common.util.DateFormatter
 import com.ssafy.yeobaeg.presentation.common.util.clearFocusOnTap
+import com.ssafy.yeobaeg.presentation.main.alignToSafeDrawing
 import com.ssafy.yeobaeg.ui.theme.YeobaegBackground
 import com.ssafy.yeobaeg.ui.theme.YeobaegBlack
 import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
@@ -287,8 +288,8 @@ fun ChattingScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(YeobaegWhite)
-                    .imePadding()
-                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                    .alignToSafeDrawing(),
                 value = inputText,
                 onValueChange = onInputChange,
                 onSendClick = onSendClick,
@@ -296,9 +297,7 @@ fun ChattingScreenContent(
                 onImageClick = onImageClick
             )
         },
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-
-        ) { innerPadding ->
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -560,7 +559,7 @@ fun ProposalMessageBubble(
             .fillMaxWidth()
             .padding(vertical = 8.dp),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Surface(
             modifier = Modifier
                 .padding(vertical = 8.dp)

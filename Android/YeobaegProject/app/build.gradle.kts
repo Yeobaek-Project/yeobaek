@@ -133,6 +133,9 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.jetbrains.kotlinx.coroutines.play.services)
 
+
+    implementation(libs.firebase.messaging)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

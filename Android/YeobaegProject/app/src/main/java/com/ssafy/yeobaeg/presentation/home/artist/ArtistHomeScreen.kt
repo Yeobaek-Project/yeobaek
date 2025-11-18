@@ -301,7 +301,7 @@ private fun ArtistArtworkItem(
                 .background(Color(0xFFF2F3F5)),
             contentScale = ContentScale.Crop
         )
-        Spacer(Modifier.width(12.dp))
+        Spacer(Modifier.width(16.dp))
 
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

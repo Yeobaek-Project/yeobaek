@@ -4,26 +4,24 @@ import androidx.compose.ui.graphics.Color
 import com.ssafy.yeobaeg.domain.model.cafe.CafeSlot
 import com.ssafy.yeobaeg.domain.model.cafe.RecommendedCafe
 import kotlin.collections.lastIndex
-import kotlin.math.absoluteValue
+import kotlin.math.abs
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChevronLeft
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -32,169 +30,81 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
+import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
 import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegButton
 import kotlinx.coroutines.launch
 
 // ---------- 색상: 화이트 배경 + 브라운/골드 포인트 ----------
-
-// 카드/배경
 private val CardBackground = Color(0xFFFFFFFF)
 private val CardStroke = Color(0xFFE5E0DA)
-
-// 텍스트
-private val TextOnCardPrimary = Color(0xFF5A4533)      // 진한 브라운
-private val TextOnCardSecondary = Color(0xFF8B6E57)    // 보조 브라운
+private val TextOnCardPrimary = Color(0xFF5A4533)
+private val TextOnCardSecondary = Color(0xFF8B6E57)
 private val TextOnCardTertiary = Color(0xFFB0B0B0)
-
-// 이미지 위 텍스트
 private val TextOnImagePrimary = Color(0xFFFFFFFF)
 private val TextOnImageSecondary = Color(0xFFE5E7EB)
-
-// 포인트 컬러
 private val PrimaryGold = Color(0xFFD6A05E)
-
-// 슬롯 칩
-private val SlotAvailableBg = Color(0xFFEBDDCB)        // 전시 가능
+private val SlotAvailableBg = Color(0xFFEBDDCB)
 private val SlotAvailableBorder = Color(0xFFD6A05E)
-private val SlotUnavailableBg = Color(0xFFF3F3F3)      // 전시 중
+private val SlotUnavailableBg = Color(0xFFF3F3F3)
 private val SlotUnavailableBorder = Color(0xFFD1D1D1)
-
-// 인디케이터
 private val IndicatorActive = PrimaryGold
 private val IndicatorInactive = Color(0xFFDDDDDD)
 
 @Composable
 fun RecommendedCafePopup(
     recommendedCafes: List<RecommendedCafe>,
-    startIndex: Int,
     onDetailClick: (cafeId: Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (recommendedCafes.isEmpty()) return
 
-    var currentIndex by remember {
-        mutableIntStateOf(startIndex.coerceIn(0, recommendedCafes.lastIndex))
-    }
-
-    val offsetX = remember { Animatable(0f) }
+    val pagerState = rememberPagerState(
+        initialPage = 0,
+        pageCount = { recommendedCafes.size }
+    )
     val scope = rememberCoroutineScope()
 
-    fun animateToPage(targetIndex: Int) {
-        scope.launch {
-            val direction = if (targetIndex > currentIndex) -1f else 1f
-            offsetX.animateTo(
-                targetValue = direction * 1000f,
-                animationSpec = tween(durationMillis = 300)
-            )
-            currentIndex = targetIndex
-            offsetX.snapTo(0f)
-        }
-    }
-
-    Box(
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center
     ) {
-        // 이전 카페 (왼쪽 뒤)
-        if (currentIndex > 0) {
-            CafeCard(
-                cafe = recommendedCafes[currentIndex - 1],
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 40.dp)
-                    .align(Alignment.Center)
-                    .graphicsLayer {
-                        translationX = -1000f + offsetX.value
-                        val progress = (offsetX.value / 1000f).coerceIn(0f, 1f)
-                        scaleX = 0.85f + (0.15f * progress)
-                        scaleY = 0.85f + (0.15f * progress)
-                        alpha = 0.3f + (0.7f * progress)
-                    }
-                    .zIndex(1f),
-                onDetailClick = onDetailClick
-            )
-        }
-
-        // 다음 카페 (오른쪽 뒤)
-        if (currentIndex < recommendedCafes.lastIndex) {
-            CafeCard(
-                cafe = recommendedCafes[currentIndex + 1],
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 40.dp)
-                    .align(Alignment.Center)
-                    .graphicsLayer {
-                        translationX = 1000f + offsetX.value
-                        val progress = (-offsetX.value / 1000f).coerceIn(0f, 1f)
-                        scaleX = 0.85f + (0.15f * progress)
-                        scaleY = 0.85f + (0.15f * progress)
-                        alpha = 0.3f + (0.7f * progress)
-                    }
-                    .zIndex(1f),
-                onDetailClick = onDetailClick
-            )
-        }
-
-        // 현재 카페 (가운데, 드래그 가능)
-        CafeCard(
-            cafe = recommendedCafes[currentIndex],
+        HorizontalPager(
+            state = pagerState,
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 40.dp)
-                .align(Alignment.Center)
-                .graphicsLayer {
-                    translationX = offsetX.value
-                    val scale = 1f - (offsetX.value.absoluteValue / 3000f)
-                    scaleX = scale.coerceIn(0.85f, 1f)
-                    scaleY = scale.coerceIn(0.85f, 1f)
-                }
-                .zIndex(2f)
-                .pointerInput(currentIndex) {
-                    detectDragGestures(
-                        onDragEnd = {
-                            scope.launch {
-                                when {
-                                    offsetX.value < -200f && currentIndex < recommendedCafes.lastIndex -> {
-                                        animateToPage(currentIndex + 1)
-                                    }
-                                    offsetX.value > 200f && currentIndex > 0 -> {
-                                        animateToPage(currentIndex - 1)
-                                    }
-                                    else -> {
-                                        offsetX.animateTo(0f, animationSpec = tween(200))
-                                    }
-                                }
-                            }
-                        },
-                        onDrag = { change, dragAmount ->
-                            change.consume()
-                            scope.launch {
-                                val newOffset = offsetX.value + dragAmount.x
-                                val minDrag = if (currentIndex < recommendedCafes.lastIndex) -500f else -100f
-                                val maxDrag = if (currentIndex > 0) 500f else 100f
-                                offsetX.snapTo(newOffset.coerceIn(minDrag, maxDrag))
-                            }
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 40.dp),
+            pageSpacing = 16.dp
+        ) { page ->
+            val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+
+            CafeCard(
+                cafe = recommendedCafes[page],
+                pageOffset = pageOffset,
+                onDetailClick = { cafeId ->
+                    if (pagerState.currentPage == page) {
+                        onDetailClick(cafeId)
+                    } else {
+                        scope.launch {
+                            pagerState.animateScrollToPage(page)
                         }
-                    )
+                    }
                 },
-            onDetailClick = onDetailClick
-        )
+            )
+        }
 
         // 페이지 인디케이터
         Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp)
-                .zIndex(3f),
-            horizontalArrangement = Arrangement.Center
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
         ) {
             repeat(recommendedCafes.size) { index ->
-                val isSelected = index == currentIndex
+                val isSelected = index == pagerState.currentPage
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
@@ -207,66 +117,47 @@ fun RecommendedCafePopup(
                 )
             }
         }
-
-        // 좌우 화살표 (원하면 지워도 됨)
-        if (recommendedCafes.size > 1) {
-            IconButton(
-                onClick = {
-                    if (currentIndex > 0) animateToPage(currentIndex - 1)
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .border(1.dp, CardStroke, CircleShape)
-                    .zIndex(4f)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ChevronLeft,
-                    contentDescription = "이전",
-                    tint = TextOnCardPrimary
-                )
-            }
-
-            IconButton(
-                onClick = {
-                    if (currentIndex < recommendedCafes.lastIndex) animateToPage(currentIndex + 1)
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .padding(end = 8.dp)
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.9f))
-                    .border(1.dp, CardStroke, CircleShape)
-                    .zIndex(4f)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.ChevronRight,
-                    contentDescription = "다음",
-                    tint = TextOnCardPrimary
-                )
-            }
-        }
     }
 }
-
 @Composable
 private fun CafeCard(
     cafe: RecommendedCafe,
-    modifier: Modifier = Modifier,
-    onDetailClick: (cafeId: Long) -> Unit
+    pageOffset: Float,
+    onDetailClick: (cafeId: Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val absOffset = abs(pageOffset).coerceIn(0f, 1f)
+    val scale = lerp(0.9f, 1f, 1f - absOffset)
+    val alpha = lerp(0.6f, 1f, 1f - absOffset)
+    val shape = RoundedCornerShape(28.dp)
+
+    // shadowElevation은 px 단위라 density 필요
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val elevationPx = with(density) {
+        // 가운데 카드일수록 더 진한 그림자
+        lerp(2.dp, 14.dp, 1f - absOffset).toPx()
+    }
+
     Card(
-        modifier = modifier,
-        shape = RoundedCornerShape(28.dp),
+        modifier = modifier
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+
+                // 그림자/모양을 그래픽 레이어에 직접 설정
+                this.shape = shape
+                clip = false            // 그림자가 모서리에서 안 잘리게
+                shadowElevation = elevationPx
+            }
+            .clickable { onDetailClick(cafe.cafeId) },
+        shape = shape,
         colors = CardDefaults.cardColors(
             containerColor = CardBackground,
             contentColor = TextOnCardPrimary
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        // 여기서는 elevation 0으로 두고, shadow는 위 graphicsLayer에서만 처리
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -275,8 +166,8 @@ private fun CafeCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(260.dp)
-                    .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
+                    .height(320.dp)
+                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             ) {
                 AsyncImage(
                     model = cafe.primaryImageUrl,
@@ -312,7 +203,8 @@ private fun CafeCard(
                                     text = cafe.cafeName,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = TextOnImagePrimary,
-                                    maxLines = 1,
+                                    fontSize = 24.sp,
+                                    maxLines = 2,
                                     overflow = TextOverflow.Ellipsis
                                 )
                                 Spacer(Modifier.height(4.dp))
@@ -398,6 +290,7 @@ private fun CafeCard(
         }
     }
 }
+
 
 @Composable
 private fun SlotStatusChip(

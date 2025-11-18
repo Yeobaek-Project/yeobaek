@@ -130,7 +130,7 @@ class ArtistHomeMatchingViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         currentStep = MatchingStep.CAFE_SELECTION,
-                        cafes = data.cafes,
+                        cafes = data.cafes.sortedBy { cafe -> cafe.slots.count{slot -> slot.isExhibiting } },
                         cafePagination = data.pagination
                     )
                 }
