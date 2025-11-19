@@ -65,3 +65,13 @@ python:
       read: 30000    # 30 seconds
     retry:
       max-attempts: 3
+
+firebase:
+  service-account-file: classpath:firebase/firebase-service-account.json
+  project-id: ${FIREBASE_PROJECT_ID}
+
+google:
+  cloud:
+    bigquery:
+      project-id: ${BIGQUERY_PROJECT_ID}
+      dataset-id: ${BIGQUERY_DATASET_ID}

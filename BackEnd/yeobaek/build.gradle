@@ -50,6 +50,12 @@ dependencies {
     // Caffeine Cache
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
 
+    // Firebase Admin SDK
+    implementation 'com.google.firebase:firebase-admin:9.3.0'
+
+    // Google Cloud BigQuery
+    implementation 'com.google.cloud:google-cloud-bigquery:2.38.2'
+
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.mysql:mysql-connector-j'
