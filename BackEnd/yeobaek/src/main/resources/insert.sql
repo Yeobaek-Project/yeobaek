@@ -1,89 +1,88 @@
-
 -- Users
 INSERT INTO users (id, user_type, email, password, nickname, birth_date, gender, profile_image_url) VALUES
 -- GENERAL users
-(1, 'GENERAL', 'user1@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', 'GeneralUser1', '1990-01-01', 'MALE', 'images/15bd825a-19ab-44a3-90ea-79a1010962dc'),
-(2, 'GENERAL', 'general2@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', 'GeneralUser2', '1992-02-02', 'FEMALE', null),
-(3, 'GENERAL', 'general3@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', 'GeneralUser3', '1993-03-03', 'MALE', null),
-(4, 'GENERAL', 'general4@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', 'GeneralUser4', '1994-04-04', 'FEMALE', null),
-(5, 'GENERAL', 'general5@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', 'GeneralUser5', '1995-05-05', 'MALE', null),
+(1, 'GENERAL', 'user1@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', '방랑자', '1990-01-01', 'MALE', 'images/15bd825a-19ab-44a3-90ea-79a1010962dc'),
+(2, 'GENERAL', 'general2@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', '탐험가', '1992-02-02', 'FEMALE', null),
+(3, 'GENERAL', 'general3@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', '모험가', '1993-03-03', 'MALE', null),
+(4, 'GENERAL', 'general4@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', '여행자', '1994-04-04', 'FEMALE', null),
+(5, 'GENERAL', 'general5@example.com', '$2a$10$n84oRbh1Vs/I1UDUBOD.bOBVLHORMmOkptOwJvkQn3hqWmHfrPs3m', '발자국', '1995-05-05', 'MALE', null),
 
 -- ARTIST users
-(6, 'ARTIST', 'user2@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser1', '1990-06-06', 'FEMALE', 'images/414b13f6-a541-4690-a972-e10df862e7f7'),
-(7, 'ARTIST', 'artist2@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser2', '1991-07-07', 'MALE', 'images/736ec16f-b3fc-45ac-b125-55b71f92786e'),
-(8, 'ARTIST', 'artist3@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser3', '1992-08-08', 'FEMALE', 'images/8625b84a-b470-4d8a-9dd2-47832d6c6b08'),
-(9, 'ARTIST', 'artist4@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser4', '1993-09-09', 'MALE', 'images/4ae5d4d4-cf4e-4846-8923-12a47cedccb4'),
-(10, 'ARTIST', 'artist5@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser5', '1994-10-10', 'FEMALE', 'images/6856d431-4dcd-46d9-8864-6720824391a2'),
-(51, 'ARTIST', 'artist51@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser51', '1990-01-01', 'MALE', null),
-(52, 'ARTIST', 'artist52@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser52', '1990-01-02', 'FEMALE', null),
-(53, 'ARTIST', 'artist53@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser53', '1990-01-03', 'MALE', null),
-(54, 'ARTIST', 'artist54@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser54', '1990-01-04', 'FEMALE', null),
-(55, 'ARTIST', 'artist55@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser55', '1990-01-05', 'MALE', null),
-(56, 'ARTIST', 'artist56@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser56', '1990-01-06', 'FEMALE', null),
-(57, 'ARTIST', 'artist57@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser57', '1990-01-07', 'MALE', null),
-(58, 'ARTIST', 'artist58@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser58', '1990-01-08', 'FEMALE', null),
-(59, 'ARTIST', 'artist59@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser59', '1990-01-09', 'MALE', null),
-(60, 'ARTIST', 'artist60@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', 'ArtistUser60', '1990-01-10', 'FEMALE', null),
+(6, 'ARTIST', 'user2@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '허지명', '1990-06-06', 'FEMALE', 'images/414b13f6-a541-4690-a972-e10df862e7f7'),
+(7, 'ARTIST', 'artist2@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '색동', '1991-07-07', 'MALE', 'images/736ec16f-b3fc-45ac-b125-55b71f92786e'),
+(8, 'ARTIST', 'artist3@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '붓놀이', '1992-08-08', 'FEMALE', 'images/8625b84a-b470-4d8a-9dd2-47832d6c6b08'),
+(9, 'ARTIST', 'artist4@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '캔버스', '1993-09-09', 'MALE', 'images/4ae5d4d4-cf4e-4846-8923-12a47cedccb4'),
+(10, 'ARTIST', 'artist5@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '팔레트', '1994-10-10', 'FEMALE', 'images/6856d431-4dcd-46d9-8864-6720824391a2'),
+(51, 'ARTIST', 'artist51@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '별무리', '1990-01-01', 'MALE', null),
+(52, 'ARTIST', 'artist52@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '그림쟁이', '1990-01-02', 'FEMALE', null),
+(53, 'ARTIST', 'artist53@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '빛의장인', '1990-01-03', 'MALE', null),
+(54, 'ARTIST', 'artist54@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '화폭', '1990-01-04', 'FEMALE', null),
+(55, 'ARTIST', 'artist55@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '조각가', '1990-01-05', 'MALE', null),
+(56, 'ARTIST', 'artist56@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '꿈꾸미', '1990-01-06', 'FEMALE', null),
+(57, 'ARTIST', 'artist57@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '예술혼', '1990-01-07', 'MALE', null),
+(58, 'ARTIST', 'artist58@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '미술꾼', '1990-01-08', 'FEMALE', null),
+(59, 'ARTIST', 'artist59@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '작품왕', '1990-01-09', 'MALE', null),
+(60, 'ARTIST', 'artist60@example.com', '$2a$10$rN6RbbxGwZF1UQwEnLjflu8vlbWL33cRxbhMuSkdo9aHxZVfFoOK6', '갤러리', '1990-01-10', 'FEMALE', null),
 
 -- CAFE_OWNER users
-(11, 'CAFE_OWNER', 'user3@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner1', '1985-11-11', 'MALE', 'images/f7a6e48d-0967-48b7-9430-c77a70b09d08'),
-(12, 'CAFE_OWNER', 'cafeowner2@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner2', '1986-12-12', 'FEMALE', 'images/394e9ed4-74fe-46ef-82c2-57b3bb0f34b9'),
-(13, 'CAFE_OWNER', 'cafeowner3@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner3', '1987-01-13', 'MALE', 'images/4d47ca27-f39c-4660-87c6-62e0d9a9adfb'),
-(14, 'CAFE_OWNER', 'cafeowner4@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner4', '1988-02-14', 'FEMALE', null),
-(15, 'CAFE_OWNER', 'cafeowner5@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner5', '1989-03-15', 'MALE', null),
-(16, 'CAFE_OWNER', 'cafeowner6@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner6', '1990-01-01', 'MALE', null),
-(17, 'CAFE_OWNER', 'cafeowner7@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner7', '1990-01-01', 'FEMALE', null),
-(18, 'CAFE_OWNER', 'cafeowner8@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner8', '1990-01-01', 'MALE', null),
-(19, 'CAFE_OWNER', 'cafeowner9@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner9', '1990-01-01', 'FEMALE', null),
-(20, 'CAFE_OWNER', 'cafeowner10@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner10', '1990-01-01', 'MALE', null),
-(21, 'CAFE_OWNER', 'cafeowner11@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner11', '1990-01-01', 'FEMALE', null),
-(22, 'CAFE_OWNER', 'cafeowner12@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner12', '1990-01-01', 'MALE', null),
-(23, 'CAFE_OWNER', 'cafeowner13@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner13', '1990-01-01', 'FEMALE', null),
-(24, 'CAFE_OWNER', 'cafeowner14@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner14', '1990-01-01', 'MALE', null),
-(25, 'CAFE_OWNER', 'cafeowner15@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner15', '1990-01-01', 'FEMALE', null),
-(26, 'CAFE_OWNER', 'cafeowner16@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner16', '1990-01-01', 'MALE', null),
-(27, 'CAFE_OWNER', 'cafeowner17@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner17', '1990-01-01', 'FEMALE', null),
-(28, 'CAFE_OWNER', 'cafeowner18@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner18', '1990-01-01', 'MALE', null),
-(29, 'CAFE_OWNER', 'cafeowner19@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner19', '1990-01-01', 'FEMALE', null),
-(30, 'CAFE_OWNER', 'cafeowner20@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner20', '1990-01-01', 'MALE', null),
-(31, 'CAFE_OWNER', 'cafeowner21@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner21', '1990-01-01', 'FEMALE', null),
-(32, 'CAFE_OWNER', 'cafeowner22@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner22', '1990-01-01', 'MALE', null),
-(33, 'CAFE_OWNER', 'cafeowner23@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner23', '1990-01-01', 'FEMALE', null),
-(34, 'CAFE_OWNER', 'cafeowner24@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner24', '1990-01-01', 'MALE', null),
-(35, 'CAFE_OWNER', 'cafeowner25@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner25', '1990-01-01', 'FEMALE', null),
-(36, 'CAFE_OWNER', 'cafeowner26@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner26', '1990-01-01', 'MALE', null),
-(37, 'CAFE_OWNER', 'cafeowner27@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner27', '1990-01-01', 'FEMALE', null),
-(38, 'CAFE_OWNER', 'cafeowner28@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner28', '1990-01-01', 'MALE', null),
-(39, 'CAFE_OWNER', 'cafeowner29@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner29', '1990-01-01', 'FEMALE', null),
-(40, 'CAFE_OWNER', 'cafeowner30@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner30', '1990-01-01', 'MALE', null),
-(41, 'CAFE_OWNER', 'cafeowner31@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner31', '1990-01-01', 'FEMALE', null),
-(42, 'CAFE_OWNER', 'cafeowner32@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner32', '1990-01-01', 'MALE', null),
-(43, 'CAFE_OWNER', 'cafeowner33@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner33', '1990-01-01', 'FEMALE', null),
-(44, 'CAFE_OWNER', 'cafeowner34@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner34', '1990-01-01', 'MALE', null),
-(45, 'CAFE_OWNER', 'cafeowner35@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner35', '1990-01-01', 'FEMALE', null),
-(46, 'CAFE_OWNER', 'cafeowner36@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner36', '1990-01-01', 'MALE', null),
-(47, 'CAFE_OWNER', 'cafeowner37@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner37', '1990-01-01', 'FEMALE', null),
-(48, 'CAFE_OWNER', 'cafeowner48@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner48', '1990-01-01', 'MALE', null),
-(49, 'CAFE_OWNER', 'cafeowner49@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner49', '1990-01-01', 'FEMALE', null),
-(50, 'CAFE_OWNER', 'cafeowner50@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', 'CafeOwner50', '1990-01-01', 'MALE', null);
+(11, 'CAFE_OWNER', 'user3@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '커피장인', '1985-11-11', 'MALE', 'images/f7a6e48d-0967-48b7-9430-c77a70b09d08'),
+(12, 'CAFE_OWNER', 'cafeowner2@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '원두대장', '1986-12-12', 'FEMALE', 'images/394e9ed4-74fe-46ef-82c2-57b3bb0f34b9'),
+(13, 'CAFE_OWNER', 'cafeowner3@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '콩볶는', '1987-01-13', 'MALE', 'images/4d47ca27-f39c-4660-87c6-62e0d9a9adfb'),
+(14, 'CAFE_OWNER', 'cafeowner4@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '라떼아트', '1988-02-14', 'FEMALE', null),
+(15, 'CAFE_OWNER', 'cafeowner5@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '카피바라', '1989-03-15', 'MALE', null),
+(16, 'CAFE_OWNER', 'cafeowner6@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '향기로운', '1990-01-01', 'MALE', null),
+(17, 'CAFE_OWNER', 'cafeowner7@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '쌉쌀이', '1990-01-01', 'FEMALE', null),
+(18, 'CAFE_OWNER', 'cafeowner8@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '에스프', '1990-01-01', 'MALE', null),
+(19, 'CAFE_OWNER', 'cafeowner9@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '달콤한', '1990-01-01', 'FEMALE', null),
+(20, 'CAFE_OWNER', 'cafeowner10@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '힐링존', '1990-01-01', 'MALE', null),
+(21, 'CAFE_OWNER', 'cafeowner11@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '따뜻한', '1990-01-01', 'FEMALE', null),
+(22, 'CAFE_OWNER', 'cafeowner12@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '커피향', '1990-01-01', 'MALE', null),
+(23, 'CAFE_OWNER', 'cafeowner13@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '로스터', '1990-01-01', 'FEMALE', null),
+(24, 'CAFE_OWNER', 'cafeowner14@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '바리스타', '1990-01-01', 'MALE', null),
+(25, 'CAFE_OWNER', 'cafeowner15@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '커피잘내림', '1990-01-01', 'FEMALE', null),
+(26, 'CAFE_OWNER', 'cafeowner16@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '맛집탐험', '1990-01-01', 'MALE', null),
+(27, 'CAFE_OWNER', 'cafeowner17@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '별다방', '1990-01-01', 'FEMALE', null),
+(28, 'CAFE_OWNER', 'cafeowner18@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '금수저', '1990-01-01', 'MALE', null),
+(29, 'CAFE_OWNER', 'cafeowner19@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '쌀쌀한커피', '1990-01-01', 'FEMALE', null),
+(30, 'CAFE_OWNER', 'cafeowner20@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '카페인중독', '1990-01-01', 'MALE', null),
+(31, 'CAFE_OWNER', 'cafeowner21@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '공간지킴', '1990-01-01', 'FEMALE', null),
+(32, 'CAFE_OWNER', 'cafeowner22@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '쉼터지기', '1990-01-01', 'MALE', null),
+(33, 'CAFE_OWNER', 'cafeowner23@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '새벽커피', '1990-01-01', 'FEMALE', null),
+(34, 'CAFE_OWNER', 'cafeowner24@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '테이크아웃', '1990-01-01', 'MALE', null),
+(35, 'CAFE_OWNER', 'cafeowner25@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '핸드드립', '1990-01-01', 'FEMALE', null),
+(36, 'CAFE_OWNER', 'cafeowner26@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '모닝커피', '1990-01-01', 'MALE', null),
+(37, 'CAFE_OWNER', 'cafeowner27@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '콜드브루', '1990-01-01', 'FEMALE', null),
+(38, 'CAFE_OWNER', 'cafeowner28@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '점심커피', '1990-01-01', 'MALE', null),
+(39, 'CAFE_OWNER', 'cafeowner29@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '시그니처', '1990-01-01', 'FEMALE', null),
+(40, 'CAFE_OWNER', 'cafeowner30@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '디저트왕', '1990-01-01', 'MALE', null),
+(41, 'CAFE_OWNER', 'cafeowner31@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '달콤매력', '1990-01-01', 'FEMALE', null),
+(42, 'CAFE_OWNER', 'cafeowner32@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '카페맨', '1990-01-01', 'MALE', null),
+(43, 'CAFE_OWNER', 'cafeowner33@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '사장님', '1990-01-01', 'FEMALE', null),
+(44, 'CAFE_OWNER', 'cafeowner34@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '단골집', '1990-01-01', 'MALE', null),
+(45, 'CAFE_OWNER', 'cafeowner35@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '맛집탐험', '1990-01-01', 'FEMALE', null),
+(46, 'CAFE_OWNER', 'cafeowner36@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '여유공간', '1990-01-01', 'MALE', null),
+(47, 'CAFE_OWNER', 'cafeowner37@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '일상탈출', '1990-01-01', 'FEMALE', null),
+(48, 'CAFE_OWNER', 'cafeowner38@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '낭만카페', '1990-01-01', 'MALE', null),
+(49, 'CAFE_OWNER', 'cafeowner39@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '별빛카페', '1990-01-01', 'FEMALE', null),
+(50, 'CAFE_OWNER', 'user4@example.com', '$2a$10$JxZS.CDhTnMDPdV2cEBKnevOfI7fs9MEnhkm6ujNnjqbudwLwZHpq', '싸타벅스', '1990-01-01', 'MALE', 'images/4d47ca27-f39c-4660-87c6-62e0d9a9adfb');
 
 -- Artists
 INSERT INTO artist (id, introduction, category) VALUES
-(6, 'Introduction for Artist 1', 'LANDSCAPE'),
-(7, 'Introduction for Artist 2', 'PORTRAIT'),
-(8, 'Introduction for Artist 3', 'STILL_LIFE'),
-(9, 'Introduction for Artist 4', 'HISTORY'),
-(10, 'Introduction for Artist 5', 'GENRE'),
-(51, 'Introduction for Artist 51', 'LANDSCAPE'),
-(52, 'Introduction for Artist 52', 'PORTRAIT'),
-(53, 'Introduction for Artist 53', 'STILL_LIFE'),
-(54, 'Introduction for Artist 54', 'HISTORY'),
-(55, 'Introduction for Artist 55', 'GENRE'),
-(56, 'Introduction for Artist 56', 'LANDSCAPE'),
-(57, 'Introduction for Artist 57', 'PORTRAIT'),
-(58, 'Introduction for Artist 58', 'STILL_LIFE'),
-(59, 'Introduction for Artist 59', 'HISTORY'),
-(60, 'Introduction for Artist 60', 'GENRE');
+(6, '자연의 변화하는 순간을 캔버스에 담아내는 것을 평생의 과제로 삼고 있습니다. 특히 계절의 전환기에 나타나는 미묘한 색채 변화와 빛의 움직임에 주목하며, 한국의 산과 들판을 주제로 작업하고 있습니다. 서양화 기법과 동양적 정서를 결합하여 독자적인 풍경화 스타일을 구축해왔으며, 최근에는 도시와 자연이 공존하는 공간에 대한 탐구를 이어가고 있습니다. 홍익대학교 미술대학을 졸업하고 개인전 5회, 단체전 30여회 참여했습니다.', 'LANDSCAPE'),
+(7, '인간의 내면과 감정을 시각적으로 표현하는 데 집중하는 초상화 작가입니다. 단순히 외형을 재현하는 것을 넘어, 인물이 가진 고유한 이야기와 정서를 화폭에 담아내고자 합니다. 사실적 묘사를 기반으로 하되 과감한 색채 대비와 붓터치를 통해 현대적 감각을 더하고 있습니다. 특히 일상 속 평범한 사람들의 순간적 표정과 몸짓에서 발견되는 인간성에 주목합니다. 서울대학교 서양화과를 졸업하고 현재 서울과 부산에서 활발히 활동 중입니다.', 'PORTRAIT'),
+(8, '일상의 사물에서 발견하는 아름다움과 고요함을 정물화로 표현합니다. 전통적인 정물화 기법을 현대적으로 재해석하여, 빛과 그림자의 섬세한 관계를 탐구하고 있습니다. 특히 한국 전통 도자기와 계절 과일, 야생화 등을 소재로 동서양의 미학을 융합한 독특한 화풍을 선보입니다. 사물 하나하나에 담긴 시간의 흔적과 질감을 세밀하게 관찰하고 표현하는 것을 중요하게 생각합니다. 국민대학교 회화과 졸업 후 개인전 8회를 개최했습니다.', 'STILL_LIFE'),
+(9, '역사적 사건과 인물을 현대적 시각으로 재조명하는 작업을 해왔습니다. 과거의 이야기가 현재에 어떤 의미를 갖는지 질문하며, 역사화라는 전통적 장르에 새로운 해석을 더하고 있습니다. 한국 근현대사의 중요한 순간들을 극적인 구도와 상징적 표현으로 담아내며, 특히 이름 없는 민중들의 이야기에 주목합니다. 철저한 역사 고증과 예술적 상상력을 결합하여 관람객에게 역사를 체험하게 합니다. 이화여대 대학원 미술사학과를 졸업하고 다수의 공공미술 프로젝트에 참여했습니다.', 'HISTORY'),
+(10, '평범한 일상 속 특별한 순간들을 포착하여 그림으로 담아냅니다. 사람들의 일상적 행위와 감정, 관계 속에서 발견되는 서사를 시각화하는 것이 주요 작업 주제입니다. 카페, 지하철, 공원 등 현대인의 삶이 펼쳐지는 공간을 배경으로 우리 시대의 초상을 그려냅니다. 사실적이면서도 따뜻한 시선으로 동시대인의 삶을 관찰하고 기록하며, 그 속에서 보편적 공감을 이끌어내고자 합니다. 한예종 미술원을 졸업하고 젊은작가상을 수상했습니다.', 'GENRE'),
+(51, '20년 이상 제주도의 풍경을 그려온 풍경화 전문 작가입니다. 화산섬 특유의 현무암 지형과 푸른 바다, 구름의 움직임을 섬세하게 포착합니다. 사계절 제주를 오가며 같은 장소의 다른 모습을 기록하고, 빛의 변화에 따라 달라지는 자연의 표정을 캔버스에 담습니다. 특히 새벽과 황혼의 극적인 색채 변화를 표현하는 데 뛰어나며, 두터운 마티에르 기법으로 풍경의 물성을 생생하게 전달합니다. 개인전 12회 개최 및 제주도립미술관 소장작가로 활동 중입니다.', 'LANDSCAPE'),
+(52, '사진작가 출신으로 회화로 전향한 독특한 이력을 가진 초상화 작가입니다. 사진적 구도와 회화적 표현을 결합하여 하이퍼리얼리즘과 표현주의 사이의 경계를 탐험합니다. 특히 동시대 젊은이들의 초상을 통해 세대의 정체성과 고민을 시각화하는 작업을 이어가고 있습니다. 디지털 시대를 살아가는 인간의 고독과 연결에 대한 갈망을 섬세하게 포착하며, SNS 프로필 사진과 실제 초상의 간극을 탐구합니다. 중앙대학교 사진학과 졸업 후 회화로 전향하여 주목받고 있습니다.', 'PORTRAIT'),
+(53, '전통 채소와 곡물, 한국 음식을 소재로 한 정물화로 독자적인 영역을 구축했습니다. 우리의 먹거리에 담긴 문화와 정서를 시각화하며, 사라져가는 전통 식문화에 대한 기록 작업을 병행합니다. 된장, 김치, 제철 나물 등 소박한 소재에서 발견되는 색과 형태의 아름다움을 극사실주의 기법으로 표현합니다. 각 음식이 만들어지기까지의 시간과 정성을 화폭에 담아내며, 관람객에게 느림의 미학을 전달합니다. 슬로푸드 운동과 연계한 다수의 전시를 진행했습니다.', 'STILL_LIFE'),
+(54, '조선시대 여성의 삶과 문화를 현대적 시각으로 재해석하는 작업을 합니다. 역사 속에서 제대로 조명받지 못했던 여성 인물들의 이야기를 발굴하고 시각화합니다. 전통 한국화 기법과 현대 회화를 융합하여 과거와 현재의 대화를 시도하며, 특히 궁중 여성과 기녀, 평민 여성들의 일상을 섬세하게 묘사합니다. 고증된 복식과 소품을 통해 역사적 사실성을 유지하면서도, 현대 여성의 시선으로 과거를 바라보는 이중적 시각을 구현합니다. 한국학중앙연구원과 협업 중입니다.', 'HISTORY'),
+(55, '도시 노동자들의 일상과 휴식을 주제로 작업하는 장르화 작가입니다. 건설 현장, 시장, 공장 등에서 땀 흘리며 일하는 사람들의 모습을 담아냅니다. 노동의 고단함뿐 아니라 그 속에서 피어나는 연대와 희망을 따뜻한 시선으로 포착합니다. 점심시간 햇볕 아래 앉아 도시락을 먹는 장면, 퇴근길 지하철에서 졸고 있는 모습 등 평범하지만 소중한 순간들을 기록합니다. 사회적 리얼리즘의 전통을 현대적으로 계승하며 다수의 공공미술 프로젝트를 수행했습니다.', 'GENRE'),
+(56, '한국의 사계절과 전통 정원을 주제로 작업하는 풍경화가입니다. 창덕궁, 비원 등 궁궐 정원의 아름다움을 현대적 감각으로 재해석하며, 자연과 인공의 조화로운 공존을 탐구합니다. 전통 한국화의 여백의 미와 서양화의 색채 기법을 접목하여 독특한 화풍을 만들어왔습니다. 특히 눈 내린 겨울 정원과 단풍 든 가을 풍경을 즐겨 그리며, 시간의 흐름에 따른 자연의 변화를 섬세하게 표현합니다. 문화재청 협력작가로도 활동하며 한국 정원의 아름다움을 알리고 있습니다.', 'LANDSCAPE'),
+(57, '가족 초상화를 전문으로 하는 작가로, 3대에 걸친 가족의 이야기를 그림으로 기록하는 프로젝트를 진행 중입니다. 단순한 외형 묘사를 넘어 가족 구성원 간의 관계와 정서적 유대를 시각화하는 데 집중합니다. 함께 모인 가족의 표정과 몸짓, 시선의 방향 등을 통해 보이지 않는 가족사를 드러냅니다. 변화하는 가족의 형태와 의미를 탐구하며, 전통적 가족 초상화에 현대적 해석을 더합니다. 다문화 가정, 1인 가구 등 다양한 가족의 모습을 담아내며 우리 시대 가족의 초상을 완성해갑니다.', 'PORTRAIT'),
+(58, '빛과 투명함을 주제로 유리 그릇과 액체를 즐겨 그립니다. 물, 와인, 차 등이 담긴 투명한 용기를 통과하는 빛의 굴절과 반사를 정밀하게 관찰하고 표현합니다. 하이퍼리얼리즘 기법을 사용하되, 사진과는 다른 회화만의 물성과 질감을 강조합니다. 각 붓터치마다 빛의 입자를 담아내듯 섬세하게 작업하며, 투명성이 만들어내는 시각적 환영과 실재의 경계를 탐구합니다. 국제 정물화 비엔날레에서 수상했으며 미술 해부학 강의도 병행하고 있습니다.', 'STILL_LIFE'),
+(59, '한국전쟁과 분단의 역사를 다루는 작업으로 널리 알려진 작가입니다. 전쟁의 상흔과 이산가족의 아픔, 평화에 대한 염원을 서사적 구도로 표현합니다. 역사적 사건을 다루되 개인의 이야기에 초점을 맞춰 관람객의 공감을 이끌어냅니다. DMZ 접경지역을 정기적으로 방문하며 분단 현실을 기록하고, 통일을 염원하는 메시지를 작품에 담습니다. 흑백과 채색을 대비시키는 독특한 기법으로 과거와 현재, 전쟁과 평화를 동시에 표현합니다. 국립현대미술관 주요 소장작가입니다.', 'HISTORY'),
+(60, '반려동물과 사람의 관계를 따뜻하게 그려내는 장르화 작가입니다. 반려견, 반려묘와 함께하는 일상의 소소한 행복과 교감의 순간을 포착합니다. 동물의 표정과 몸짓을 섬세하게 관찰하고 표현하는 능력이 뛰어나며, 사람과 동물이 함께 만들어가는 따뜻한 이야기를 담아냅니다. 산책하는 모습, 함께 낮잠 자는 장면, 간식을 기다리는 순간 등 평범한 일상 속 특별함을 발견합니다. 반려동물 초상화 의뢰도 받으며 동물권 보호 활동에도 적극 참여하고 있습니다.', 'GENRE');
 
 -- Cafe Categories
 INSERT INTO cafe_category (id, category_name) VALUES
@@ -98,46 +97,46 @@ INSERT INTO cafe_category (id, category_name) VALUES
 
 -- Cafes
 INSERT INTO cafe (id, cafe_name, address, latitude, longitude, description, contact, business_start_time, business_end_time, daily_visitors, view_count, bookmark_count) VALUES
-(11, '너와숲', '경북 구미시 너와숲로 1', 36.11512, 128.42045, '너와숲입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 3),
-(12, '벨빌베이크하우스 금오산점', '경북 구미시 벨빌베이크하우스 금오산점로 2', 36.10275, 128.40790, '벨빌베이크하우스 금오산점입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 2),
-(13, '페트리코', '경북 구미시 페트리코로 3', 36.10975, 128.42700, '페트리코입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 1),
-(14, '민다방', '경북 구미시 민다방로 4', 36.09540, 128.42230, '민다방입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 1),
-(15, '언유주얼커피바', '경북 구미시 언유주얼커피바로 5', 36.11800, 128.41010, '언유주얼커피바입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 2),
-(16, '매일그대와', '경북 구미시 매일그대와로 6', 36.10890, 128.39980, '매일그대와입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 1),
-(17, '어니스트밀로', '경북 구미시 어니스트밀로로 7', 36.12020, 128.41670, '어니스트밀로입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
-(18, '금오당', '경북 구미시 금오당로 8', 36.10150, 128.42620, '금오당입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 1),
-(19, '런던벨', '경북 구미시 런던벨로 9', 36.11230, 128.40380, '런던벨입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 1),
-(20, '도로시홈카페', '경북 구미시 도로시홈카페로 10', 36.10560, 128.42990, '도로시홈카페입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 1),
-(21, '커피우드', '경북 구미시 커피우드로 11', 36.09380, 128.41250, '커피우드입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 1),
-(22, '빅스타루프탑', '경북 구미시 빅스타루프탑로 12', 36.11750, 128.42410, '빅스타루프탑입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 1),
-(23, '구옥희커피', '경북 구미시 구옥희커피로 13', 36.11120, 128.43080, '구옥희커피입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
-(24, '모미지', '경북 구미시 모미지로 14', 36.09850, 128.39990, '모미지입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
-(25, '파네룬', '경북 구미시 파네룬로 15', 36.10700, 128.41500, '파네룬입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
-(26, '카페숨', '경북 구미시 카페숨로 16', 36.10040, 128.41820, '카페숨입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
-(27, '호두당', '경북 구미시 호두당로 17', 36.11300, 128.41990, '호두당입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
-(28, '카페 호', '경북 구미시 카페 호로 18', 36.11480, 128.40740, '카페 호입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
-(29, '스테이550', '경북 구미시 스테이550로 19', 36.09690, 128.43000, '스테이550입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
-(30, '돌멩', '경북 구미시 돌멩로 20', 36.10410, 128.40330, '돌멩입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
-(31, '스코비하우스', '경북 구미시 스코비하우스로 21', 36.10900, 128.42120, '스코비하우스입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
-(32, '여기봉산리', '경북 구미시 여기봉산리로 22', 36.11850, 128.41330, '여기봉산리입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
-(33, '언젠가', '경북 구미시 언젠가로 23', 36.11640, 128.42650, '언젠가입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
-(34, '브라운핸즈 구미점', '경북 구미시 브라운핸즈 구미점로 24', 36.10200, 128.41380, '브라운핸즈 구미점입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
-(35, '올리부치', '경북 구미시 올리부치로 25', 36.10850, 128.40300, '올리부치입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
-(36, '오드카페', '경북 구미시 오드카페로 26', 36.09410, 128.41970, '오드카페입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
-(37, '보나카페', '경북 구미시 보나카페로 27', 36.09920, 128.42840, '보나카페입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
-(38, '시크릿가든카페', '경북 구미시 시크릿가든카페로 28', 36.11570, 128.40900, '시크릿가든카페입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
-(39, '카페 코너', '경북 구미시 카페 코너로 29', 36.10500, 128.43050, '카페 코너입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
-(40, '어벤더치 카페', '경북 구미시 어벤더치 카페로 30', 36.11090, 128.40420, '어벤더치 카페입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
-(41, '카페 STL', '경북 구미시 카페 STL로 31', 36.09980, 128.40560, '카페 STL입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
-(42, '상상 커피', '경북 구미시 상상 커피로 32', 36.11280, 128.43120, '상상 커피입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
-(43, '카페 십일월삼십일', '경북 구미시 카페 십일월삼십일로 33', 36.09750, 128.40680, '카페 십일월삼십일입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
-(44, '머뭄', '경북 구미시 머뭄로 34', 36.11790, 128.41880, '머뭄입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
-(45, '카페 무이', '경북 구미시 카페 무이로 35', 36.10330, 128.40020, '카페 무이입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
-(46, 'WOOZ', '경북 구미시 WOOZ로 36', 36.10620, 128.42600, 'WOOZ입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
-(47, '화담', '경북 구미시 화담로 37', 36.11420, 128.42760, '화담입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
-(48, '카페 우드', '경북 구미시 카페 우드로 38', 36.09500, 128.41710, '카페 우드입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
-(49, '20도씨', '경북 구미시 20도씨로 39', 36.11000, 128.42270, '20도씨입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
-(50, '오드커피', '경북 구미시 오드커피로 40', 36.10110, 128.41120, '오드커피입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0);
+(11, '너와숲', '경북 구미시 진평동 1023-2', 36.107080540758425, 128.41793846471992, '너와숲입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 3),
+(12, '벨빌베이크하우스 금오산점', '경북 구미시 황상동 305-26 노블레스타워 1층', 36.108135910254404, 128.41848113306207, '벨빌베이크하우스 금오산점입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 2),
+(13, '페트리코', '경북 구미시 황상동 633-32', 36.107158849412116, 128.42096357086064, '페트리코입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 1),
+(14, '민다방', '경북 구미시 인의동 374-6', 36.105618195744206, 128.4204896661862, '민다방입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 1),
+(15, '언유주얼커피바', '경북 구미시 진평동 549-4', 36.10294504892144, 128.42089656121203, '언유주얼커피바입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 2),
+(16, '매일그대와', '경북 구미시 진평동 5-6', 36.09970459319914, 128.42465055724034, '매일그대와입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 1),
+(17, '어니스트밀로', '경북 구미시 진평동 1028-3', 36.10665978244862, 128.41797758661335, '어니스트밀로입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
+(18, '금오당', '경북 구미시 임수동 92-28', 36.1063938065966, 128.40468839544076, '금오당입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 1),
+(19, '런던벨', '경북 구미시 공단동 263-1', 36.10104480092262, 128.3849872235885, '런던벨입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 1),
+(20, '도로시홈카페', '경북 구미시 진평동 32-7', 36.097603416862164, 128.42281242252727, '도로시홈카페입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 1),
+(21, '커피우드', '경북 구미시 진평동 27-10', 36.096627049897435, 128.42578580840933, '커피우드입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 1),
+(22, '빅스타루프탑', '경북 구미시 진평동 273-2', 36.10039703375375, 128.42133011426796, '빅스타루프탑입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 1),
+(23, '구옥희커피', '경북 구미시 인의동 557-11', 36.105059357697485, 128.42104976585054, '구옥희커피입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
+(24, '모미지', '경북 구미시 진평동 416-7', 36.104496439493, 128.41791534021968, '모미지입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
+(25, '파네룬', '경북 구미시 인의동 381-8', 36.106408263099894, 128.42175582176708, '파네룬입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
+(26, '카페숨', '경북 구미시 황상동 303-4', 36.10904505645522, 128.41877050179696, '카페숨입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
+(27, '호두당', '경북 구미시 황상동 280-9', 36.108338244992595, 128.4224006853217, '호두당입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
+(28, '카페 호', '경북 구미시 임수동 92-9', 36.109544584178074, 128.40299005950595, '카페 호입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
+(29, '스테이550', '경북 구미시 황상동 203-19', 36.11453749480286, 128.42503308709217, '스테이550입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
+(30, '돌멩', '경북 구미시 인의동 825-1', 36.11341086112906, 128.42531629084084, '돌멩입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
+(31, '스코비하우스', '경북 구미시 인의동 427-1', 36.108685166223395, 128.42572618205895, '스코비하우스입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
+(32, '여기봉산리', '경북 구미시 황상동 355-1', 36.11037424070588, 128.4204290963885, '여기봉산리입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
+(33, '언젠가', '경북 구미시 황상동 322-3', 36.10983855542447, 128.41829367691713, '언젠가입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
+(34, '브라운핸즈 구미점', '경북 구미시 황상동 301-22', 36.10919051469259, 128.42142653079276, '브라운핸즈 구미점입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
+(35, '올리부치', '경북 구미시 황상동 305-42', 36.10800135626678, 128.41919539798613, '올리부치입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
+(36, '오드카페', '경북 구미시 인의동 368-9', 36.10721830935534, 128.42143180506042, '오드카페입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
+(37, '보나카페', '경북 구미시 인의동 377', 36.10609463826734, 128.42120043426343, '보나카페입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
+(38, '시크릿가든카페', '경북 구미시 황상동 308-31', 36.10754861320022, 128.420398999761, '시크릿가든카페입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
+(39, '카페 코너', '경북 구미시 진평동 558', 36.10223131901698, 128.42081814336848, '카페 코너입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
+(40, '어벤더치 카페', '경북 구미시 진평동 288-5', 36.10117161444913, 128.42128643969542, '어벤더치 카페입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
+(41, '카페 STL', '경북 구미시 진평동 9-1', 36.099002191083315, 128.42539886142487, '카페 STL입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
+(42, '상상 커피', '경북 구미시 인의동 699-2', 36.099272496538454, 128.42682291953724, '상상 커피입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
+(43, '카페 십일월삼십일', '경북 구미시 인의동 687-5', 36.099925973091665, 128.42583129869888, '카페 십일월삼십일입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
+(44, '머뭄', '경북 구미시 인의동 655-2', 36.10121620479818, 128.42844171575115, '머뭄입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
+(45, '카페 무이', '경북 구미시 인의동 641-46', 36.10278546815807, 128.42539483135118, '카페 무이입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0),
+(46, 'WOOZ', '경북 구미시 인의동 646-5', 36.102353519020674, 128.42762281065734, 'WOOZ입니다.', '010-1234-5678', '09:00', '22:00', '100-150', 0, 0),
+(47, '화담', '경북 구미시 인의동 597-8', 36.104394819927585, 128.4256159602112, '화담입니다.', '010-1234-5678', '09:00', '22:00', '150-200', 0, 0),
+(48, '카페 우드', '경북 구미시 인의동 488', 36.10677320338773, 128.42526748990576, '카페 우드입니다.', '010-1234-5678', '09:00', '22:00', '200-250', 0, 0),
+(49, '20도씨', '경북 구미시 인의동 491-1', 36.10632173039316, 128.4258140243916, '20도씨입니다.', '010-1234-5678', '09:00', '22:00', '250-300', 0, 0),
+(50, '싸타벅스', '경북 구미시 임수동 94-1', 36.108149090399436, 128.4139800493925, '싸타벅스입니다.', '010-1234-5678', '09:00', '22:00', '300+', 0, 0);
 
 -- Cafe Images
 INSERT INTO cafe_image (cafe_id, image_url, display_order) VALUES
@@ -147,7 +146,7 @@ INSERT INTO cafe_image (cafe_id, image_url, display_order) VALUES
 (12, 'cafe/50bf107a-a857-4dca-a005-61c46e8b5f3e', 0),
 (12, 'cafe/57e4e2e1-1751-4f58-bdb3-0c1131687274', 1),
 (12, 'cafe/682306c2-1652-4415-acac-2fcbd70ae41a', 2),
-(13, 'cafe/398b7883-f3ec-4781-ac5b-01f51535dc44', 0),
+(13, 'cafe/398b7883-f3ec-4781-ac5b-01f51543dc44', 0),
 (13, 'cafe/99961e08-7b96-42e6-a98c-3066c19dea44', 1),
 (13, 'cafe/5d29c540-7182-4f9c-aecb-ba9802d7a621', 2),
 (14, 'cafe/5915d541-6f0a-4672-8a0c-fbccc2b9b284', 0),
@@ -645,15 +644,15 @@ INSERT INTO display_wall (id, cafe_id, wall_name, start_x, start_y, end_x, end_y
 (219, 49, '벽 5', 12.0, 8.0, 8.0, 8.0, 400, 250, true),
 (220, 49, '벽 6', 8.0, 8.0, 8.0, 12.0, 400, 250, false),
 (221, 49, '벽 7', 8.0, 12.0, 4.0, 12.0, 400, 250, true),
-(222, 49, '벽 8', 4.0, 12.0, 4.0, 0.0, 1200, 250, false),
+(222, 49, '벽 8', 4.0, 12.0, 4.0, 0.0, 1200, 250, false);
 
 -- 작은 육각형 카페 (6개 벽) - 카페 50
-(223, 50, '벽 A', 2.0, 0.0, 6.0, 0.0, 400, 250, false),
-(224, 50, '벽 B', 6.0, 0.0, 8.0, 3.0, 360, 250, true),
-(225, 50, '벽 C', 8.0, 3.0, 6.0, 6.0, 360, 250, false),
-(226, 50, '벽 D', 6.0, 6.0, 2.0, 6.0, 400, 250, true),
-(227, 50, '벽 E', 2.0, 6.0, 0.0, 3.0, 360, 250, false),
-(228, 50, '벽 F', 0.0, 3.0, 2.0, 0.0, 360, 250, true);
+-- (223, 50, '벽 A', 2.0, 0.0, 6.0, 0.0, 400, 250, false),
+-- (224, 50, '벽 B', 6.0, 0.0, 8.0, 3.0, 360, 250, true),
+-- (225, 50, '벽 C', 8.0, 3.0, 6.0, 6.0, 360, 250, false),
+-- (226, 50, '벽 D', 6.0, 6.0, 2.0, 6.0, 400, 250, true),
+-- (227, 50, '벽 E', 2.0, 6.0, 0.0, 3.0, 360, 250, false),
+-- (228, 50, '벽 F', 0.0, 3.0, 2.0, 0.0, 360, 250, true);
 
 -- Display Slots
 INSERT INTO display_slot (id, is_exhibiting, commission_rate, requirements) VALUES
@@ -774,10 +773,10 @@ INSERT INTO display_slot (id, is_exhibiting, commission_rate, requirements) VALU
 (215, false, 9.0, '현대적인 추상화'),
 (217, false, 10.0, '자연 소재'),
 (219, false, 3.0, '미니멀 아트'),
-(221, false, 15.0, '자연 소재'),
-(224, false, 15.0, '클래식한 작품'),
-(226, false, 11.0, '스칸디나비아 감성'),
-(228, false, 10.0, '북유럽 스타일');
+(221, false, 15.0, '자연 소재');
+-- (224, false, 15.0, '클래식한 작품')
+-- (226, false, 11.0, '스칸디나비아 감성'),
+-- (228, false, 10.0, '북유럽 스타일');
 
 -- Artworks
 INSERT INTO artwork (id, artist_id, title, description, art_category, price, width_cm, height_cm, weight_kg, production_year, is_exhibiting, view_count, bookmark_count, created_at) VALUES
@@ -887,29 +886,134 @@ INSERT INTO artwork_image (artwork_id, image_url, display_order) VALUES
 
 -- Artwork Bookmarks
 INSERT INTO artwork_bookmark (user_id, artwork_id, created_at) VALUES
--- User 1
-(1, 1, NOW()), (1, 2, NOW()), (1, 3, NOW()), (1, 4, NOW()), (1, 5, NOW()),
--- User 2
-(2, 6, NOW()), (2, 7, NOW()), (2, 8, NOW()), (2, 9, NOW()), (2, 10, NOW()),
--- User 3
-(3, 1, NOW()), (3, 6, NOW()), (3, 11, NOW()), (3, 12, NOW()), (3, 17, NOW()),
--- User 6
-(6, 2, NOW()), (6, 7, NOW()), (6, 13, NOW()), (6, 18, NOW()), (6, 19, NOW()),
--- User 11
-(11, 1, NOW()), (11, 8, NOW()), (11, 14, NOW()), (11, 20, NOW()), (11, 21, NOW());
+-- Artwork 1 (most popular - 23 more users)
+(4, 1, NOW()), (5, 1, NOW()), (12, 1, NOW()), (13, 1, NOW()), (14, 1, NOW()), (15, 1, NOW()), (16, 1, NOW()), (17, 1, NOW()), (18, 1, NOW()), (19, 1, NOW()), (20, 1, NOW()), (21, 1, NOW()),
+(22, 1, NOW()), (23, 1, NOW()), (24, 1, NOW()), (25, 1, NOW()), (26, 1, NOW()), (27, 1, NOW()), (28, 1, NOW()), (29, 1, NOW()), (30, 1, NOW()), (34, 1, NOW()), (35, 1, NOW()),
+-- Artwork 2 (18 more users)
+(3, 2, NOW()), (4, 2, NOW()), (5, 2, NOW()), (12, 2, NOW()), (13, 2, NOW()), (14, 2, NOW()), (15, 2, NOW()), (22, 2, NOW()), (23, 2, NOW()), (24, 2, NOW()),
+(25, 2, NOW()), (26, 2, NOW()), (27, 2, NOW()), (28, 2, NOW()), (31, 2, NOW()), (32, 2, NOW()), (36, 2, NOW()), (37, 2, NOW()),
+-- Artwork 3 (17 more users)
+(2, 3, NOW()), (4, 3, NOW()), (5, 3, NOW()), (13, 3, NOW()), (16, 3, NOW()), (17, 3, NOW()), (18, 3, NOW()), (25, 3, NOW()),
+(19, 3, NOW()), (20, 3, NOW()), (21, 3, NOW()), (22, 3, NOW()), (26, 3, NOW()), (29, 3, NOW()), (33, 3, NOW()), (38, 3, NOW()), (39, 3, NOW()),
+-- Artwork 4 (14 more users)
+(2, 4, NOW()), (3, 4, NOW()), (5, 4, NOW()), (14, 4, NOW()), (19, 4, NOW()), (20, 4, NOW()), (26, 4, NOW()),
+(21, 4, NOW()), (23, 4, NOW()), (24, 4, NOW()), (27, 4, NOW()), (30, 4, NOW()), (40, 4, NOW()), (41, 4, NOW()),
+-- Artwork 5 (13 more users)
+(2, 5, NOW()), (3, 5, NOW()), (4, 5, NOW()), (15, 5, NOW()), (21, 5, NOW()), (27, 5, NOW()),
+(16, 5, NOW()), (17, 5, NOW()), (22, 5, NOW()), (28, 5, NOW()), (31, 5, NOW()), (42, 5, NOW()), (43, 5, NOW()),
+-- Artwork 6 (17 more users)
+(1, 6, NOW()), (4, 6, NOW()), (5, 6, NOW()), (16, 6, NOW()), (17, 6, NOW()), (18, 6, NOW()), (22, 6, NOW()), (28, 6, NOW()), (29, 6, NOW()),
+(12, 6, NOW()), (19, 6, NOW()), (20, 6, NOW()), (23, 6, NOW()), (24, 6, NOW()), (32, 6, NOW()), (44, 6, NOW()), (45, 6, NOW()),
+-- Artwork 7 (15 more users)
+(1, 7, NOW()), (3, 7, NOW()), (4, 7, NOW()), (5, 7, NOW()), (17, 7, NOW()), (23, 7, NOW()), (30, 7, NOW()),
+(12, 7, NOW()), (13, 7, NOW()), (18, 7, NOW()), (20, 7, NOW()), (25, 7, NOW()), (33, 7, NOW()), (46, 7, NOW()), (47, 7, NOW()),
+-- Artwork 8 (13 more users)
+(1, 8, NOW()), (3, 8, NOW()), (4, 8, NOW()), (5, 8, NOW()), (18, 8, NOW()), (31, 8, NOW()),
+(12, 8, NOW()), (13, 8, NOW()), (19, 8, NOW()), (21, 8, NOW()), (26, 8, NOW()), (34, 8, NOW()), (48, 8, NOW()),
+-- Artwork 9 (11 more users)
+(1, 9, NOW()), (3, 9, NOW()), (4, 9, NOW()), (19, 9, NOW()), (32, 9, NOW()),
+(5, 9, NOW()), (12, 9, NOW()), (14, 9, NOW()), (20, 9, NOW()), (27, 9, NOW()), (49, 9, NOW()),
+-- Artwork 10 (9 more users)
+(1, 10, NOW()), (3, 10, NOW()), (4, 10, NOW()), (33, 10, NOW()),
+(5, 10, NOW()), (12, 10, NOW()), (15, 10, NOW()), (21, 10, NOW()), (28, 10, NOW()),
+-- Other artworks (moderate popularity)
+-- Artwork 11-20 (Artist 7)
+(1, 11, NOW()), (2, 11, NOW()), (4, 11, NOW()), (21, 11, NOW()),
+(2, 12, NOW()), (3, 12, NOW()), (5, 12, NOW()), (22, 12, NOW()),
+(1, 13, NOW()), (4, 13, NOW()), (23, 13, NOW()),
+(2, 14, NOW()), (3, 14, NOW()), (5, 14, NOW()), (24, 14, NOW()),
+(1, 15, NOW()), (4, 15, NOW()), (25, 15, NOW()),
+(2, 16, NOW()), (5, 16, NOW()), (26, 16, NOW()),
+(3, 17, NOW()), (4, 17, NOW()), (27, 17, NOW()),
+(1, 18, NOW()), (2, 18, NOW()), (28, 18, NOW()),
+(3, 19, NOW()), (5, 19, NOW()), (29, 19, NOW()),
+(2, 20, NOW()), (4, 20, NOW()), (30, 20, NOW()),
+-- Artwork 21-30 (Artist 8)
+(1, 21, NOW()), (3, 21, NOW()), (31, 21, NOW()),
+(2, 22, NOW()), (4, 22, NOW()), (32, 22, NOW()),
+(1, 23, NOW()), (5, 23, NOW()), (33, 23, NOW()),
+(3, 24, NOW()), (4, 24, NOW()), (34, 24, NOW()),
+(2, 25, NOW()), (5, 25, NOW()), (35, 25, NOW()),
+(1, 26, NOW()), (4, 26, NOW()), (36, 26, NOW()),
+(2, 27, NOW()), (3, 27, NOW()), (37, 27, NOW()),
+(1, 28, NOW()), (5, 28, NOW()), (38, 28, NOW()),
+(3, 29, NOW()), (4, 29, NOW()), (39, 29, NOW()),
+(2, 30, NOW()), (5, 30, NOW()), (40, 30, NOW()),
+-- Artwork 31-39 (Artist 9)
+(1, 31, NOW()), (3, 31, NOW()), (41, 31, NOW()),
+(2, 32, NOW()), (4, 32, NOW()), (42, 32, NOW()),
+(1, 33, NOW()), (5, 33, NOW()), (43, 33, NOW()),
+(2, 34, NOW()), (3, 34, NOW()), (44, 34, NOW()),
+(1, 35, NOW()), (4, 35, NOW()), (45, 35, NOW()),
+(2, 36, NOW()), (5, 36, NOW()), (46, 36, NOW()),
+(3, 37, NOW()), (4, 37, NOW()), (47, 37, NOW()),
+(1, 38, NOW()), (5, 38, NOW()), (48, 38, NOW()),
+(2, 39, NOW()), (3, 39, NOW()), (49, 39, NOW());
 
 -- Cafe Bookmarks
 INSERT INTO cafe_bookmark (user_id, cafe_id, created_at) VALUES
--- User 1
-(1, 11, NOW()), (1, 15, NOW()), (1, 20, NOW()),
--- User 2
-(2, 12, NOW()), (2, 16, NOW()), (2, 21, NOW()),
--- User 6
-(6, 11, NOW()), (6, 13, NOW()), (6, 18, NOW()),
--- User 8
-(8, 11, NOW()), (8, 15, NOW()), (8, 22, NOW()),
--- User 11
-(11, 12, NOW()), (11, 14, NOW()), (11, 19, NOW());
+-- Cafe 11 (has artwork 1 - most popular artwork, 18 more users)
+(4, 11, NOW()), (5, 11, NOW()), (12, 11, NOW()), (13, 11, NOW()), (14, 11, NOW()), (15, 11, NOW()), (16, 11, NOW()), (17, 11, NOW()),
+(18, 11, NOW()), (19, 11, NOW()), (20, 11, NOW()), (21, 11, NOW()), (22, 11, NOW()), (23, 11, NOW()), (24, 11, NOW()), (25, 11, NOW()), (26, 11, NOW()), (27, 11, NOW()),
+-- Cafe 12 (has artwork 2, 13 more users)
+(3, 12, NOW()), (4, 12, NOW()), (5, 12, NOW()), (13, 12, NOW()), (14, 12, NOW()), (22, 12, NOW()), (23, 12, NOW()),
+(15, 12, NOW()), (24, 12, NOW()), (25, 12, NOW()), (26, 12, NOW()), (28, 12, NOW()), (31, 12, NOW()),
+-- Cafe 13 (has artwork 3, 12 more users)
+(2, 13, NOW()), (4, 13, NOW()), (5, 13, NOW()), (16, 13, NOW()), (17, 13, NOW()), (18, 13, NOW()),
+(19, 13, NOW()), (20, 13, NOW()), (21, 13, NOW()), (22, 13, NOW()), (26, 13, NOW()), (29, 13, NOW()),
+-- Cafe 14 (has artwork 4, 10 more users)
+(2, 14, NOW()), (3, 14, NOW()), (5, 14, NOW()), (19, 14, NOW()), (20, 14, NOW()),
+(21, 14, NOW()), (23, 14, NOW()), (24, 14, NOW()), (27, 14, NOW()), (30, 14, NOW()),
+-- Cafe 15 (has artwork 5, 9 more users)
+(2, 15, NOW()), (3, 15, NOW()), (4, 15, NOW()), (21, 15, NOW()), (27, 15, NOW()),
+(16, 15, NOW()), (17, 15, NOW()), (22, 15, NOW()), (28, 15, NOW()),
+-- Cafe 16 (has artwork 6, 11 more users)
+(1, 16, NOW()), (4, 16, NOW()), (5, 16, NOW()), (17, 16, NOW()), (22, 16, NOW()), (28, 16, NOW()),
+(12, 16, NOW()), (19, 16, NOW()), (20, 16, NOW()), (23, 16, NOW()), (24, 16, NOW()),
+-- Cafe 17 (has artwork 7, 10 more users)
+(1, 17, NOW()), (3, 17, NOW()), (4, 17, NOW()), (5, 17, NOW()), (23, 17, NOW()),
+(12, 17, NOW()), (13, 17, NOW()), (18, 17, NOW()), (20, 17, NOW()), (25, 17, NOW()),
+-- Cafe 18 (has artwork 8, 9 more users)
+(1, 18, NOW()), (3, 18, NOW()), (4, 18, NOW()), (5, 18, NOW()), (31, 18, NOW()),
+(12, 18, NOW()), (13, 18, NOW()), (19, 18, NOW()), (21, 18, NOW()),
+-- Cafe 19 (has artwork 9, 7 more users)
+(1, 19, NOW()), (3, 19, NOW()), (4, 19, NOW()), (32, 19, NOW()),
+(5, 19, NOW()), (12, 19, NOW()), (14, 19, NOW()),
+-- Cafe 20 (has artwork 10, 6 more users)
+(2, 20, NOW()), (3, 20, NOW()), (4, 20, NOW()), (33, 20, NOW()),
+(5, 20, NOW()), (12, 20, NOW()),
+-- Cafe 21-30 (moderate popularity)
+(1, 21, NOW()), (2, 21, NOW()), (4, 21, NOW()),
+(2, 22, NOW()), (3, 22, NOW()), (5, 22, NOW()),
+(1, 23, NOW()), (4, 23, NOW()), (5, 23, NOW()),
+(2, 24, NOW()), (3, 24, NOW()), (4, 24, NOW()),
+(1, 25, NOW()), (4, 25, NOW()), (5, 25, NOW()),
+(2, 26, NOW()), (3, 26, NOW()), (5, 26, NOW()),
+(1, 27, NOW()), (3, 27, NOW()), (4, 27, NOW()),
+(2, 28, NOW()), (4, 28, NOW()), (5, 28, NOW()),
+(1, 29, NOW()), (3, 29, NOW()), (5, 29, NOW()),
+(2, 30, NOW()), (3, 30, NOW()), (4, 30, NOW()),
+-- Cafe 31-40
+(1, 31, NOW()), (3, 31, NOW()), (5, 31, NOW()),
+(2, 32, NOW()), (4, 32, NOW()), (5, 32, NOW()),
+(1, 33, NOW()), (3, 33, NOW()), (4, 33, NOW()),
+(2, 34, NOW()), (3, 34, NOW()), (5, 34, NOW()),
+(1, 35, NOW()), (4, 35, NOW()), (5, 35, NOW()),
+(2, 36, NOW()), (3, 36, NOW()), (4, 36, NOW()),
+(1, 37, NOW()), (3, 37, NOW()), (5, 37, NOW()),
+(2, 38, NOW()), (4, 38, NOW()), (5, 38, NOW()),
+(1, 39, NOW()), (3, 39, NOW()), (4, 39, NOW()),
+(2, 40, NOW()), (3, 40, NOW()), (5, 40, NOW()),
+-- Cafe 41-49
+(1, 41, NOW()), (3, 41, NOW()),
+(2, 42, NOW()), (4, 42, NOW()),
+(1, 43, NOW()), (5, 43, NOW()),
+(2, 44, NOW()), (3, 44, NOW()),
+(1, 45, NOW()), (4, 45, NOW()),
+(2, 46, NOW()), (5, 46, NOW()),
+(3, 47, NOW()), (4, 47, NOW()),
+(1, 48, NOW()), (5, 48, NOW()),
+(2, 49, NOW()), (3, 49, NOW());
 
 -- Exhibitions
 INSERT INTO exhibition (cafe_id, display_slot_id, artwork_id, start_date, end_date, commission_rate, requirements, state, cafe_agreed, artist_agreed, agreed_at, created_at, updated_at) VALUES
@@ -947,7 +1051,47 @@ INSERT INTO exhibition (cafe_id, display_slot_id, artwork_id, start_date, end_da
 (11, 4, 11, '2025-08-19', '2025-09-02', 12.0, '베이커리 카페 분위기에 맞는 따뜻한 느낌의 작품', 'COMPLETED', true, true, '2025-08-04 10:00:00', '2025-07-30 09:00:00', '2025-09-02 23:59:59'),
 (11, 1, 3, '2025-08-01', '2025-08-15', 10.0, '따뜻한 분위기 작품 선호', 'COMPLETED', true, true, '2025-07-25 10:00:00', '2025-07-20 09:00:00', '2025-08-15 23:59:59'),
 (11, 3, 5, '2025-07-05', '2025-07-20', 12.0, '모던 아트, 추상화 환영', 'COMPLETED', true, true, '2025-06-30 10:00:00', '2025-06-25 09:00:00', '2025-07-20 23:59:59'),
-(11, 4, 7, '2025-06-10', '2025-06-25', 15.0, '자연 풍경, 인물화 적합', 'COMPLETED', true, true, '2025-06-01 10:00:00', '2025-05-25 09:00:00', '2025-06-25 23:59:59');
+(11, 4, 7, '2025-06-10', '2025-06-25', 15.0, '자연 풍경, 인물화 적합', 'COMPLETED', true, true, '2025-06-01 10:00:00', '2025-05-25 09:00:00', '2025-06-25 23:59:59'),
+-- COMPLETED Exhibitions for May 2025 (Cafe 11-49)
+(11, 1, 1, '2025-05-01', '2025-05-31', 12.0, '미니멀리즘 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(12, 6, 2, '2025-05-01', '2025-05-31', 2.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(13, 11, 3, '2025-05-01', '2025-05-31', 13.0, '추억을 담은 그림', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(14, 15, 4, '2025-05-01', '2025-05-31', 3.0, '클래식한 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(15, 23, 5, '2025-05-01', '2025-05-31', 9.0, '정통 회화', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(16, 30, 6, '2025-05-01', '2025-05-31', 2.0, '우아한 분위기', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(17, 36, 7, '2025-05-01', '2025-05-31', 10.0, '클래식한 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(18, 42, 8, '2025-05-01', '2025-05-31', 11.0, '단순하고 깔끔한 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(19, 45, 9, '2025-05-01', '2025-05-31', 7.0, '편안한 분위기', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(20, 51, 10, '2025-05-01', '2025-05-31', 15.0, '고풍스러운 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(21, 58, 11, '2025-05-01', '2025-05-31', 6.0, '거친 질감의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(22, 61, 12, '2025-05-01', '2025-05-31', 14.0, '자연주의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(23, 65, 13, '2025-05-01', '2025-05-31', 7.0, '미니멀리즘 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(24, 74, 14, '2025-05-01', '2025-05-31', 5.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(25, 79, 15, '2025-05-01', '2025-05-31', 14.0, '인더스트리얼 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(26, 86, 16, '2025-05-01', '2025-05-31', 10.0, '미니멀리즘 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(27, 90, 17, '2025-05-01', '2025-05-31', 4.0, '옛날 감성의 그림', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(28, 98, 18, '2025-05-01', '2025-05-31', 5.0, '현대적인 추상화', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(29, 103, 19, '2025-05-01', '2025-05-31', 12.0, '거친 질감의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(30, 108, 20, '2025-05-01', '2025-05-31', 6.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(31, 116, 21, '2025-05-01', '2025-05-31', 2.0, '인더스트리얼 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(32, 120, 22, '2025-05-01', '2025-05-31', 12.0, '거친 질감의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(33, 126, 23, '2025-05-01', '2025-05-31', 6.0, '정통 회화', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(34, 135, 24, '2025-05-01', '2025-05-31', 4.0, '단순하고 깔끔한 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(35, 138, 25, '2025-05-01', '2025-05-31', 8.0, '인더스트리얼 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(36, 145, 26, '2025-05-01', '2025-05-31', 2.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(37, 151, 27, '2025-05-01', '2025-05-31', 3.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(38, 156, 28, '2025-05-01', '2025-05-31', 3.0, '북유럽 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(39, 161, 29, '2025-05-01', '2025-05-31', 10.0, '레트로 컨셉', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(40, 165, 30, '2025-05-01', '2025-05-31', 14.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(41, 173, 31, '2025-05-01', '2025-05-31', 7.0, '미니멀리즘 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(42, 180, 32, '2025-05-01', '2025-05-31', 6.0, '미니멀 아트', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(43, 186, 33, '2025-05-01', '2025-05-31', 15.0, '모던한 감성의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(44, 192, 34, '2025-05-01', '2025-05-31', 11.0, '인더스트리얼 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(45, 195, 35, '2025-05-01', '2025-05-31', 5.0, '복고풍 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(46, 201, 36, '2025-05-01', '2025-05-31', 4.0, '인더스트리얼 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(47, 208, 37, '2025-05-01', '2025-05-31', 11.0, '거친 질감의 작품', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(48, 211, 38, '2025-05-01', '2025-05-31', 9.0, '북유럽 스타일', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59'),
+(49, 215, 39, '2025-05-01', '2025-05-31', 9.0, '현대적인 추상화', 'COMPLETED', true, true, '2025-04-15 10:00:00', '2025-04-10 09:00:00', '2025-05-31 23:59:59');
 
 -- Reviews
 INSERT INTO review (reviewer_id, reviewee_id, exhibition_id, rating, comment, created_at) VALUES
@@ -961,8 +1105,8 @@ INSERT INTO review (reviewer_id, reviewee_id, exhibition_id, rating, comment, cr
 (13, 6, 20, 5, '숲속 오솔길 작품, 카페 컨셉과 완벽했습니다.', '2025-10-30 11:00:00'),
 (6, 13, 20, 4, '아늑한 공간에서 좋은 전시였습니다.', '2025-10-30 16:00:00'),
 -- Exhibition 21: Cafe 11, Artwork 1 (Artist 6) - Ended 2025-10-21
-(11, 6, 21, 5, '산의 아침 작품이 정말 아름다웠습니다.', '2025-10-22 10:00:00'),
-(6, 11, 21, 5, '카페 분위기가 좋아 작품이 더 돋보였어요.', '2025-10-22 14:00:00'),
+-- (11, 6, 21, 5, '산의 아침 작품이 정말 아름다웠습니다.', '2025-10-22 10:00:00'),
+-- (6, 11, 21, 5, '카페 분위기가 좋아 작품이 더 돋보였어요.', '2025-10-22 14:00:00'),
 -- Exhibition 22: Cafe 11, Artwork 2 (Artist 6) - Ended 2025-10-14
 (11, 6, 22, 4, '바다의 노을, 고객들이 정말 좋아했습니다.', '2025-10-15 10:00:00'),
 (6, 11, 22, 5, '전시 기간 내내 관리가 완벽했습니다.', '2025-10-15 15:00:00'),
@@ -989,7 +1133,125 @@ INSERT INTO review (reviewer_id, reviewee_id, exhibition_id, rating, comment, cr
 (6, 11, 29, 5, '따뜻한 분위기에서 좋은 전시였습니다.', '2025-08-16 15:00:00'),
 -- Exhibition 30: Cafe 11, Artwork 5 (Artist 6) - Ended 2025-07-20
 (11, 6, 30, 5, '봄날의 들판, 여름에도 봄 느낌이 났어요.', '2025-07-21 10:00:00'),
-(6, 11, 30, 4, '모던하고 깔끔한 전시 공간 감사합니다.', '2025-07-21 14:00:00');
+(6, 11, 30, 4, '모던하고 깔끔한 전시 공간 감사합니다.', '2025-07-21 14:00:00'),
+-- May 2025 Exhibitions (Cafe 11-49)
+-- Exhibition 31: Cafe 11, Artwork 1 (Artist 6) - Ended 2025-05-31
+(11, 6, 31, 5, '산의 아침, 5월 카페 분위기에 완벽했습니다.', '2025-06-01 10:00:00'),
+(6, 11, 31, 5, '항상 좋은 전시 공간 제공해 주셔서 감사합니다.', '2025-06-01 14:00:00'),
+-- Exhibition 32: Cafe 12, Artwork 2 (Artist 6) - Ended 2025-05-31
+(12, 6, 32, 4, '바다의 노을 작품이 손님들에게 큰 호응을 얻었어요.', '2025-06-01 11:00:00'),
+(6, 12, 32, 5, '넓고 쾌적한 공간에서 전시할 수 있어 좋았습니다.', '2025-06-01 15:00:00'),
+-- Exhibition 33: Cafe 13, Artwork 3 (Artist 6) - Ended 2025-05-31
+(13, 6, 33, 5, '숲속 오솔길이 카페 분위기와 잘 어울렸어요.', '2025-06-01 12:00:00'),
+(6, 13, 33, 4, '아늑한 카페에서 전시할 수 있어 영광이었습니다.', '2025-06-01 16:00:00'),
+-- Exhibition 34: Cafe 14, Artwork 4 (Artist 6) - Ended 2025-05-31
+(14, 6, 34, 5, '겨울 설경, 5월에도 시원한 느낌을 줬습니다.', '2025-06-02 10:00:00'),
+(6, 14, 34, 5, '전시 관리가 완벽했습니다.', '2025-06-02 14:00:00'),
+-- Exhibition 35: Cafe 15, Artwork 5 (Artist 6) - Ended 2025-05-31
+(15, 6, 35, 4, '봄날의 들판, 계절과 딱 맞는 작품이었어요.', '2025-06-02 11:00:00'),
+(6, 15, 35, 5, '손님들의 반응이 매우 좋았습니다.', '2025-06-02 15:00:00'),
+-- Exhibition 36: Cafe 16, Artwork 6 (Artist 6) - Ended 2025-05-31
+(16, 6, 36, 5, '가을 단풍이 카페에 활기를 더했습니다.', '2025-06-02 12:00:00'),
+(6, 16, 36, 4, '우아한 분위기의 카페에서 좋은 경험이었습니다.', '2025-06-02 16:00:00'),
+-- Exhibition 37: Cafe 17, Artwork 7 (Artist 6) - Ended 2025-05-31
+(17, 6, 37, 4, '호수의 반영 작품이 정말 아름다웠어요.', '2025-06-03 10:00:00'),
+(6, 17, 37, 5, '클래식한 카페 분위기가 작품과 잘 맞았습니다.', '2025-06-03 14:00:00'),
+-- Exhibition 38: Cafe 18, Artwork 8 (Artist 6) - Ended 2025-05-31
+(18, 6, 38, 5, '해변의 아침, 손님들이 힐링했다고 하네요.', '2025-06-03 11:00:00'),
+(6, 18, 38, 4, '깔끔한 전시 공간이 좋았습니다.', '2025-06-03 15:00:00'),
+-- Exhibition 39: Cafe 19, Artwork 9 (Artist 6) - Ended 2025-05-31
+(19, 6, 39, 4, '계곡의 물소리, 편안한 분위기를 만들어줬어요.', '2025-06-03 12:00:00'),
+(6, 19, 39, 5, '카페의 따뜻한 환대에 감사드립니다.', '2025-06-03 16:00:00'),
+-- Exhibition 40: Cafe 20, Artwork 10 (Artist 6) - Ended 2025-05-31
+(20, 6, 40, 5, '석양의 들판이 카페 분위기를 완성했습니다.', '2025-06-04 10:00:00'),
+(6, 20, 40, 5, '고풍스러운 카페에서 멋진 전시였습니다.', '2025-06-04 14:00:00'),
+-- Exhibition 41: Cafe 21, Artwork 11 (Artist 7) - Ended 2025-05-31
+(21, 7, 41, 4, '생각에 잠긴 여인, 손님들이 많이 감상했어요.', '2025-06-04 11:00:00'),
+(7, 21, 41, 5, '긴 복도형 공간이 작품을 돋보이게 했습니다.', '2025-06-04 15:00:00'),
+-- Exhibition 42: Cafe 22, Artwork 12 (Artist 7) - Ended 2025-05-31
+(22, 7, 42, 5, '젊은 예술가 작품이 카페와 완벽한 조화를 이뤘어요.', '2025-06-04 12:00:00'),
+(7, 22, 42, 4, '자연주의 공간에서 좋은 전시였습니다.', '2025-06-04 16:00:00'),
+-- Exhibition 43: Cafe 23, Artwork 13 (Artist 7) - Ended 2025-05-31
+(23, 7, 43, 4, '어머니의 초상이 따뜻한 감동을 줬습니다.', '2025-06-05 10:00:00'),
+(7, 23, 43, 5, '미니멀리즘 공간과 잘 어울렸습니다.', '2025-06-05 14:00:00'),
+-- Exhibition 44: Cafe 24, Artwork 14 (Artist 7) - Ended 2025-05-31
+(24, 7, 44, 5, '아이의 순수함 작품이 카페에 활기를 더했어요.', '2025-06-05 11:00:00'),
+(7, 24, 44, 4, '모던한 감성의 카페에서 좋은 경험이었습니다.', '2025-06-05 15:00:00'),
+-- Exhibition 45: Cafe 25, Artwork 15 (Artist 7) - Ended 2025-05-31
+(25, 7, 45, 5, '노신사의 품격, 정말 인상 깊은 작품이었습니다.', '2025-06-05 12:00:00'),
+(7, 25, 45, 5, '인더스트리얼 스타일과 완벽한 매치였습니다.', '2025-06-05 16:00:00'),
+-- Exhibition 46: Cafe 26, Artwork 16 (Artist 7) - Ended 2025-05-31
+(26, 7, 46, 4, '독서하는 소녀가 카페 분위기에 잘 맞았어요.', '2025-06-06 10:00:00'),
+(7, 26, 46, 5, '미니멀리즘 공간에서 작품이 돋보였습니다.', '2025-06-06 14:00:00'),
+-- Exhibition 47: Cafe 27, Artwork 17 (Artist 7) - Ended 2025-05-31
+(27, 7, 47, 5, '음악가의 열정이 손님들에게 영감을 줬어요.', '2025-06-06 11:00:00'),
+(7, 27, 47, 4, '옛날 감성의 카페와 잘 어울렸습니다.', '2025-06-06 15:00:00'),
+-- Exhibition 48: Cafe 28, Artwork 18 (Artist 7) - Ended 2025-05-31
+(28, 7, 48, 4, '사색하는 청년, 카페의 철학적 분위기를 만들었어요.', '2025-06-06 12:00:00'),
+(7, 28, 48, 5, '현대적 추상화 공간에서 좋은 전시였습니다.', '2025-06-06 16:00:00'),
+-- Exhibition 49: Cafe 29, Artwork 19 (Artist 7) - Ended 2025-05-31
+(29, 7, 49, 5, '우아한 귀부인 작품이 카페에 우아함을 더했습니다.', '2025-06-07 10:00:00'),
+(7, 29, 49, 4, '거친 질감의 공간과 대조적으로 좋았습니다.', '2025-06-07 14:00:00'),
+-- Exhibition 50: Cafe 30, Artwork 20 (Artist 7) - Ended 2025-05-31
+(30, 7, 50, 4, '미소 짓는 노부인, 손님들에게 따뜻함을 줬어요.', '2025-06-07 11:00:00'),
+(7, 30, 50, 5, '모던한 감성 공간에서 작품이 빛났습니다.', '2025-06-07 15:00:00'),
+-- Exhibition 51: Cafe 31, Artwork 21 (Artist 8) - Ended 2025-05-31
+(31, 8, 51, 5, '테이블 위의 과일, 카페와 완벽한 조화였어요.', '2025-06-07 12:00:00'),
+(8, 31, 51, 4, '인더스트리얼 스타일과 잘 어울렸습니다.', '2025-06-07 16:00:00'),
+-- Exhibition 52: Cafe 32, Artwork 22 (Artist 8) - Ended 2025-05-31
+(32, 8, 52, 4, '꽃병과 꽃다발이 카페를 화사하게 만들었어요.', '2025-06-08 10:00:00'),
+(8, 32, 52, 5, '거친 질감의 공간에서 부드러움이 돋보였습니다.', '2025-06-08 14:00:00'),
+-- Exhibition 53: Cafe 33, Artwork 23 (Artist 8) - Ended 2025-05-31
+(33, 8, 53, 5, '아침 식탁, 손님들이 공감하며 감상했습니다.', '2025-06-08 11:00:00'),
+(8, 33, 53, 4, '정통 회화 공간에서 좋은 전시였습니다.', '2025-06-08 15:00:00'),
+-- Exhibition 54: Cafe 34, Artwork 24 (Artist 8) - Ended 2025-05-31
+(34, 8, 54, 4, '오래된 책들이 카페의 지적 분위기를 높였어요.', '2025-06-08 12:00:00'),
+(8, 34, 54, 5, '단순하고 깔끔한 공간과 잘 맞았습니다.', '2025-06-08 16:00:00'),
+-- Exhibition 55: Cafe 35, Artwork 25 (Artist 8) - Ended 2025-05-31
+(35, 8, 55, 5, '와인과 치즈, 카페의 감성을 완성했습니다.', '2025-06-09 10:00:00'),
+(8, 35, 55, 5, '인더스트리얼 스타일 공간이 완벽했습니다.', '2025-06-09 14:00:00'),
+-- Exhibition 56: Cafe 36, Artwork 26 (Artist 8) - Ended 2025-05-31
+(36, 8, 56, 4, '도자기 정물이 전통적 아름다움을 보여줬어요.', '2025-06-09 11:00:00'),
+(8, 36, 56, 4, '모던한 감성과 대조가 흥미로웠습니다.', '2025-06-09 15:00:00'),
+-- Exhibition 57: Cafe 37, Artwork 27 (Artist 8) - Ended 2025-05-31
+(37, 8, 57, 5, '과일 바구니가 카페에 풍요로움을 더했어요.', '2025-06-09 12:00:00'),
+(8, 37, 57, 5, '모던한 공간에서 작품이 돋보였습니다.', '2025-06-09 16:00:00'),
+-- Exhibition 58: Cafe 38, Artwork 28 (Artist 8) - Ended 2025-05-31
+(38, 8, 58, 4, '식탁의 정물, 손님들이 일상의 아름다움을 느꼈어요.', '2025-06-10 10:00:00'),
+(8, 38, 58, 5, '북유럽 스타일과 완벽한 조화였습니다.', '2025-06-10 14:00:00'),
+-- Exhibition 59: Cafe 39, Artwork 29 (Artist 8) - Ended 2025-05-31
+(39, 8, 59, 5, '커피와 디저트 작품이 카페 컨셉과 딱이었어요.', '2025-06-10 11:00:00'),
+(8, 39, 59, 4, '레트로 컨셉에 잘 어울렸습니다.', '2025-06-10 15:00:00'),
+-- Exhibition 60: Cafe 40, Artwork 30 (Artist 8) - Ended 2025-05-31
+(40, 8, 60, 4, '꽃과 촛불이 카페의 로맨틱함을 더했습니다.', '2025-06-10 12:00:00'),
+(8, 40, 60, 5, '모던한 감성 공간에서 멋진 전시였습니다.', '2025-06-10 16:00:00'),
+-- Exhibition 61: Cafe 41, Artwork 31 (Artist 9) - Ended 2025-05-31
+(41, 9, 61, 5, '왕의 대관식, 장엄한 작품이 카페를 압도했어요.', '2025-06-11 10:00:00'),
+(9, 41, 61, 4, '미니멀리즘 공간과 대조가 인상적이었습니다.', '2025-06-11 14:00:00'),
+-- Exhibition 62: Cafe 42, Artwork 32 (Artist 9) - Ended 2025-05-31
+(42, 9, 62, 4, '역사적 회담 작품이 카페의 품격을 높였어요.', '2025-06-11 11:00:00'),
+(9, 42, 62, 5, '미니멀 아트 공간에서 작품이 돋보였습니다.', '2025-06-11 15:00:00'),
+-- Exhibition 63: Cafe 43, Artwork 33 (Artist 9) - Ended 2025-05-31
+(43, 9, 63, 5, '전투의 서막, 손님들이 긴장감을 느꼈다고 해요.', '2025-06-11 12:00:00'),
+(9, 43, 63, 4, '모던한 감성과 잘 어울렸습니다.', '2025-06-11 16:00:00'),
+-- Exhibition 64: Cafe 44, Artwork 34 (Artist 9) - Ended 2025-05-31
+(44, 9, 64, 4, '평화 조약 작품이 카페에 평화로움을 줬어요.', '2025-06-12 10:00:00'),
+(9, 44, 64, 5, '인더스트리얼 스타일 공간이 좋았습니다.', '2025-06-12 14:00:00'),
+-- Exhibition 65: Cafe 45, Artwork 35 (Artist 9) - Ended 2025-05-31
+(45, 9, 65, 5, '건국의 선언, 역사적 순간을 느낄 수 있었어요.', '2025-06-12 11:00:00'),
+(9, 45, 65, 5, '복고풍 카페와 완벽한 매치였습니다.', '2025-06-12 15:00:00'),
+-- Exhibition 66: Cafe 46, Artwork 36 (Artist 9) - Ended 2025-05-31
+(46, 9, 66, 4, '왕의 행차가 화려하고 인상 깊었습니다.', '2025-06-12 12:00:00'),
+(9, 46, 66, 4, '인더스트리얼 스타일과 흥미로운 조합이었습니다.', '2025-06-12 16:00:00'),
+-- Exhibition 67: Cafe 47, Artwork 37 (Artist 9) - Ended 2025-05-31
+(47, 9, 67, 5, '역사의 전환점, 손님들이 깊이 감상했어요.', '2025-06-13 10:00:00'),
+(9, 47, 67, 5, '거친 질감의 공간에서 작품이 빛났습니다.', '2025-06-13 14:00:00'),
+-- Exhibition 68: Cafe 48, Artwork 38 (Artist 9) - Ended 2025-05-31
+(48, 9, 68, 4, '영웅의 귀환이 카페에 영웅적 분위기를 만들었어요.', '2025-06-13 11:00:00'),
+(9, 48, 68, 5, '북유럽 스타일과 잘 어울렸습니다.', '2025-06-13 15:00:00'),
+-- Exhibition 69: Cafe 49, Artwork 39 (Artist 9) - Ended 2025-05-31
+(49, 9, 69, 5, '왕실의 연회, 화려한 작품이 카페를 빛냈습니다.', '2025-06-13 12:00:00'),
+(9, 49, 69, 4, '현대적 추상화 공간에서 좋은 대조를 이뤘습니다.', '2025-06-13 16:00:00');
 
 -- Chat Rooms
 INSERT INTO chat_room (id, created_at, updated_at) VALUES
@@ -1067,7 +1329,7 @@ INSERT INTO chat_room_member (user_id, chat_room_id, last_read_at) VALUES (9, 20
 -- Messages
 -- Room 1: Artist 6 (ArtistUser1) and CafeOwner 11 (CafeOwner1)
 INSERT INTO message (user_id, chat_room_id, content, message_type, is_read, created_at, exhibition_id) VALUES
-(6, 1, '사장님, 안녕하세요. ArtistUser1입니다. 제안서 하나 보냅니다. 검토 부탁드립니다.', 'TEXT', true, '2025-09-15 14:30:00', 1),
+(6, 1, '사장님, 안녕하세요. 제안서 하나 보냅니다 검토 부탁드립니다.', 'TEXT', true, '2025-09-15 14:30:00', null),
 (11, 1, '작가님, 안녕하세요. 제안서 잘 받았습니다. 긍정적으로 검토해보겠습니다.', 'TEXT', true, '2025-09-15 16:00:00', null),
 (11, 1, '작품 실물을 한번 보고 싶은데, 언제가 괜찮으신가요?', 'TEXT', true, '2025-09-16 10:00:00', null),
 (6, 1, '네, 좋습니다. 저는 내일 오후 3시 이후로는 다 괜찮습니다.', 'TEXT', true, '2025-09-16 10:05:00', null),
