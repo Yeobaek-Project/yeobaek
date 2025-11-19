@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ssafy.yeobaeg.ui.theme.YeobaegBlack
 import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
@@ -27,7 +26,8 @@ import com.ssafy.yeobaeg.ui.theme.jansilFont
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun YeobaegTopAppBar(
-    title: String,
+    title: String? = null,
+    titleIcon: Int? = null,
     onBackClick: () -> Unit,
     showBackButton: Boolean = true,
     @DrawableRes actionIcon: Int? = null,
@@ -37,12 +37,21 @@ fun YeobaegTopAppBar(
     androidx.compose.foundation.layout.Column {
         TopAppBar(
             title = {
-                Text(
-                    text = title,
-                    fontFamily = jansilFont,
-                    fontWeight = FontWeight.Medium,
-                    color = YeobaegBlack
-                )
+                if (titleIcon != null) {
+                    Icon(
+                        painter = painterResource(id = titleIcon),
+                        contentDescription = null,
+                        modifier = Modifier.size(70.dp),
+                        tint = Color.Unspecified
+                    )
+                } else if (title != null) {
+                    Text(
+                        text = title,
+                        fontFamily = jansilFont,
+                        fontWeight = FontWeight.Medium,
+                        color = YeobaegBlack
+                    )
+                }
             },
             navigationIcon = {
                 if (showBackButton) {
@@ -78,10 +87,4 @@ fun YeobaegTopAppBar(
             thickness = 0.5.dp
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppBarPreview() {
-    YeobaegTopAppBar("프로필", {}, true)
 }
