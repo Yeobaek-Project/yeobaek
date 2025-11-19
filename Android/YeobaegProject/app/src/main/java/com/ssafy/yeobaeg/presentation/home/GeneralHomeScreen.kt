@@ -47,9 +47,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.ssafy.yeobaeg.R
 import com.ssafy.yeobaeg.domain.model.SlotStatus
 import com.ssafy.yeobaeg.domain.model.art.PopularArtwork
 import com.ssafy.yeobaeg.domain.model.cafe.CafeSummary
+import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import com.ssafy.yeobaeg.ui.theme.YeobaegBackground
 import com.ssafy.yeobaeg.ui.theme.YeobaegIndicatorGray
 import com.ssafy.yeobaeg.ui.theme.YeobaegLightBrown
@@ -83,14 +85,18 @@ fun GeneralHomeScreen(
 ) {
     Scaffold(
         topBar = {
-            GeneralHomeTopBar()
-        },
+            YeobaegTopAppBar(
+                title = null,
+                titleIcon = R.drawable.logo_title,
+                onBackClick = {},
+                showBackButton = false
+            )        },
         containerColor = YeobaegWhite
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(top=paddingValues.calculateTopPadding())
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
