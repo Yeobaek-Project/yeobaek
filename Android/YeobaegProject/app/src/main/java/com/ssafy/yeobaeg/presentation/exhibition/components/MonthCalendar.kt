@@ -20,6 +20,7 @@ import com.ssafy.yeobaeg.domain.model.ArtworkCategory
 import com.ssafy.yeobaeg.domain.model.exhibition.ArtworkSummary
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionSchedule
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionState
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -52,11 +53,7 @@ fun MonthCalendar(
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
-                    color = when (day) {
-                        "일" -> Color.Red
-                        "토" -> Color.Blue
-                        else -> Color.Gray
-                    }
+                    color = YeobaegBrown
                 )
             }
         }

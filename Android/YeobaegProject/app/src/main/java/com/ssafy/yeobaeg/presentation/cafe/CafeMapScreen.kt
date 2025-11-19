@@ -46,6 +46,8 @@ import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
 import androidx.core.graphics.createBitmap
 import com.ssafy.yeobaeg.presentation.cafe.components.CafeFilterDialog
 import com.ssafy.yeobaeg.presentation.cafe.components.CafeListBottomSheetContent
+import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
+import com.ssafy.yeobaeg.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +60,7 @@ fun CafeMapScreen(
     // 바텀 시트 상태
     val bottomSheetState = rememberStandardBottomSheetState(
         initialValue = SheetValue.PartiallyExpanded,
-        skipHiddenState = true  // Hidden 상태를 건너뛰어 항상 화면에 표시
+        skipHiddenState = true
     )
     val scaffoldState = rememberBottomSheetScaffoldState(
         bottomSheetState = bottomSheetState
@@ -83,104 +85,124 @@ fun CafeMapScreen(
         )
     }
 
-    BottomSheetScaffold(
-        scaffoldState = scaffoldState,
-        sheetContent = {
-            CafeListBottomSheetContent(
-                cafes = uiState.cafes,
-                onCafeClick = { cafeId ->
-                    viewModel.onCafeListItemClick(cafeId)
-                    // 바텀시트를 PartiallyExpanded 상태로 내리기
-                    coroutineScope.launch {
-                        bottomSheetState.partialExpand()
-                    }
-                }
+    Scaffold(
+        topBar = {
+            YeobaegTopAppBar(
+                title = "카페 찾기",
+                onBackClick = {},
+                showBackButton = false,
+                actionIcon = if (uiState.userRole == UserRole.ARTIST) {
+                    R.drawable.ic_filter
+                } else null,
+                iconTint = YeobaegDarkBrown,
+                onActionClick = if (uiState.userRole == UserRole.ARTIST) {
+                    { viewModel.toggleFilterDialog() }
+                } else null
             )
-        },
-        sheetPeekHeight = 56.dp,
-        sheetSwipeEnabled = true,
-        sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
-        sheetContainerColor = Color.White
+        }
     ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            // 지도 (전체 화면)
-            GoogleMapView(
-                cafes = uiState.cafes,
-                currentLocation = uiState.currentLocation,
-                cameraPosition = uiState.cameraPosition,
-                currentZoomLevel = uiState.currentZoomLevel,
-                selectedCafeId = uiState.selectedCafeId,
-                shouldAnimateCamera = uiState.shouldAnimateCamera,
-                onCameraPositionChanged = viewModel::onCameraPositionChanged,
-                onCameraAnimationCompleted = viewModel::onCameraAnimationCompleted,
-                onCafeInfoWindowClick = { viewModel.navigateToCafeDetail(it) }
-            )
-
-            // 검색 바 (지도 위에 배치)
-            CafeSearchBar(
-                searchKeyword = uiState.searchKeyword,
-                onSearchKeywordChanged = viewModel::onSearchKeywordChanged,
-                onSearch = {
-                    viewModel.onSearch()
-                    coroutineScope.launch {
-                        bottomSheetState.expand()
-                    }
-                },
-                showFilterButton = uiState.userRole == UserRole.ARTIST,
-                onFilterClick = viewModel::toggleFilterDialog,
-                isFilterActive = uiState.filter.isActive(),
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
-
-            // 현재 위치로 이동 버튼
-            FloatingActionButton(
-                onClick = { viewModel.loadCurrentLocation() },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-                    .padding(bottom = 72.dp),
-                containerColor = Color.White,
-                elevation = FloatingActionButtonDefaults.elevation(
-                    defaultElevation = 4.dp,
-                    pressedElevation = 8.dp
-                ),
-                shape = CircleShape
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MyLocation,
-                    contentDescription = "현재 위치",
-                    tint = YeobaegDarkBrown
-                )
-            }
-
-            if (uiState.isFilterDialogVisible) {
-                CafeFilterDialog(
-                    currentFilter = uiState.filter,
-                    onDismiss = viewModel::toggleFilterDialog,
-                    onApply = viewModel::applyFilter,
-                    onClear = viewModel::clearFilter
-                )
-            }
-
-            if (uiState.isInitialLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            uiState.error?.let { error ->
-                Snackbar(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp)
-                        .padding(bottom = 200.dp),
-                    action = {
-                        TextButton(onClick = viewModel::clearError) {
-                            Text("확인")
+        BottomSheetScaffold(
+            scaffoldState = scaffoldState,
+            sheetContent = {
+                CafeListBottomSheetContent(
+                    cafes = uiState.cafes,
+                    onCafeClick = { cafeId ->
+                        viewModel.onCafeListItemClick(cafeId)
+                        coroutineScope.launch {
+                            bottomSheetState.partialExpand()
                         }
                     }
+                )
+            },
+            sheetPeekHeight = 56.dp,
+            sheetSwipeEnabled = true,
+            sheetShape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+            sheetContainerColor = Color.White
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                // 지도
+                GoogleMapView(
+                    cafes = uiState.cafes,
+                    currentLocation = uiState.currentLocation,
+                    cameraPosition = uiState.cameraPosition,
+                    currentZoomLevel = uiState.currentZoomLevel,
+                    selectedCafeId = uiState.selectedCafeId,
+                    shouldAnimateCamera = uiState.shouldAnimateCamera,
+                    onCameraPositionChanged = viewModel::onCameraPositionChanged,
+                    onCameraAnimationCompleted = viewModel::onCameraAnimationCompleted,
+                    onCafeInfoWindowClick = { viewModel.navigateToCafeDetail(it) }
+                )
+
+                // 검색 바 (지도 위에 배치)
+                CafeSearchBar(
+                    searchKeyword = uiState.searchKeyword,
+                    onSearchKeywordChanged = viewModel::onSearchKeywordChanged,
+                    onSearch = {
+                        viewModel.onSearch()
+                        coroutineScope.launch {
+                            bottomSheetState.expand()
+                        }
+                    },
+                    showFilterButton = uiState.userRole == UserRole.ARTIST,
+                    onFilterClick = viewModel::toggleFilterDialog,
+                    isFilterActive = uiState.filter.isActive(),
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+
+                // 현재 위치로 이동 버튼
+                FloatingActionButton(
+                    onClick = { viewModel.loadCurrentLocation() },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                        .padding(bottom = 72.dp),
+                    containerColor = Color.White,
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 4.dp,
+                        pressedElevation = 8.dp
+                    ),
+                    shape = CircleShape
                 ) {
-                    Text(error)
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "현재 위치",
+                        tint = YeobaegDarkBrown
+                    )
+                }
+
+                if (uiState.isFilterDialogVisible) {
+                    CafeFilterDialog(
+                        currentFilter = uiState.filter,
+                        onDismiss = viewModel::toggleFilterDialog,
+                        onApply = viewModel::applyFilter,
+                        onClear = viewModel::clearFilter
+                    )
+                }
+
+                if (uiState.isInitialLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+
+                uiState.error?.let { error ->
+                    Snackbar(
+                        modifier = Modifier
+                            .align(Alignment.BottomCenter)
+                            .padding(16.dp)
+                            .padding(bottom = 200.dp),
+                        action = {
+                            TextButton(onClick = viewModel::clearError) {
+                                Text("확인")
+                            }
+                        }
+                    ) {
+                        Text(error)
+                    }
                 }
             }
         }
@@ -215,12 +237,6 @@ fun CafeSearchBar(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "카페 찾기",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = YeobaegDarkBrown
-                )
 
                 if (showFilterButton) {
                     Surface(
@@ -230,7 +246,10 @@ fun CafeSearchBar(
                         color = if (isFilterActive) YeobaegDarkBrown else Color(0xFFF5F5F5),
                         shadowElevation = if (isFilterActive) 4.dp else 0.dp
                     ) {
-                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
                             Icon(
                                 imageVector = Icons.Default.FilterList,
                                 contentDescription = "필터",
@@ -400,8 +419,11 @@ fun GoogleMapView(
                 // 클러스터 마커: 임시 객체이므로 자체 MarkerState를 생성해서 사용
                 val count = cluster.cafes.size
                 val clusterIcon = markerIconCache.getOrPut(count) {
-                    try { createClusterMarkerIcon(count) }
-                    catch (_: Exception) { BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE) }
+                    try {
+                        createClusterMarkerIcon(count)
+                    } catch (_: Exception) {
+                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)
+                    }
                 }
 
                 Marker(
@@ -496,7 +518,10 @@ fun CafeInfoWindow(
                     )
                 }
 
-                Surface(shape = RoundedCornerShape(6.dp), color = YeobaegDarkBrown.copy(alpha = 0.1f)) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = YeobaegDarkBrown.copy(alpha = 0.1f)
+                ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -574,7 +599,7 @@ fun clusterCafes(
     val clusterDistance = when {
         zoomLevel >= 13f -> 0.01  // ~1km
         zoomLevel >= 11f -> 0.05  // ~5km
-        zoomLevel >= 9f  -> 0.1   // ~10km
+        zoomLevel >= 9f -> 0.1   // ~10km
         else -> 0.2               // ~20km
     }
 

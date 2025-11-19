@@ -48,8 +48,8 @@ import com.ssafy.yeobaeg.ui.theme.YeobaegLightYellow
 @Composable
 fun StatusChip(status: SlotStatus) {
     val (bg, fg, label) = when (status) {
-        SlotStatus.AVAILABLE -> Triple(YeobaegLightGreen, YeobaegDarkGreen, "전시 가능")
-        SlotStatus.EXHIBITING -> Triple(YeobaegLightBlue, YeobaegDarkBlue, "전시 중")
+        SlotStatus.EXHIBITING -> Triple(YeobaegLightGreen, YeobaegDarkGreen, "전시 중")
+        SlotStatus.AVAILABLE -> Triple(YeobaegLightBlue, YeobaegDarkBlue, "전시 가능")
         else -> Triple(YeobaegLightGray, YeobaegDarkGray, "전시 불가능")
     }
     Box(

@@ -25,6 +25,8 @@ import com.ssafy.yeobaeg.domain.model.ArtworkCategory
 import com.ssafy.yeobaeg.domain.model.exhibition.ArtworkSummary
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionSchedule
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionState
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
+import com.ssafy.yeobaeg.ui.theme.YeobaegWhite
 import java.time.LocalDate
 
 @Composable
@@ -49,8 +51,8 @@ fun CalendarDayCell(
     val hasExhibition = exhibitionsOnDate.isNotEmpty()
     val backgroundColor = when {
         !isInRange -> Color.Transparent
-        isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-        hasExhibition -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+        isSelected -> YeobaegBrown.copy(alpha = 0.2f)
+        hasExhibition -> YeobaegBrown.copy(alpha = 0.3f)
         else -> Color.Transparent
     }
 
@@ -62,7 +64,7 @@ fun CalendarDayCell(
             .background(backgroundColor)
             .border(
                 width = if (isSelected) 2.dp else 0.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                color = if (isSelected) YeobaegBrown else Color.Transparent,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable(enabled = hasExhibition && isInRange) {
@@ -81,8 +83,6 @@ fun CalendarDayCell(
                 color = when {
                     !isInRange -> Color.LightGray.copy(alpha = 0.3f)
                     !hasExhibition -> Color.LightGray
-                    date.dayOfWeek == java.time.DayOfWeek.SUNDAY -> Color.Red
-                    date.dayOfWeek == java.time.DayOfWeek.SATURDAY -> Color.Blue
                     else -> Color.Black
                 }
             )
@@ -94,8 +94,7 @@ fun CalendarDayCell(
                         .clip(RoundedCornerShape(2.dp))
                         .background(
                             when (exhibitionsOnDate.first().exhibitionState) {
-                                ExhibitionState.ONGOING -> Color(0xFF4CAF50)
-                                ExhibitionState.SCHEDULED -> Color(0xFF2196F3)
+                                ExhibitionState.SCHEDULED, ExhibitionState.ONGOING -> YeobaegWhite
                                 ExhibitionState.COMPLETED -> Color.Gray
                             }
                         )

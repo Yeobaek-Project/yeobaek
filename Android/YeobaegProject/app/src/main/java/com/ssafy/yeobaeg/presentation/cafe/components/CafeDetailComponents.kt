@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.presentation.cafe.CafeDetailTab
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegWhite
 
@@ -116,7 +117,7 @@ fun CafeBasicInfo(
             items(categories) { category ->
                 Surface(
                     shape = RoundedCornerShape(16.dp),
-                    color = Color(0xFFFFF59D)
+                    color = YeobaegBrown.copy(0.1f)
                 ) {
                     Text(
                         text = category,

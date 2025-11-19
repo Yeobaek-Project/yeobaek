@@ -20,6 +20,7 @@ import coil.compose.AsyncImage
 import com.ssafy.yeobaeg.R
 import com.ssafy.yeobaeg.domain.model.DisplaySlot
 import com.ssafy.yeobaeg.domain.model.SlotStatus
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 
 @Composable
 fun ExhibitionSlotSectionHeader(slotCount: Int) {
@@ -147,8 +148,8 @@ private fun BoxScope.StatusBadge(status: SlotStatus) {
     Surface(
         shape = RoundedCornerShape(bottomEnd = 8.dp),
         color = when (status) {
-            SlotStatus.AVAILABLE -> Color(0xFF4CAF50)
-            SlotStatus.EXHIBITING -> Color(0xFFFFC107)
+            SlotStatus.AVAILABLE -> Color(0xFF2196F3)
+            SlotStatus.EXHIBITING -> Color(0xFF4CAF50)
             SlotStatus.RESERVED -> Color(0xFF2196F3)
             SlotStatus.UNAVAILABLE -> Color(0xFF9E9E9E)
         },
@@ -301,16 +302,10 @@ private fun CommissionBadge(commission: Float) {
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Percent,
-                contentDescription = null,
-                tint = Color(0xFFFF6F00),
-                modifier = Modifier.size(14.dp)
-            )
             Text(
                 text = "수수료 ${commission.toInt()}%",
                 style = MaterialTheme.typography.labelMedium,
-                color = Color(0xFFFF6F00),
+                color = YeobaegBrown,
                 fontWeight = FontWeight.Bold
             )
         }

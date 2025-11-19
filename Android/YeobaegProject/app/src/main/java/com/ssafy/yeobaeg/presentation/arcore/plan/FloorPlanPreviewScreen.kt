@@ -397,8 +397,8 @@ private fun pointToSegmentDistance(p: Offset, a: Offset, b: Offset): Float {
 private fun wallColor(status: SlotStatus): Color {
     return when (status) {
         SlotStatus.UNAVAILABLE -> Color(0xFFCBD5E1)
-        SlotStatus.AVAILABLE -> Color(0xFF10B981)
-        SlotStatus.EXHIBITING -> Color(0xFFFFC107)
+        SlotStatus.AVAILABLE -> Color(0xFF22D3EE).copy(alpha = 0.3f)
+        SlotStatus.EXHIBITING -> Color(0xFF10B981).copy(alpha = 0.3f)
         SlotStatus.RESERVED -> Color(0xFF684352)
     }
 }

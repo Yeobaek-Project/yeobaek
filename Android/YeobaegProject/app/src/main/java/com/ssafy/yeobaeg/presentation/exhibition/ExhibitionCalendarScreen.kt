@@ -17,8 +17,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionSchedule
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.ssafy.yeobaeg.presentation.exhibition.components.ExhibitionListDialog
 import com.ssafy.yeobaeg.presentation.exhibition.components.MonthCalendar
 import com.ssafy.yeobaeg.ui.theme.YeobaegDarkBrown
@@ -290,18 +292,20 @@ private fun SlotInfoCard(
             // 요구사항
             if (requirements.isNotEmpty()) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Text(
                         text = "요구사항",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         color = Color(0xFF757575)
                     )
                     Text(
                         text = requirements,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color(0xFF212121)
+                        color = Color(0xFF212121),
+                        lineHeight = 20.sp  // 줄 간격 추가로 가독성 향상
                     )
                 }
             }
@@ -322,13 +326,13 @@ private fun InfoRow(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             color = Color(0xFF757575)
         )
         Text(
             text = value,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Medium,
             color = YeobaegDarkBrown
         )
     }

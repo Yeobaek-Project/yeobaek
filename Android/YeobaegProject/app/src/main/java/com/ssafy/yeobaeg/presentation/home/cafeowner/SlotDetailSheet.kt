@@ -41,6 +41,7 @@ import com.ssafy.yeobaeg.presentation.common.component.YeobaegOutlinedButton
 import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegLightBrown
 import com.ssafy.yeobaeg.ui.theme.YeobaegLightGray
+import com.ssafy.yeobaeg.ui.theme.YeobaegTextGray
 
 @Composable
 fun SlotDetailSheet(
@@ -160,10 +161,10 @@ private fun SlotDetailContent(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("현재 전시 중", color = YeobaegBrown, fontWeight = FontWeight.SemiBold)
+                Text("현재 전시 중", color = YeobaegBrown, fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 Text(exhibition.artTitle, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                Text("작가: ${exhibition.artist}", color = YeobaegBrown)
-                Text("종료일: ${exhibition.endDate}", color = YeobaegBrown)
+                Text("작가: ${exhibition.artist}", color = YeobaegTextGray)
+                Text("종료일: ${exhibition.endDate}", color = YeobaegTextGray)
             }
         }
 

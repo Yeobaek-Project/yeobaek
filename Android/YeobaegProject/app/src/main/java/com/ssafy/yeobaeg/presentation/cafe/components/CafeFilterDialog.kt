@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ssafy.yeobaeg.domain.model.cafe.CafeFilter
+import com.ssafy.yeobaeg.ui.theme.YeobaegBrown
 
 @Composable
 fun CafeFilterDialog(
@@ -89,7 +90,7 @@ fun CafeFilterDialog(
                             text = "${commissionRange.start.toInt()}% - ${commissionRange.endInclusive.toInt()}%",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF8D6E63)
+                            color = YeobaegBrown
                         )
                     }
 
@@ -104,8 +105,8 @@ fun CafeFilterDialog(
                             valueRange = 0f..15f,
                             steps = 14,
                             colors = SliderDefaults.colors(
-                                thumbColor = Color(0xFF8D6E63),
-                                activeTrackColor = Color(0xFF8D6E63),
+                                thumbColor = YeobaegBrown,
+                                activeTrackColor = YeobaegBrown,
                                 inactiveTrackColor = Color(0xFFE0E0E0)
                             )
                         )
@@ -144,9 +145,9 @@ fun CafeFilterDialog(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF8D6E63)
+                        contentColor = YeobaegBrown
                     ),
-                    border = BorderStroke(1.dp, Color(0xFF8D6E63))
+                    border = BorderStroke(1.dp, YeobaegBrown)
                 ) {
                     Text("초기화")
                 }
@@ -165,7 +166,7 @@ fun CafeFilterDialog(
                     },
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF8D6E63)
+                        containerColor =YeobaegBrown
                     )
                 ) {
                     Text("적용하기")
