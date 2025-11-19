@@ -426,6 +426,20 @@ public class ChatServiceImpl implements ChatService {
                 .exhibition(exhibition)
                 .content(messageContent)
                 .build();
+
+        // 발신자가 있는 경우에만 상대방의 접속 여부를 확인하여 isRead 설정
+        if (sender != null) {
+            User recipient = chatRoom.getMembers().stream()
+                    .map(ChatRoomMember::getUser)
+                    .filter(user -> !user.getId().equals(sender.getId()))
+                    .findFirst()
+                    .orElseThrow(() -> new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND));
+            boolean isPresent = chatPresenceService.isUserPresent(chatRoomId, recipient.getId());
+            message.setIsRead(isPresent);
+        } else {
+            // 발신자가 없는 시스템 메시지(브로드캐스트)는 기본적으로 읽지 않은 상태로 생성
+            message.setIsRead(false);
+        }
         messageRepository.save(message);
         log.info("시스템 메시지 DB 저장 완료 - 메시지 ID: {}", message.getId());
 
