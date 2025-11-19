@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -148,12 +150,15 @@ fun ChatListItem(chat: ChatRoomInfo, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = chat.partnerImageUrl ?: R.drawable.profile,
+            model = chat.partnerImageUrl,
             contentDescription = null,
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape)
-                .border(1.dp, YeobaegLightGray, CircleShape)
+                .border(1.dp, YeobaegLightGray, CircleShape),
+            contentScale = ContentScale.Crop,
+            fallback = painterResource(R.drawable.profile),
+
         )
         Spacer(modifier = Modifier.width(12.dp))
 
@@ -198,6 +203,7 @@ fun ChatListItem(chat: ChatRoomInfo, onClick: () -> Unit) {
                 Box(
                     modifier = Modifier
                         .size(24.dp)
+                        .clip(CircleShape)
                         .background(YeobaegBrown, shape = CircleShape),
                     contentAlignment = Alignment.Center
                 ) {

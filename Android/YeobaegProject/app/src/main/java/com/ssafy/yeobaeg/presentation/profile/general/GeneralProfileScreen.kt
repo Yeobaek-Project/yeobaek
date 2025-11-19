@@ -135,26 +135,16 @@ fun ProfileSection(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // 프로필 이미지
-        if (userInfo.profileImageUrl != null) {
-            AsyncImage(
-                model = userInfo.profileImageUrl,
-                contentDescription = "프로필 이미지",
-                modifier = Modifier
-                    .size(100.dp)
-                    .clip(RoundedCornerShape(50.dp)),
-                contentScale = ContentScale.Crop,
-                placeholder = painterResource(R.drawable.profile),
-                error = painterResource(R.drawable.profile)
-            )
-        } else {
-            Image(
-                painter = painterResource(id = R.drawable.profile),
-                contentDescription = "프로필 이미지",
-                modifier = Modifier.size(100.dp)
-            )
-        }
-
+        AsyncImage(
+            model = userInfo.profileImageUrl,
+            contentDescription = "프로필 이미지",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(50.dp)),
+            contentScale = ContentScale.Crop,
+            fallback = painterResource(R.drawable.profile),
+            error = painterResource(R.drawable.profile)
+        )
         Spacer(modifier = Modifier.width(16.dp))
 
         // Name and Email

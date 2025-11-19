@@ -162,7 +162,8 @@ fun ProfileHeader(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(CircleShape)
-                    .border(1.dp, YeobaegLightGray, CircleShape)
+                    .border(1.dp, YeobaegLightGray, CircleShape),
+                fallback = painterResource(R.drawable.profile)
             )
 
             Spacer(Modifier.height(8.dp))

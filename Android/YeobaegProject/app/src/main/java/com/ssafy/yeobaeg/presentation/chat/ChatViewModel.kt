@@ -205,17 +205,7 @@ class ChatViewModel @Inject constructor(
                         errorMessage = null
                     )
                 }
-                val systemMsg = result.messages.firstOrNull { msg ->
-                    msg.messageType == MessageType.STARTED || msg.messageType == MessageType.ENDED
-                }
-
-                systemMsg?.let { msg ->
-                    val id = msg.exhibitionId ?: msg.exhibition?.exhibitionId
-                    if (id != null) {
-                        Log.d(TAG, "📌 채팅방 입장 시 전시 상세 조회 호출: exhibitionId=$id")
-                        loadExhibitionInfo(id)   // ← 여기서 API 호출!
-                    }
-                }
+                detectAndLoadExhibitionInfo(result.messages)
             }
             .onFailure { e ->
                 Log.e(TAG, "loadChatMessages failed: ${e.message}", e)
@@ -258,6 +248,7 @@ class ChatViewModel @Inject constructor(
                         errorMessage = null
                     )
                 }
+                detectAndLoadExhibitionInfo(result.messages)
             }
             .onFailure { e ->
                 Log.e(TAG, "loadMoreMessages failed: ${e.message}", e)
@@ -456,6 +447,25 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+
+    private fun detectAndLoadExhibitionInfo(messages: List<ChatMessage>) {
+
+        val systemMsg = messages
+            .filter { it.messageType == MessageType.STARTED || it.messageType == MessageType.ENDED }
+            .maxByOrNull { it.createdAt }
+
+        systemMsg?.let { msg ->
+
+            val exhibitionId = msg.exhibitionId ?: msg.exhibition?.exhibitionId
+
+            if (exhibitionId != null) {
+                Log.d(TAG, "📌 시스템 메시지 발견 → 전시 정보 조회: $exhibitionId")
+                loadExhibitionInfo(exhibitionId)
+            } else {
+                Log.d(TAG, "⚠ 시스템 메시지 발견했지만 exhibitionId 없음")
+            }
+        }
+    }
 
     fun navigateToChatRoom(chatRoomId: Long) = viewModelScope.launch {
         navigator.navigate(FullScreen.ChattingScreen(chatRoomId))

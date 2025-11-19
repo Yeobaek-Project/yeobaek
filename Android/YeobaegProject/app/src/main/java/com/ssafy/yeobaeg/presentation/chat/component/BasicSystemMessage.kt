@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,8 +57,9 @@ fun BasicSystemMessage(
                 Text(
                     text = textHeader,
                     fontFamily = jansilFont,
-                    fontSize = 16.sp,
-                    color = YeobaegBlack
+                    fontSize = 18.sp,
+                    color = YeobaegBlack,
+                    fontWeight = FontWeight.Bold
                 )
 
                 val textBody = when (message.messageType) {
@@ -75,7 +77,7 @@ fun BasicSystemMessage(
                 Text(
                     text = textBody,
                     fontFamily = jansilFont,
-                    fontSize = 14.sp,
+                    fontSize = 16.sp,
                     color = YeobaegBlack
                 )
 

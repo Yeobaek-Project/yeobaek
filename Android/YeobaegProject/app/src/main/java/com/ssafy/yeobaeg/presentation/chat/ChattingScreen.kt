@@ -1,6 +1,7 @@
 package com.ssafy.yeobaeg.presentation.chat
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -74,6 +75,7 @@ import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
 import com.ssafy.yeobaeg.domain.model.chat.MessageType
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionInfo
 import com.ssafy.yeobaeg.presentation.chat.component.BasicSystemMessage
+import com.ssafy.yeobaeg.presentation.chat.component.ExhibitionMessage
 import com.ssafy.yeobaeg.presentation.common.component.SnackbarType
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegSnackbarHost
 import com.ssafy.yeobaeg.presentation.common.component.YeobaegTopAppBar
@@ -393,24 +395,22 @@ fun ChattingScreenContent(
 
                             MessageType.STARTED -> {
                                 val info = exhibitionInfo
-
-                                ExhibitionEndedMessage(
+                                ExhibitionMessage(
                                     type = "STARTED",
                                     info = info,
-                                    onReviewClick = { onReviewClickShow() },
+                                    onReviewClick = {}
                                 )
                             }
 
                             MessageType.ENDED -> {
                                 val info = exhibitionInfo
-                                ExhibitionEndedMessage(
+                                Log.d(TAG, "ChattingScreenContent: $info")
+                                ExhibitionMessage(
                                     type = "ENDED",
                                     info = info,
-                                    onReviewClick = { onReviewClickShow() },
+                                    onReviewClick = { onReviewClickShow() }
                                 )
                             }
-
-
                             // 서버가 추가 타입 보내도 UI 깨지지 않도록
                             else -> {
                                 Text("지원하지 않는 메시지 타입: ${msg.messageType}")
@@ -423,6 +423,7 @@ fun ChattingScreenContent(
     }
 }
 
+//상대방 메시지
 @Composable
 fun PartnerMessageBubble(message: ChatMessage, profileImg: String?) {
     Row(
@@ -436,7 +437,8 @@ fun PartnerMessageBubble(message: ChatMessage, profileImg: String?) {
             modifier = Modifier
                 .size(40.dp)
                 .border(0.5.dp, YeobaegLightGray, CircleShape)
-                .clip(CircleShape)
+                .clip(CircleShape),
+            fallback = painterResource(R.drawable.profile)
         )
         Spacer(modifier = Modifier.width(8.dp))
         Column(
@@ -493,7 +495,8 @@ fun ImageMessageBubble(
                 modifier = Modifier
                     .size(40.dp)
                     .border(0.5.dp, YeobaegLightGray, CircleShape)
-                    .clip(CircleShape)
+                    .clip(CircleShape),
+                fallback = painterResource(R.drawable.profile)
             )
             Spacer(modifier = Modifier.width(8.dp))
         }
@@ -659,67 +662,6 @@ fun ProposalMessageBubble(
         }
     }
 }
-
-@Composable
-fun MatchingStatusMessageBubble(
-    message: ChatMessage,
-    partnerName: String,
-    myId: Long?
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = YeobaegWhite,
-        shadowElevation = 1.dp,
-        border = BorderStroke(1.dp, YeobaegLightGray.copy(alpha = 0.5f))
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-
-            Text(
-                text = "매칭 상태 알림",
-                fontFamily = jansilFont,
-                fontSize = 16.sp,
-                color = YeobaegBlack
-            )
-
-            val isMy = message.senderId == myId
-
-            val textBody = when (message.messageType) {
-                MessageType.AGREED ->
-                    "매칭이 수락되었습니다!"
-
-
-                MessageType.REJECTED ->
-                    if (isMy) "${partnerName}님의 제안을 거절했습니다."
-                    else "당신의 제안이 거절되었습니다."
-
-                MessageType.CANCELLED ->
-                    "전시가 취소되었습니다."
-
-                else -> ""
-            }
-
-            Text(
-                text = textBody,
-                fontFamily = jansilFont,
-                fontSize = 14.sp,
-                color = YeobaegBlack
-            )
-
-            Text(
-                text = DateFormatter.toTimeAgo(message.createdAt),
-                color = YeobaegTextGray,
-                fontSize = 11.sp
-            )
-        }
-    }
-}
-
 
 @Composable
 fun MyMessageBubble(message: ChatMessage) {
@@ -890,11 +832,11 @@ fun ChatInputBar(
                     horizontalAlignment = Alignment.Start,
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    DialogOption("사진", Color(0xFFE3F2FD)) {
+                    DialogOption("사진", Color(0xFF033D69), R.drawable.ic_photo) {
                         showDialog = false
                         onImageClick()
                     }
-                    DialogOption("매칭 요청", Color(0xFFFFF8E1)) {
+                    DialogOption("매칭 요청", Color(0xFFE7A630), R.drawable.hallway_24px) {
                         showDialog = false
                         onMatchingClick()
                     }
@@ -908,191 +850,39 @@ fun ChatInputBar(
 
 // 사진, 매칭 버튼
 @Composable
-fun DialogOption(text: String, color: Color, onClick: () -> Unit) {
+fun DialogOption(text: String, color: Color, icon: Int, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
             .clickable { onClick() }
-            .background(color.copy(alpha = 0.4f))
             .padding(vertical = 10.dp, horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, fontSize = 16.sp, color = YeobaegBlack, fontFamily = jansilFont)
-    }
-}
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
-@Composable
-fun ExhibitionEndedMessage(
-    type: String,
-    info: ExhibitionInfo,
-    onReviewClick: () -> Unit
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
-//            .padding(vertical = 8.dp),
-        shape = RoundedCornerShape(16.dp),
-        shadowElevation = 1.dp,
-        color = Color.White
-    ) {
-        Column {
-            // 상단 베이지 바
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color(0xFFD2C1A5))
-                    .padding(15.dp)
-                    .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    .clip(RoundedCornerShape(30.dp))
+                    .background(color.copy(alpha = 0.4f))
+                    .padding(vertical = 5.dp, horizontal = 5.dp),
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_end), // 종료 아이콘
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(22.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = when (type) {
-                            "STARTED" -> "전시 시작"
-                            "ENDED" -> "전시 종료"
-                            else -> {
-                                ""
-                            }
-                        },
-                        fontFamily = jansilFont,
-                        fontSize = 15.sp,
-                        color = Color.White
-                    )
-
-                }
-            }
-            Column(
-                modifier = Modifier.padding(15.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
-            ) {
-
-
-                // 작가
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_profile),
-                        contentDescription = null,
-                        tint = YeobaegBlack,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "작가: ${info.artwork.artistName}",
-                        fontFamily = jansilFont,
-                        fontSize = 14.sp,
-                        color = YeobaegBlack
-                    )
-                }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_profile),
-                        contentDescription = null,
-                        tint = YeobaegBlack,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "카페: ${info.cafe.cafeName}",
-                        fontFamily = jansilFont,
-                        fontSize = 14.sp,
-                        color = YeobaegBlack
-                    )
-                }
-                // 벽
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_pin),
-                        contentDescription = null,
-                        tint = YeobaegBlack,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "전시 공간: ${info.slot.wallName}",
-                        fontFamily = jansilFont,
-                        fontSize = 14.sp,
-                        color = YeobaegBlack
-                    )
-                }
-
-                // 기간
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_cal),
-                        contentDescription = null,
-                        tint = YeobaegBlack,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = "기간: ${info.startDate} - ${info.endDate}",
-                        fontFamily = jansilFont,
-                        fontSize = 14.sp,
-                        color = YeobaegBlack
-                    )
-                }
-
-                // 리뷰하기 버튼
-                if (type == "ENDED") {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(46.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(Color(0xFF6A4E2F))
-                            .clickable { onReviewClick() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_star),
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(18.dp)
-                            )
-
-                            Spacer(Modifier.width(6.dp))
-
-                            Text(
-                                text = "리뷰하기",
-                                fontFamily = jansilFont,
-                                fontSize = 16.sp,
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
-                // 하단 문구
-                Text(
-                    text = when (type) {
-                        "STARTED" -> "전시가 시작되었습니다! ✨"
-                        "ENDED" -> "전시가 성공적으로 종료되었습니다.!"
-                        else -> {
-                            ""
-                        }
-                    },
-                    fontFamily = jansilFont,
-                    fontSize = 14.sp,
-                    color = YeobaegTextGray,
-                    modifier = Modifier.padding(top = 4.dp)
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = "버튼",
+                    tint = color,
+                    modifier = Modifier.size(20.dp)
                 )
             }
+            Spacer(Modifier.width(20.dp))
+            Text(text, fontSize = 19.sp, fontFamily = jansilFont)
 
         }
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
