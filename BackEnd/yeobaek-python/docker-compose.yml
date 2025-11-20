@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  yeobaek-recommender:
+    build: .
+    container_name: yeobaek-recommender
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # 모델 캐시 디렉토리를 볼륨으로 마운트 (재시작 시 재다운로드 방지)
+      - model-cache:/app/models
+    restart: unless-stopped
+    # 헬스체크 설정
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # 기존 yeobaek 네트워크에 연결
+    networks:
+      - yeobaek-network
+
+# 볼륨 정의
+volumes:
+  model-cache:
+    driver: local
+
+# 기존 네트워크 사용 (외부 네트워크로 지정)
+networks:
+  yeobaek-network:
+    external: true
+    name: yeobaek_yeobaek-network
