@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  yeobaek-app:
+    build: .
+    container_name: yeobaek-app
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./yeobaek.env
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - TZ=Asia/Seoul
+    depends_on:
+      - mysql
+      - redis
+    restart: unless-stopped
+    networks:
+      - yeobaek-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - yeobaek-network
+
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - yeobaek-network
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  yeobaek-network:
+    driver: bridge

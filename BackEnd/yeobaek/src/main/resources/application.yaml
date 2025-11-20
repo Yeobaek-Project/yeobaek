@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: yeobaek
+  config:
+    import: optional:file:yeobaek.env[.properties]
+  datasource:
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        use_sql_comments: true
+        dialect: com.ssafy.yeobaek.config.CustomMySQLDialect
+    open-in-view: false
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      s3:
+        bucket: ${AWS_S3_BUCKET}
+      region:
+        static: ${AWS_REGION:ap-northeast-2}
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+logging:
+  level:
+    com.ssafy.yeobaek: debug
+#    org.hibernate.SQL: debug
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 3600000    # 1시간 (밀리초)
+  refresh-token-expiration: 604800000 # 7일 (밀리초)
+
+vworld:
+  api:
+    key: ${GEOCODER_API_KEY}
+    search-type: parcel
+    epsg: epsg:4326
+    url: https://api.vworld.kr/req/address
+
+python:
+  server:
+    url: ${PYTHON_SERVER_URL}
+    timeout:
+      connect: 5000  # 5 seconds
+      read: 30000    # 30 seconds
+    retry:
+      max-attempts: 3
+
+firebase:
+  service-account-file: classpath:firebase/firebase-service-account.json
+  project-id: ${FIREBASE_PROJECT_ID}
+
+google:
+  cloud:
+    bigquery:
+      project-id: ${BIGQUERY_PROJECT_ID}
+      dataset-id: ${BIGQUERY_DATASET_ID}

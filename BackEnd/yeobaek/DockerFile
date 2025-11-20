@@ -1,0 +1,14 @@
+# Stage 1: build
+FROM gradle:8.7-jdk17-alpine AS build
+WORKDIR /src
+COPY build.gradle settings.gradle ./
+COPY src ./src
+RUN gradle --no-daemon clean bootJar
+
+# Stage 2: runtime
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+COPY --from=build /src/build/libs/*.jar app.jar
+RUN mkdir -p /app/secrets
+EXPOSE 8080
+ENTRYPOINT ["java","-XX:MaxRAMPercentage=75.0","-jar","/app/app.jar"]
