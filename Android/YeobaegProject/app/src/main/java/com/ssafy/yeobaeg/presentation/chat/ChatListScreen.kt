@@ -46,8 +46,8 @@ fun ChatListScreen(
 
     // 전역 메시지 들어오면 채팅 리스트 새로고침
     LaunchedEffect(Unit) {
-        mainViewModel.chatListRefreshFlow.collect {
-            viewModel.loadChatRooms()
+        mainViewModel.chatListUpdateFlow.collect {summary ->
+            viewModel.updateChatListItem(summary)
         }
     }
     DisposableEffect(Unit) {

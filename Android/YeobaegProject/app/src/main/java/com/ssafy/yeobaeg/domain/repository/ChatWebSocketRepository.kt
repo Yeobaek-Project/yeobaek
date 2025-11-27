@@ -2,6 +2,7 @@ package com.ssafy.yeobaeg.domain.repository
 
 import com.ssafy.yeobaeg.data.model.ws.resquest.SendMessageRequest
 import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
+import com.ssafy.yeobaeg.domain.model.ws.Event
 import com.ssafy.yeobaeg.domain.model.ws.SendMessage
 import kotlinx.coroutines.flow.Flow
 
@@ -12,5 +13,5 @@ interface ChatWebSocketRepository {
     fun disconnectWebSocket()
     fun unsubscribeFromRoom(chatRoomId:Long)
     fun receiveChatMessages(): Flow<ChatMessage>
-    fun receiveGlobalEvents(): Flow<String>
+    fun receiveGlobalEvents(): Flow<Event>
 }

@@ -6,11 +6,13 @@ import com.ssafy.yeobaeg.data.model.chat.response.ChatMessageResponse
 import com.ssafy.yeobaeg.data.model.chat.response.toDomain
 import com.ssafy.yeobaeg.data.model.ws.resquest.SendMessageRequest
 import com.ssafy.yeobaeg.domain.model.chat.ChatMessage
+import com.ssafy.yeobaeg.domain.model.ws.Event
 import com.ssafy.yeobaeg.domain.model.ws.SendMessage
 import com.ssafy.yeobaeg.domain.repository.ChatWebSocketRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,7 +53,9 @@ class ChatWebSocketRepositoryImpl @Inject constructor(
                 Json.decodeFromString(ChatMessageResponse.serializer(), json).toDomain()
             }
 
-    override fun receiveGlobalEvents(): Flow<String> =
-        chatWebSocketService.globalEventFlow
+    override fun receiveGlobalEvents(): Flow<Event> =
+        chatWebSocketService.globalEventFlow.map { json ->
+            Json.decodeFromString(Event.serializer(), json)
+        }
 
 }

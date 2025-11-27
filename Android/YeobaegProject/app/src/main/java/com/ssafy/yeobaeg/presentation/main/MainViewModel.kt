@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.yeobaeg.domain.model.AuthEvent
 import com.ssafy.yeobaeg.domain.model.UserRole
+import com.ssafy.yeobaeg.domain.model.ws.ChatListUpdateSummary
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import com.ssafy.yeobaeg.domain.repository.ChatWebSocketRepository
 import com.ssafy.yeobaeg.domain.session.AuthSessionManager
@@ -32,8 +33,9 @@ internal class MainViewModel @Inject constructor(
 
     val userRole: StateFlow<UserRole?> = authSessionManager.currentUserRole
 
-    private val _chatListRefreshFlow = MutableSharedFlow<Unit>()
-    val chatListRefreshFlow = _chatListRefreshFlow
+    private val _chatListUpdateFlow = MutableSharedFlow<ChatListUpdateSummary>()
+    val chatListUpdateFlow = _chatListUpdateFlow
+
 
     private val _snackbarMessage = MutableStateFlow<SnackbarMessage?>(null)
     val snackbarMessage: StateFlow<SnackbarMessage?> = _snackbarMessage.asStateFlow()
@@ -79,17 +81,21 @@ internal class MainViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            chatWebSocketRepository.receiveGlobalEvents().collect { msg ->
-                Log.d("MainViewModel", "🔔 Global event received: $msg")
-                // 채팅 목록 화면에 있을 때만 새로고침
-                if (_isOnChatListScreen.value) {
-                    Log.d("MainViewModel", "♻️ Refreshing chat list")
-                    _chatListRefreshFlow.emit(Unit)
-                } else {
-                    Log.d("MainViewModel", "⏭️ Skipping refresh - not on chat list screen")
+            chatWebSocketRepository.receiveGlobalEvents().collect { event ->
+                Log.d("MainViewModel", "🔔 EventDto received: $event")
+
+                if (event.eventType == "NEW_MESSAGE_RECEIVED") {
+                    event.chatListUpdateSummary?.let { summary ->
+                        Log.d("MainViewModel", "📌 Emitting chatRoomUpdateSummary: $summary")
+                        _chatListUpdateFlow.emit(summary)
+                    }
                 }
+
+                // 다른 eventType 있으면 여기서 추가 처리 가능
+                // if (event.eventType == "CHAT_ROOM_CREATED") { ... }
             }
         }
+
     }
 
     fun setOnChatListScreen(isOnScreen: Boolean) {

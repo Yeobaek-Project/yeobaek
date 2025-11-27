@@ -12,6 +12,7 @@ import com.ssafy.yeobaeg.domain.model.chat.ChatRoomMessages
 import com.ssafy.yeobaeg.domain.model.chat.MessageType
 import com.ssafy.yeobaeg.domain.model.chat.WriteReview
 import com.ssafy.yeobaeg.domain.model.exhibition.ExhibitionInfo
+import com.ssafy.yeobaeg.domain.model.ws.ChatListUpdateSummary
 import com.ssafy.yeobaeg.domain.model.ws.SendMessage
 import com.ssafy.yeobaeg.domain.repository.ChatRepository
 import com.ssafy.yeobaeg.domain.repository.ChatWebSocketRepository
@@ -189,6 +190,23 @@ class ChatViewModel @Inject constructor(
                 }
             }
     }
+    fun updateChatListItem(summary: ChatListUpdateSummary) {
+        _uiState.update { state ->
+            val updated = state.chatRooms.map { room ->
+                if (room.chatRoomId == summary.chatRoomId) {
+                    room.copy(
+                        lastMessage = summary.lastMessage,
+                        lastMessageType = summary.lastMessageType,
+                        lastMessageAt = summary.lastMessageAt,
+                        unreadCount = summary.unreadCount.toInt()
+                    )
+                } else room
+            }
+
+            state.copy(chatRooms = updated)
+        }
+    }
+
 
     /** 채팅방 메시지 불러오기 */
     fun loadChatMessages(chatRoomId: Long) = viewModelScope.launch {
