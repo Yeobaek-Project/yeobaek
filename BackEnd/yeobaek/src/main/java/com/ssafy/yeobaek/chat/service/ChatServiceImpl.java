@@ -287,8 +287,12 @@ public class ChatServiceImpl implements ChatService {
         webSocketMessageService.sendChatMessage(request.getChatRoomId(), chatMessage);
 
         // 9. 상대방에게 새 메시지 도착 이벤트 전송
+        Long unreadCountForRecipient = messageRepository.countByChatRoomAndUserNotAndIsReadFalse(chatRoom, recipient);
+        ChatRoomUpdateSummary chatRoomUpdateSummary = chatMapper.toChatRoomUpdateSummary(chatRoom, message, unreadCountForRecipient);
+
         EventDto eventDto = EventDto.builder()
                 .eventType(EventType.NEW_MESSAGE_RECEIVED)
+                .chatRoomUpdateSummary(chatRoomUpdateSummary)
                 .build();
         webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
         log.info("채팅 메시지 전송 완료 - 채팅방 ID: {}", request.getChatRoomId());
@@ -450,10 +454,6 @@ public class ChatServiceImpl implements ChatService {
         webSocketMessageService.sendChatMessage(chatRoomId, chatMessage);
 
         // 5. 상대방 또는 모든 멤버에게 시스템 이벤트 알림 전송
-        EventDto eventDto = EventDto.builder()
-                .eventType(EventType.NEW_MESSAGE_RECEIVED)
-                .build();
-
         if (sender != null) {
             // 발신자가 있는 경우, 상대방에게만 알림
             User recipient = chatRoom.getMembers().stream()
@@ -464,11 +464,26 @@ public class ChatServiceImpl implements ChatService {
                         log.error("시스템 메시지 알림 전송 실패 - 채팅방에 상대방이 없습니다. 채팅방 ID: {}", chatRoomId);
                         return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
                     });
+            Long unreadCountForRecipient = messageRepository.countByChatRoomAndUserNotAndIsReadFalse(chatRoom, recipient);
+            ChatRoomUpdateSummary chatRoomUpdateSummary = chatMapper.toChatRoomUpdateSummary(chatRoom, message, unreadCountForRecipient);
+
+            EventDto eventDto = EventDto.builder()
+                    .eventType(EventType.NEW_MESSAGE_RECEIVED)
+                    .chatRoomUpdateSummary(chatRoomUpdateSummary)
+                    .build();
             webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
         } else {
             // 발신자가 없는 시스템 메시지의 경우, 모든 멤버에게 알림
             chatRoom.getMembers().forEach(member -> {
-                webSocketMessageService.sendEventToUser(member.getUser().getId(), eventDto);
+                User recipient = member.getUser();
+                Long unreadCountForRecipient = messageRepository.countByChatRoomAndUserNotAndIsReadFalse(chatRoom, recipient);
+                ChatRoomUpdateSummary chatRoomUpdateSummary = chatMapper.toChatRoomUpdateSummary(chatRoom, message, unreadCountForRecipient);
+
+                EventDto eventDto = EventDto.builder()
+                        .eventType(EventType.NEW_MESSAGE_RECEIVED)
+                        .chatRoomUpdateSummary(chatRoomUpdateSummary)
+                        .build();
+                webSocketMessageService.sendEventToUser(recipient.getId(), eventDto);
             });
         }
         log.info("시스템 메시지 전송 완료 - 채팅방 ID: {}", chatRoomId);
