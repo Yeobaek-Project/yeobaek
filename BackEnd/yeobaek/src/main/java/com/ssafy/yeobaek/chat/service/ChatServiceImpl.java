@@ -288,14 +288,7 @@ public class ChatServiceImpl implements ChatService {
 
         // 9. 상대방에게 새 메시지 도착 이벤트 전송
         Long unreadCountForRecipient = messageRepository.countByChatRoomAndUserNotAndIsReadFalse(chatRoom, recipient);
-
-        ChatRoomUpdateSummary chatRoomUpdateSummary = ChatRoomUpdateSummary.builder()
-                .chatRoomId(chatRoom.getId())
-                .unreadCount(unreadCountForRecipient)
-                .lastMessage(message.getContent())
-                .lastMessageType(message.getMessageType())
-                .lastMessageAt(message.getCreatedAt())
-                .build();
+        ChatRoomUpdateSummary chatRoomUpdateSummary = chatMapper.toChatRoomUpdateSummary(chatRoom, message, unreadCountForRecipient);
 
         EventDto eventDto = EventDto.builder()
                 .eventType(EventType.NEW_MESSAGE_RECEIVED)
@@ -472,14 +465,7 @@ public class ChatServiceImpl implements ChatService {
                         return new CustomException(ResponseCode.PROFILE_USER_NOT_FOUND);
                     });
             Long unreadCountForRecipient = messageRepository.countByChatRoomAndUserNotAndIsReadFalse(chatRoom, recipient);
-
-            ChatRoomUpdateSummary chatRoomUpdateSummary = ChatRoomUpdateSummary.builder()
-                    .chatRoomId(chatRoom.getId())
-                    .unreadCount(unreadCountForRecipient)
-                    .lastMessage(message.getContent())
-                    .lastMessageType(message.getMessageType())
-                    .lastMessageAt(message.getCreatedAt())
-                    .build();
+            ChatRoomUpdateSummary chatRoomUpdateSummary = chatMapper.toChatRoomUpdateSummary(chatRoom, message, unreadCountForRecipient);
 
             EventDto eventDto = EventDto.builder()
                     .eventType(EventType.NEW_MESSAGE_RECEIVED)
@@ -491,14 +477,7 @@ public class ChatServiceImpl implements ChatService {
             chatRoom.getMembers().forEach(member -> {
                 User recipient = member.getUser();
                 Long unreadCountForRecipient = messageRepository.countByChatRoomAndUserNotAndIsReadFalse(chatRoom, recipient);
-
-                ChatRoomUpdateSummary chatRoomUpdateSummary = ChatRoomUpdateSummary.builder()
-                        .chatRoomId(chatRoom.getId())
-                        .unreadCount(unreadCountForRecipient)
-                        .lastMessage(message.getContent())
-                        .lastMessageType(message.getMessageType())
-                        .lastMessageAt(message.getCreatedAt())
-                        .build();
+                ChatRoomUpdateSummary chatRoomUpdateSummary = chatMapper.toChatRoomUpdateSummary(chatRoom, message, unreadCountForRecipient);
 
                 EventDto eventDto = EventDto.builder()
                         .eventType(EventType.NEW_MESSAGE_RECEIVED)
