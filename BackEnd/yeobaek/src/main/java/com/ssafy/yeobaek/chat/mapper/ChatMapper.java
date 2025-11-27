@@ -1,11 +1,7 @@
 package com.ssafy.yeobaek.chat.mapper;
 
 import com.ssafy.yeobaek.chat.dto.request.ChatMessageRequest;
-import com.ssafy.yeobaek.chat.dto.response.ChatMessage;
-import com.ssafy.yeobaek.chat.dto.response.ChatRoomData;
-import com.ssafy.yeobaek.chat.dto.response.ChatRoomInfo;
-import com.ssafy.yeobaek.chat.dto.response.ChatRoomSummary;
-import com.ssafy.yeobaek.chat.dto.response.ExhibitionInfo;
+import com.ssafy.yeobaek.chat.dto.response.*;
 import com.ssafy.yeobaek.chat.entity.ChatRoom;
 import com.ssafy.yeobaek.chat.entity.Message;
 import com.ssafy.yeobaek.common.enums.MessageType;
@@ -67,6 +63,23 @@ public class ChatMapper {
                 .lastMessage(lastMessageOpt.map(Message::getContent).orElse(null))
                 .lastMessageAt(lastMessageOpt.map(Message::getCreatedAt).orElse(null))
                 .lastMessageType(lastMessageOpt.map(Message::getMessageType).orElse(null))
+                .build();
+    }
+
+    /**
+     * 새 메시지 도착 시 클라이언트에 전송될 채팅방 업데이트 요약 DTO로 변환
+     * @param chatRoom 채팅방 엔티티
+     * @param message 마지막 메시지 엔티티
+     * @param unreadCount 읽지 않은 메시지 수
+     * @return ChatRoomUpdateSummary DTO
+     */
+    public ChatRoomUpdateSummary toChatRoomUpdateSummary(ChatRoom chatRoom, Message message, Long unreadCount) {
+        return ChatRoomUpdateSummary.builder()
+                .chatRoomId(chatRoom.getId())
+                .unreadCount(unreadCount)
+                .lastMessage(message.getContent())
+                .lastMessageType(message.getMessageType())
+                .lastMessageAt(message.getCreatedAt())
                 .build();
     }
 
